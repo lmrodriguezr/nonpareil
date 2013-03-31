@@ -1,4 +1,9 @@
-nonpareil
+Nonpareil
 =========
 
-Create nonpareil curves for (meta)genomic datasets using short reads
+Estimate average coverage and create Nonpareil curves for metagenomic datasets.
+
+[Stand-alone](http://lmrodriguezr.github.com/nonpareil/) or [Online querying](http://enve-omics.gatech.edu/nonpareil/).
+
+
+
