@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
    if(argc<=1) help("");
 
    // Vars
-   char		*file, *format=(char *)"fasta", *outfile=(char *)"-", *namFile[LARGEST_PATH], *seqFile[LARGEST_PATH];
+   char		*file, *format=(char *)"fasta", *outfile=(char *)"-", *namFile, *seqFile;
    double	heur=1.0;
    int		rseed=time(NULL), largest_seq;
    unsigned int	k=1, labels_no, N;
@@ -245,13 +245,13 @@ int main(int argc, char *argv[]) {
    if(V) cerr << "Counting sequences" << endl;
    N = build_index(file, format, namFile, seqFile, largest_seq);
    if(largest_seq<1) error("Your sequences are empty or an internal error occurred.  Largest sequence is ", largest_seq);
-   if(V>=2) cerr << "The file " << *seqFile << " was just created with sequence-only data" << endl;
+   if(V>=2) cerr << "The file " << seqFile << " was just created with sequence-only data" << endl;
    if(V>=4) cerr << "Longest sequence is: " << largest_seq << endl;
-   if(N==0) error("The file you provided do not contain sequences.  Before re-run please delete the file", *seqFile);
+   if(N==0) error("The file you provided do not contain sequences.  Before re-run please delete the file", seqFile);
    if(V) cerr << "Reading file with " << N << " sequences" << endl;
 
    // Run counts
-   labels_no = count_polynucleotides(counts, *seqFile, k, heur);
+   labels_no = count_polynucleotides(counts, seqFile, k, heur);
    report(counts, labels_no, outfile, extended);
 
    return 0;
