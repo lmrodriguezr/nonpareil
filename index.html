@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Nonpareil by lmrodriguezr</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Nonpareil</h1>
+        <p>Estimate average coverage and create Nonpareil curves for metagenomic datasets</p>
+
+        <p class="view"><a href="https://github.com/lmrodriguezr/nonpareil">View the Project on GitHub <small>lmrodriguezr/nonpareil</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/lmrodriguezr/nonpareil/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/lmrodriguezr/nonpareil/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/lmrodriguezr/nonpareil">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Nonpareil</h1>
+
+<p>Estimate average coverage and create Nonpareil curves for metagenomic datasets.</p>
+
+<h1>System requirements</h1>
+
+<p><strong>Nonpareil binary</strong>:  Nonpareil requires a C++ compiler.  It has been tested on 64-bit machines with GCC versions ≥ 4.2.1, running Mac OSX or Read Hat Linux.</p>
+
+<p><strong>Nonpareil utilities</strong>:  Requires <a href="http://www.r-project.org/">R</a>.  No additional libraries are necessary.</p>
+
+<h1>Installation</h1>
+
+<p>Download TAR Ball and unpack it using:</p>
+
+<pre><code>tar zxvf nonpareil.tar.gz
+</code></pre>
+
+<p>Change directory into the newly created folder, and compile Nonpareil using:</p>
+
+<pre><code>make nonpareil
+</code></pre>
+
+<p>If you want to make Nonpareil available system-wide, just copy the generated binary into a folder listed in <code>$PATH</code>.  For example:</p>
+
+<pre><code>sudo cp nonpareil /usr/local/bin/
+</code></pre>
+
+<h1>Usage</h1>
+
+<p>Type <code>nonpareil</code> with no arguments to see all the available parameters.  To run it with default parameters, simply type:</p>
+
+<pre><code>nonpareil -s reads.fa -b output
+</code></pre>
+
+<p>Where <em>reads.fa</em> is a FastA file containing the WGS reads and <em>output</em> is the prefix of the files to be generated.</p>
+
+<p>The output files are all in raw text, and can be processed in <a href="http://www.r-project.org/">R</a> to generate Nonpareil curves and estimates.  The Nonpareil.R file contains the <code>Nonpareil.curves</code> function.  Refer to the embedded documentation for more details.  Nonpareil curves with default parameters can be generated in R with:</p>
+
+<pre><code>source('Nonpareil.R');
+Nonpareil.curves('*output.npo*', 50);
+</code></pre>
+
+<p>Adjust 'Nonpareil.R' to point to the actual location of the file.  50 indicates the read overlap used in <code>nonpareil</code> (-L parameter).  If you used a different value, change it accordingly.</p>
+
+<h1>License</h1>
+
+<p><a href="http://www.perlfoundation.org/artistic_license_2_0">Artistic license 2.0</a>.</p>
+
+<h1>Authors</h1>
+
+<p>Luis M. Rodriguez-R and Konstantinos Konstantinidis, at the <a href="http://enve-omics.gatech.edu/">Kostas lab</a>.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/lmrodriguezr">lmrodriguezr</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
