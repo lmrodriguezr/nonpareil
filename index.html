@@ -34,7 +34,7 @@
 
 <h1>System requirements</h1>
 
-<p><strong>Nonpareil binary</strong>:  Nonpareil requires a C++ compiler.  It has been tested on 64-bit machines with GCC versions ≥ 4.2.1, running Mac OSX or Read Hat Linux.</p>
+<p><strong>Nonpareil binary</strong>:  Nonpareil requires a C++ compiler.  It has been tested on 64-bit machines with GCC versions ≥ 4.2.1, running Mac OSX and Read Hat Linux.</p>
 
 <p><strong>Nonpareil utilities</strong>:  Requires <a href="http://www.r-project.org/">R</a>.  No additional libraries are necessary.</p>
 
@@ -66,11 +66,11 @@
 
 <p>The output files are all in raw text, and can be processed in <a href="http://www.r-project.org/">R</a> to generate Nonpareil curves and estimates.  The Nonpareil.R file contains the <code>Nonpareil.curves</code> function.  Refer to the embedded documentation for more details.  Nonpareil curves with default parameters can be generated in R with:</p>
 
-<pre><code>source('Nonpareil.R');
+<pre><code>source('utils/Nonpareil.R');
 Nonpareil.curves('*output.npo*', 50);
 </code></pre>
 
-<p>Adjust 'Nonpareil.R' to point to the actual location of the file.  50 indicates the read overlap used in <code>nonpareil</code> (-L parameter).  If you used a different value, change it accordingly.</p>
+<p>Adjust 'utils/Nonpareil.R' to point to the actual location of the file.  50 indicates the read overlap used in <code>nonpareil</code> (-L parameter).  If you used a different value, change it accordingly.</p>
 
 <h1>License</h1>
 
