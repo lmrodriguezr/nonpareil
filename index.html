@@ -67,10 +67,10 @@
 <p>The output files are all in raw text, and can be processed in <a href="http://www.r-project.org/">R</a> to generate Nonpareil curves and estimates.  The Nonpareil.R file contains the <code>Nonpareil.curves</code> function.  Refer to the embedded documentation for more details.  Nonpareil curves with default parameters can be generated in R with:</p>
 
 <pre><code>source('utils/Nonpareil.R');
-Nonpareil.curves('*output.npo*', 50);
+Nonpareil.curves('output.npo', 50);
 </code></pre>
 
-<p>Adjust 'utils/Nonpareil.R' to point to the actual location of the file.  50 indicates the read overlap used in <code>nonpareil</code> (-L parameter).  If you used a different value, change it accordingly.</p>
+<p>Adjust 'utils/Nonpareil.R' and 'output.npo' to point to the actual location of the files.  <em>50</em> indicates the read overlap used in <code>nonpareil</code> (-L parameter).  If you used a different value, change it accordingly.</p>
 
 <h1>License</h1>
 
