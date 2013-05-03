@@ -17,15 +17,15 @@ Nonpareil.antif <- function(y,a,b){ return(exp(qgamma(y,a,b))-1) }
 #Nonpareil.antif <- function(y,a,b){ ly<-log(max(1e-10, y)); return(exp((b*ly/(1-ly))^(1/a))) }
 
 # NONPAREIL CURVES
-Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NULL, ...){
+Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA, ...){
    if(!is.vector(files)) files = as.vector(files);
    new=TRUE;
    for(i in 1:length(files)){
-      o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i], libname=ifelse(is.null(libnames), NULL, libnames[i]), new=new, ...);
+      o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i], libname=ifelse(is.null(libnames), NA, libnames[i]), new=new, ...);
       if(new){
 	 out.m = matrix(NA, ncol=length(o), nrow=length(files));
          colnames(out.m) <- rownames(as.matrix(o));
-	 if(!is.null(libnames)) rownames(out.m) <- libnames;
+	 if(!is.na(libnames)) rownames(out.m) <- libnames;
       }
       out.m[i, ] <- as.numeric(o);
       new = FALSE;
@@ -37,9 +37,9 @@ Nonpareil.curve <- function(file,overlap,
 			factor=1,plotDispersion=NA,
 			xmax=10e12,ymax=1,xmin=1e3,ymin=1e-6,xlab=NULL,ylab=NULL,
 			r=NA,g=NA,b=NA,
-			new=TRUE,plot=TRUE,libname=NULL,modelOnly=FALSE, plotModel=TRUE,
+			new=TRUE,plot=TRUE,libname=NA,modelOnly=FALSE, plotModel=TRUE,
 			curve.lwd=2, curve.alpha=0.4, model.lwd=1, model.alpha=1, log='x',
-			data.consistency=TRUE){
+			data.consistency=TRUE, useValue='mean', star=95){
 	# Create environment
 	Nonpareil.__init_globals(!new);
 	# Examine consistency
@@ -51,20 +51,33 @@ Nonpareil.curve <- function(file,overlap,
 	# Read input
 	out <- list(kappa=0, C=0, Sstar=0, Rstar=0, modelR2=0)
 	a <- read.table(file, sep="\t", h=F);
-	out$kappa <- a[nrow(a),2];
 	for(i in 2:6){
 	   a[, i] <- a[, i]^Nonpareil.coverageFactor(overlap);
 	}
-	a$V1 = exp(max(log(a$V1)) + max(a$V2^0.27)*(log(a$V1) - max(log(a$V1))));
+	if(useValue=='median'){
+	   values = a[, 5]
+	}else if(useValue=='ub'){
+	   values = pmin(1, a[, 2] + a[, 3]*1.9)
+	}else if(useValue=='lb'){
+	   values = pmax(0, a[, 2] - a[, 3]*1.9)
+	}else if(useValue=='q1'){
+	   values = a[, 4]
+	}else if(useValue=='q3'){
+	   values = a[, 6]
+	}else{
+	   values = a[, 2]
+	}
+	out$kappa <- values[nrow(a)];
+	a$V1 = exp(max(log(a$V1)) + max(values^0.27)*(log(a$V1) - max(log(a$V1))));
 	a$V1 = exp(log(a$V1)*0.61 + 10);
-	if(is.null(libname)) {
+	if(is.na(libname)) {
 	   libname <- basename(file);
 	   if(substr(libname, nchar(libname)-3, nchar(libname))==".npo")
 	      libname <- substr(libname, 0, nchar(libname)-4);
 	}
 
 	# Check data
-	out$C <- max(a$V2);
+	out$C <- max(values);
 	if(data.consistency){
 	   if(a[0.2*nrow(a), 5]==0){
 	      warning('Median of the curve is zero at 20% of the reads, check parameters and re-run (e.g., decrease value of -L in nonpareil).');
@@ -106,7 +119,7 @@ Nonpareil.curve <- function(file,overlap,
 			if(is.null(ylab)) ylab <- 'Estimated average coverage';
 
 			plot(1, t='n', xlim=c(xmin, xmax), ylim=c(ymin, ymax), xlab=xlab, ylab=ylab, log=log);
-			abline(h=c(1,0.95), lty=2, col='red');
+			abline(h=c(1,star/100), lty=2, col='red');
 			abline(v=10^seq(0,15,by=3), lty=2, col='gray80')
 		}
 
@@ -120,19 +133,19 @@ Nonpareil.curve <- function(file,overlap,
 		if(!modelOnly){
 			if(!is.na(plotDispersion)){
 				if(plotDispersion == 'sd'){
-				   err.y <- c(a$V2+a$V3, rev(a$V2-a$V3));
+				   err.y <- c(values+a$V3, rev(values-a$V3));
 				}else if(plotDispersion == 'ci95'){
-				   err.y <- c(a$V2+a$V3*1.9, rev(a$V2-a$V3*1.9));
+				   err.y <- c(values+a$V3*1.9, rev(values-a$V3*1.9));
 				}else if(plotDispersion == 'ci90'){
-				   err.y <- c(a$V2+a$V3*1.64, rev(a$V2-a$V3*1.64));
+				   err.y <- c(values+a$V3*1.64, rev(values-a$V3*1.64));
 				}else if(plotDispersion == 'ci50'){
-				   err.y <- c(a$V2+a$V3*.67, rev(a$V2-a$V3*.67));
+				   err.y <- c(values+a$V3*.67, rev(values-a$V3*.67));
 				}else if(plotDispersion == 'iq'){
 				   err.y <- c(a$V4, rev(a$V6));
 				}
 				polygon(c(a$V1, rev(a$V1))*factor, ifelse(err.y<=ymin*0.1, ymin*0.1, err.y), col=rgb(r,g,b,.2), border=NA);
 			}
-			lines(a$V1*factor, a$V2, col=rgb(r,g,b,curve.alpha), lwd=curve.lwd);
+			lines(a$V1*factor, values, col=rgb(r,g,b,curve.alpha), lwd=curve.lwd);
 		}
 		
 		# Save some info
@@ -142,10 +155,10 @@ Nonpareil.curve <- function(file,overlap,
 	}
 	
 	# Model it
-	sel  <- a$V2>0 & a$V2<0.9;
+	sel  <- values>0 & values<0.9;
 	x <- a$V1[sel];
 	if(length(x)>10){
-	   y <- a$V2[sel];
+	   y <- values[sel];
 	   data <- list(x=x, y=y)
 	   model <- nls(y ~ Nonpareil.f(x, a, b), data=data, weights=(a$V3[sel]^-1.1), start=list(a=1, b=0.1), lower=c(a=0, b=0), algorithm='port', 
 			control=nls.control(minFactor=1e-25000, tol=1e-15, maxiter=1024, warnOnly=T));
@@ -163,7 +176,7 @@ Nonpareil.curve <- function(file,overlap,
 	      }
 	      pa <- as.numeric(summary(model)$parameters['a', 1])
 	      pb <- as.numeric(summary(model)$parameters['b', 1])
-	      out$Sstar <- Nonpareil.antif(0.95, pa, pb);
+	      out$Sstar <- Nonpareil.antif(star/100, pa, pb);
 	      out$Rstar <- out$Sstar; #^1.6
 	      out$modelR2 <- cor(y, predict(model, list(x=x)));
 	   }else{
