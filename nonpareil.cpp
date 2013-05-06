@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
    // Re-wire query portion
 restart_vars:
    if(qry_portion!=0) hX = (size_t)total_seqs*qry_portion;
-   qry_portion = (size_t)hX/total_seqs;
+   qry_portion = (double)hX/total_seqs;
 
    // Prepare memory arguments
    if(ram > UINT_MAX/1024) error("The memory to allocate is huge, I cannot manage such a big number.  Reduce -R and try again", ram);
