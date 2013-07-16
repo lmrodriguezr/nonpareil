@@ -25,7 +25,7 @@ Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA,
       if(new){
 	 out.m = matrix(NA, ncol=length(o), nrow=length(files));
          colnames(out.m) <- rownames(as.matrix(o));
-	 if(!is.na(libnames)) rownames(out.m) <- libnames;
+	 if(!is.na(libnames[1])) rownames(out.m) <- libnames;
       }
       out.m[i, ] <- as.numeric(o);
       new = FALSE;

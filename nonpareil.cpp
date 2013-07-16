@@ -14,6 +14,7 @@
 */
 
 #include <math.h>
+#include <getopt.h>
 #include "enveomics/nonpareil_mating.h"
 #include "enveomics/nonpareil_sampling.h"
 #include "enveomics/universal.h"
