@@ -20,7 +20,7 @@ Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA,
    if(!is.vector(files)) files = as.vector(files);
    new=TRUE;
    for(i in 1:length(files)){
-      o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i], libname=ifelse(is.na(libnames), NA, libnames[i]), new=new, ...);
+      o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i], libname=ifelse(is.na(libnames), NA, as.character(libnames[i])), new=new, ...);
       if(new){
 	 out.m = matrix(NA, ncol=length(o), nrow=length(files));
          colnames(out.m) <- rownames(as.matrix(o));
