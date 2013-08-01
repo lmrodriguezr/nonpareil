@@ -16,11 +16,13 @@ Nonpareil.antif <- function(y,a,b){ return(exp(qgamma(y,a,b))-1) }
 #Nonpareil.antif <- function(y,a,b){ ly<-log(max(1e-10, y)); return(exp((b*ly/(1-ly))^(1/a))) }
 
 # NONPAREIL CURVES
-Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA, ...){
+Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA, read.lengths=NA, ...){
    if(!is.vector(files)) files = as.vector(files);
    new=TRUE;
    for(i in 1:length(files)){
-      o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i], libname=ifelse(is.na(libnames[1]), NA, as.character(libnames[i])), new=new, ...);
+      o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i],
+      		libname=ifelse(is.na(libnames[1]), NA, as.character(libnames[i])), new=new,
+		read.length=ifelse(is.na(read.lengths[1]), 101, read.lengths[i]), ...);
       if(new){
 	 out.m = matrix(NA, ncol=length(o), nrow=length(files));
          colnames(out.m) <- rownames(as.matrix(o));
@@ -38,7 +40,8 @@ Nonpareil.curve <- function(file,overlap,
 			r=NA,g=NA,b=NA,
 			new=TRUE,plot=TRUE,libname=NA,modelOnly=FALSE, plotModel=TRUE,
 			curve.lwd=2, curve.alpha=0.4, model.lwd=1, model.alpha=1, log='x',
-			data.consistency=TRUE, useValue='mean', star=95){
+			data.consistency=TRUE, useValue='mean', star=95,
+			read.length=101){
 	# Create environment
 	Nonpareil.__init_globals(!new);
 	# Examine consistency
@@ -69,6 +72,7 @@ Nonpareil.curve <- function(file,overlap,
 	out$kappa <- values[nrow(a)];
 	a$V1 = exp(max(log(a$V1)) + max(values^0.27)*(log(a$V1) - max(log(a$V1))));
 	a$V1 = exp(log(a$V1)*0.61 + 10);
+	a$V1 = a$V1 * read.length / 101;
 	if(is.na(libname)) {
 	   libname <- basename(file);
 	   if(substr(libname, nchar(libname)-3, nchar(libname))==".npo")
