@@ -53,6 +53,7 @@ Nonpareil.curve <- function(file,overlap,
 	# Read input
 	out <- list(kappa=0, C=0, Sstar=0, Rstar=0, modelR2=0)
 	a <- read.table(file, sep="\t", h=F);
+	LR <- exp(log(max(a$V1)) + log(read.length));
 	for(i in 2:6){
 	   a[, i] <- a[, i]^Nonpareil.coverageFactor(overlap);
 	}
@@ -73,6 +74,9 @@ Nonpareil.curve <- function(file,overlap,
 	a$V1 = exp(max(log(a$V1)) + max(values^0.27)*(log(a$V1) - max(log(a$V1))));
 	a$V1 = exp(log(a$V1)*0.61 + 10);
 	a$V1 = a$V1 * read.length / 101;
+	horiz.diff = LR / max(a$V1);
+	a$V1 = a$V1 * horiz.diff;
+	horiz.diff = 1;
 	if(is.na(libname)) {
 	   libname <- basename(file);
 	   if(substr(libname, nchar(libname)-3, nchar(libname))==".npo")
@@ -146,9 +150,9 @@ Nonpareil.curve <- function(file,overlap,
 				}else if(plotDispersion == 'iq'){
 				   err.y <- c(a$V4, rev(a$V6));
 				}
-				polygon(c(a$V1, rev(a$V1))*factor, ifelse(err.y<=ymin*0.1, ymin*0.1, err.y), col=rgb(r,g,b,.2), border=NA);
+				polygon(horiz.diff*c(a$V1, rev(a$V1))*factor, ifelse(err.y<=ymin*0.1, ymin*0.1, err.y), col=rgb(r,g,b,.2), border=NA);
 			}
-			lines(a$V1*factor, values, col=rgb(r,g,b,curve.alpha), lwd=curve.lwd);
+			lines(horiz.diff*a$V1*factor, values, col=rgb(r,g,b,curve.alpha), lwd=curve.lwd);
 		}
 		
 		# Save some info
@@ -172,7 +176,7 @@ Nonpareil.curve <- function(file,overlap,
 	      if(modelOnly) model.lty=1;
 	      if(plot & plotModel){
 		 model.x <- exp(seq(log(xmin), log(xmax), length.out=1e3));
-		 lines(model.x*factor, predict(model, list(x=model.x)),
+		 lines(horiz.diff*model.x*factor, predict(model, list(x=model.x)),
 			   col=rgb(r,g,b,model.alpha), lty=model.lty, lwd=model.lwd);
 		 if(modelOnly) points(max(a$V1), predict(model, list(x=max(a$V1))), col=rgb(r,g,b), pch=21, bg='white');
 		 #if(modelOnly) points(min(a$V1[a$V1>0]), predict(model, list(x=min(a$V1[a$V1>0]))), col=rgb(r,g,b), pch=8, bg='white');
