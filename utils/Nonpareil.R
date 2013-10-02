@@ -22,7 +22,7 @@ Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA,
    for(i in 1:length(files)){
       o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i],
       		libname=ifelse(is.na(libnames[1]), NA, as.character(libnames[i])), new=new,
-		read.length=ifelse(is.na(read.lengths[1]), 101, read.lengths[i]), ...);
+		read.length=ifelse(is.na(read.lengths[1]), NA, read.lengths[i]), ...);
       if(new){
 	 out.m = matrix(NA, ncol=length(o), nrow=length(files));
          colnames(out.m) <- rownames(as.matrix(o));
@@ -34,29 +34,42 @@ Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA,
    return(out.m);
 }
 
-Nonpareil.curve <- function(file,overlap,
+Nonpareil.curve <- function(file,overlap=NULL,
 			factor=1,plotDispersion=NA,
 			xmax=10e12,ymax=1,xmin=1e3,ymin=1e-6,xlab=NULL,ylab=NULL,
 			r=NA,g=NA,b=NA,
 			new=TRUE,plot=TRUE,libname=NA,modelOnly=FALSE, plotModel=TRUE,
 			curve.lwd=2, curve.alpha=0.4, model.lwd=1, model.alpha=1, log='x',
 			data.consistency=TRUE, useValue='mean', star=95,
-			read.length=101){
+			read.length=NA){
+	
 	# Create environment
 	Nonpareil.__init_globals(!new);
+	
 	# Examine consistency
 	if(is.null(file)) stop('The file argument is mandatory');
-	if(is.null(overlap)) stop('The overlap argument is mandatory');
 	if(!new && (is.null(Nonpareil.LastFactor) || is.null(Nonpareil.LastXmax)))
 		stop('No previous plot found, please use new=TRUE if this is the first plot.');
 	
+	# Read metadata (.npo header)
+	meta_data <- gsub('^# @', '', grep("^# @", readLines(file), value=TRUE));
+	keys <- gsub(': .*', '', meta_data);
+	vals <- gsub('.*: ', '', meta_data);
+	if(is.null(overlap) & 'overlap' %in% keys) overlap = as.numeric(vals[keys=='overlap']);
+	if(is.null(overlap)) stop('The overlap argument is mandatory for Nonpareil versions before 2.0.');
+	if(is.na(read.length) & 'L' %in% keys) read.length = as.numeric(vals[keys=='L']);
+	if(is.na(read.length)) read.length=101;
+	num_reads = NULL;
+	if('R' %in% keys) num_reads = as.numeric(vals[keys=='R']);
+	
 	# Read input
-	out <- list(kappa=0, C=0, Sstar=0, Rstar=0, modelR2=0)
+	out <- list(kappa=0, C=0, LRstar=0, LR=0, modelR=0)
 	a <- read.table(file, sep="\t", h=F);
-	LR <- exp(log(max(a$V1)) + log(read.length));
-	for(i in 2:6){
-	   a[, i] <- a[, i]^Nonpareil.coverageFactor(overlap);
-	}
+	out$kappa <- a$V2[nrow(a)];
+	if(is.null(num_reads)) num_reads = max(a$V1);
+	LR <- exp(log(num_reads) + log(read.length));
+	out$LR <- LR;
+	for(i in 2:6) a[, i] <- a[, i]^Nonpareil.coverageFactor(overlap);
 	if(useValue=='median'){
 	   values = a[, 5]
 	}else if(useValue=='ub'){
@@ -70,12 +83,11 @@ Nonpareil.curve <- function(file,overlap,
 	}else{
 	   values = a[, 2]
 	}
-	out$kappa <- values[nrow(a)];
 	a$V1 = exp(max(log(a$V1)) + max(values^0.27)*(log(a$V1) - max(log(a$V1))));
 	a$V1 = exp(log(a$V1)*0.61 + 10);
 	a$V1 = a$V1 * read.length / 101;
 	horiz.diff = LR / max(a$V1);
-	a$V1 = a$V1 * horiz.diff;
+	a$V1 = a$V1 * horiz.diff;##
 	horiz.diff = 1;
 	if(is.na(libname)) {
 	   libname <- basename(file);
@@ -183,9 +195,8 @@ Nonpareil.curve <- function(file,overlap,
 	      }
 	      pa <- as.numeric(summary(model)$parameters['a', 1])
 	      pb <- as.numeric(summary(model)$parameters['b', 1])
-	      out$Sstar <- Nonpareil.antif(star/100, pa, pb);
-	      out$Rstar <- out$Sstar; #^1.6
-	      out$modelR2 <- cor(y, predict(model, list(x=x)));
+	      out$LRstar <- Nonpareil.antif(star/100, pa, pb);
+	      out$modelR <- cor(y, predict(model, list(x=x)));
 	   }else{
 	      warning('Model didn\'t converge.');
 	   }

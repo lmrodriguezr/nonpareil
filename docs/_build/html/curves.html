@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Nonpareil curves &mdash; Nonpareil 1.6.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Nonpareil 1.6.2 documentation" href="index.html" />
+    <link rel="prev" title="Redundancy" href="redundancy.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="redundancy.html" title="Redundancy"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Nonpareil 1.6.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="nonpareil-curves">
+<h1>Nonpareil curves<a class="headerlink" href="#nonpareil-curves" title="Permalink to this headline">¶</a></h1>
+<p>The estimation of the <a class="reference internal" href="redundancy.html"><em>Redundancy</em></a> is at the core of Nonpareil, but it&#8217;s when those values are transformed
+into average coverage that they become comporable across samples, and become useful for project design and sample
+evaluation.</p>
+<p>To build Nonpareil curves, you need two things. First, the Nonpareil.R file (you can find it in the <tt class="docutils literal"><span class="pre">utils</span></tt> folder
+of Nonpareil). Second, the <tt class="docutils literal"><span class="pre">.npo</span></tt> file (or <tt class="docutils literal"><span class="pre">-o</span></tt> value, if you used this option) generated in the estimation of
+<a class="reference internal" href="redundancy.html"><em>Redundancy</em></a>.</p>
+<div class="section" id="for-the-impatient">
+<h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Permalink to this headline">¶</a></h2>
+<p>You can simply open <a class="reference external" href="http://www.r-project.org/">R</a> and execute:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">source</span><span class="p">(</span><span class="s">&#39;utils/Nonpareil.R&#39;</span><span class="p">);</span>
+<span class="n">Nonpareil</span><span class="o">.</span><span class="n">curve</span><span class="p">(</span><span class="s">&#39;output.npo&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Changing <tt class="docutils literal"><span class="pre">utils/Nonpareil.R</span></tt> and <tt class="docutils literal"><span class="pre">output.npo</span></tt> to point to the actual location of the files.</p>
+</div>
+<div class="section" id="nonpareil-curve">
+<h2>Nonpareil.curve()<a class="headerlink" href="#nonpareil-curve" title="Permalink to this headline">¶</a></h2>
+<p>This function can generate a Nonpareil curve from a <tt class="docutils literal"><span class="pre">.npo</span></tt> file. The parameters that this function accepts are:</p>
+<dl class="docutils">
+<dt>file</dt>
+<dd>Path to the <tt class="docutils literal"><span class="pre">.npo</span></tt> file, containing the read redundancy.</dd>
+<dt>overlap=NULL</dt>
+<dd>Value of the <tt class="docutils literal"><span class="pre">-L</span></tt> parameter (in Nonpareil, the default is <tt class="docutils literal"><span class="pre">50</span></tt>). If not set, it tries to find the value in the
+<tt class="docutils literal"><span class="pre">.npo</span></tt> file (supported in Nonpareil ≥2.0), or fails with an error message.</dd>
+<dt>factor=1</dt>
+<dd>Factor by which the number of reads must be multiplied (x-axis). For example, a factor of 1e-3 will produce curves
+in Kbp (instead of bp). This option should be used when if an &#8220;integer overload&#8221; is produced, at risk of reducing
+the accuracy of the curves.</dd>
+<dt>plotDispersion=NA</dt>
+<dd>Indicates if and how the dispersion of replicates is to be represented. If it&#8217;s <tt class="docutils literal"><span class="pre">NA</span></tt> no dispersion is plotted.
+Otherwise, it can take the values <tt class="docutils literal"><span class="pre">'sd'</span></tt>: 1 standard deviation around the mean; <tt class="docutils literal"><span class="pre">'ci95'</span></tt>: 95% confidence
+interval; <tt class="docutils literal"><span class="pre">'ci90'</span></tt>: 90% confidence interval; <tt class="docutils literal"><span class="pre">'ci50'</span></tt>: 50% confidence interval; <tt class="docutils literal"><span class="pre">'iq'</span></tt>: Inter-quartile
+range.</dd>
+<dt>xmin=1e3, xmax=10e12</dt>
+<dd>Range to plot in the x-axis (Sequencing effort).</dd>
+<dt>ymax=1, ymin=1e-6</dt>
+<dd>Range to plot in the y-axis (Average coverage).</dd>
+<dt>xlab=NULL,ylab=NULL</dt>
+<dd>Labels of the axes. If <tt class="docutils literal"><span class="pre">NULL</span></tt>, the default values are set Sequencing effort (<em>units</em>) for the x-axis, and
+Estimated average coverage for the y-axis.</dd>
+<dt>r=NA,g=NA,b=NA,</dt>
+<dd>Values for the red, green, and blue components of the rgb representation of the curve&#8217;s color. If <tt class="docutils literal"><span class="pre">NA</span></tt>, random
+values are set. If the numbers are in the range [0,1], they are assumed to be fractions of 1 (as interpreted by
+rgb). Otherwise, they are assumed to be fractions of 256 (as represented in most color palettes).</dd>
+<dt>new=TRUE</dt>
+<dd>Indicates if a new canvas must be created. If <tt class="docutils literal"><span class="pre">FALSE</span></tt>, it requires that Nonpareil.curve() was previously called
+(so a proper canvas exists already). This is useful to create a single plot with several samples (see also
+<a class="reference internal" href="#nonpareil-legend">Nonpareil.legend()</a>).</dd>
+<dt>plot=TRUE</dt>
+<dd>Indicates if the curve is to be plotted. If <tt class="docutils literal"><span class="pre">FALSE</span></tt>, no plots are generated, but the estimations are.</dd>
+<dt>libname=NA</dt>
+<dd>Name of the library (to be used in later calls of <a class="reference internal" href="#nonpareil-legend">Nonpareil.legend()</a>). If <tt class="docutils literal"><span class="pre">NA</span></tt> the base of the filename
+(withouth .npo) is used.</dd>
+<dt>modelOnly=FALSE</dt>
+<dd>If <tt class="docutils literal"><span class="pre">TRUE</span></tt>, prints only the fitted model. It also causes variables related to dispersion and curve to be
+ignored, and it produces an empty circle denoting the actual size of the dataset and the estimated average
+coverage.</dd>
+<dt>plotModel=TRUE</dt>
+<dd>Indicates whether the fitted model is to be included in the plot. If <tt class="docutils literal"><span class="pre">FALSE</span></tt>, it still fits the model to
+find the estimate of sequencing effort, but the curve of the model is not included in the plot.</dd>
+<dt>curve.lwd=2</dt>
+<dd>Line width of the curve (the observed curve, not the fitted model).</dd>
+<dt>curve.alpha=0.4</dt>
+<dd>Transparency of the curve.</dd>
+<dt>model.lwd=1</dt>
+<dd>Line width of the fitted model line.</dd>
+<dt>model.alpha=1</dt>
+<dd>Transparency of the fitted model line.</dd>
+<dt>log=&#8217;x&#8217;</dt>
+<dd>Use logarithmic scale in the X or Y-axis (or both).</dd>
+<dt>data.consistency=TRUE</dt>
+<dd>Check consistency of the input data before plotting and fitting the model.</dd>
+<dt>useValue=&#8217;mean&#8217;</dt>
+<dd>Value of the distribution of replicates to be used as the curve. The fitted model and the estimated coverage
+is only meaningful when <tt class="docutils literal"><span class="pre">useValue='mean'</span></tt>, but all of the following values are supported to allow visual
+inspection of the distribution of replicates: The mean (<tt class="docutils literal"><span class="pre">'mean'</span></tt>) or the median (<tt class="docutils literal"><span class="pre">'median'</span></tt>) of the
+distribution (<tt class="docutils literal"><span class="pre">'median'</span></tt>); the upper (<tt class="docutils literal"><span class="pre">'ub'</span></tt>) or the lower (<tt class="docutils literal"><span class="pre">'lb'</span></tt>) bound of the 95% confidence interval
+(assuming normality); or the first (<tt class="docutils literal"><span class="pre">'q1'</span></tt>) or the third (<tt class="docutils literal"><span class="pre">'q3'</span></tt>) quartile of the ditribution.</dd>
+<dt>star=95</dt>
+<dd>Value of average coverage (in percentage) to be used as <em>almost complete covereage</em>. Usually this value should
+be set to 95 or 99, but other estimations can be useful. For example, setting this value to 60 predicts the
+minimum sequencing effort at which an assembly with N50 larger than 200bp can be achieved with (100bp-long)
+Illumina reads.</dd>
+<dt>read.length=101</dt>
+<dd>Length of the reads. This value can be found in the <tt class="docutils literal"><span class="pre">.npl</span></tt> file, but other estimation (<em>e.g.</em>, the average
+length after trimming) can be used.</dd>
+</dl>
+<p><strong>Value</strong>: A list with the following keys:</p>
+<dl class="docutils">
+<dt>kappa</dt>
+<dd>Redundancy of the dataset, as calculated by Nonpareil.</dd>
+<dt>C</dt>
+<dd>Estimated abundance-weighted average coverage.</dd>
+<dt>LRstar</dt>
+<dd>Estimated sequecing effort (in bp) required to reach <tt class="docutils literal"><span class="pre">star</span></tt> average coverage (95%, by default).</dd>
+<dt>LR</dt>
+<dd>Size of the datasets (in bp).</dd>
+<dt>modelR</dt>
+<dd>Pearson&#8217;s correlation coeficient between the calculated values and the fitted model.</dd>
+</dl>
+</div>
+<div class="section" id="nonpareil-legend">
+<h2>Nonpareil.legend()<a class="headerlink" href="#nonpareil-legend" title="Permalink to this headline">¶</a></h2>
+<p>This function creates a legend for the Nonpareil curve(s) in the (active) plot. It&#8217;s compatible with single
+or multiple calls of <a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a> (using <tt class="docutils literal"><span class="pre">new=F</span></tt> in all but the first call) and with
+<a class="reference internal" href="#nonpareil-curve-batch">Nonpareil.curve.batch()</a>. The parameters that this function accepts are:</p>
+<dl class="docutils">
+<dt>x=NULL</dt>
+<dd>Position in the X-axis. If <tt class="docutils literal"><span class="pre">NULL</span></tt>, it&#8217;s located at 75% of the maximum value of X. It can also be set to
+any character string supported by xy.coords.</dd>
+<dt>y=.3</dt>
+<dd>Position in the Y-axis.</dd>
+</dl>
+<dl class="docutils">
+<dt>...</dt>
+<dd>Any other parameter accepted by <tt class="docutils literal"><span class="pre">legend()</span></tt> is supported, except for <tt class="docutils literal"><span class="pre">fill</span></tt> and <tt class="docutils literal"><span class="pre">legend</span></tt>.</dd>
+</dl>
+</div>
+<div class="section" id="nonpareil-curve-batch">
+<h2>Nonpareil.curve.batch()<a class="headerlink" href="#nonpareil-curve-batch" title="Permalink to this headline">¶</a></h2>
+<p>This function can generate a plot with several Nonpareil curves from <tt class="docutils literal"><span class="pre">.npo</span></tt> files. The parameters that this
+function accepts are:</p>
+<dl class="docutils">
+<dt>files</dt>
+<dd>Vector of characters with the paths to the <tt class="docutils literal"><span class="pre">.npo</span></tt> files.</dd>
+<dt>overlap=NULL</dt>
+<dd>Value of the <tt class="docutils literal"><span class="pre">-L</span></tt> parameter (in Nonpareil, the default is <tt class="docutils literal"><span class="pre">50</span></tt>). It can be a number (if all the curves were
+generated with the same value) or a vector (in the same order of <tt class="docutils literal"><span class="pre">files</span></tt>). See the <tt class="docutils literal"><span class="pre">overlap</span></tt> value of
+<a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a>.</dd>
+<dt>r=NA,g=NA,b=NA</dt>
+<dd>Values of the corresponding <tt class="docutils literal"><span class="pre">r</span></tt>, <tt class="docutils literal"><span class="pre">g</span></tt>, and <tt class="docutils literal"><span class="pre">b</span></tt> in <a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a>. It can be <tt class="docutils literal"><span class="pre">NA</span></tt> (to set random
+colors) or vectors of numbers in the same order of <tt class="docutils literal"><span class="pre">files</span></tt>.</dd>
+<dt>libnames=NA</dt>
+<dd>Vector of names of the libraries (corresponding to <tt class="docutils literal"><span class="pre">libname</span></tt> in <a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a>). It must be characters,
+not factors.</dd>
+<dt>read.lengths=NA</dt>
+<dd>A vector of numbers indicating the length of the reads (corresponding to <tt class="docutils literal"><span class="pre">read.length</span></tt> in <a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a>).
+If <tt class="docutils literal"><span class="pre">NA</span></tt>, the default is used.</dd>
+</dl>
+<dl class="docutils">
+<dt>...</dt>
+<dd>Any other parameter accepted by <a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a> is supported.</dd>
+</dl>
+<p><strong>Value</strong>: A dataframe containing the values generated by <a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a>.</p>
+<p><strong>Example</strong>: I find it very convenient to first prepare a table with the samples, something like:</p>
+<div class="highlight-python"><pre># samples.txt
+File        Name    R       G       B
+# HMP
+SRS063417.1.L50.npo Posterior fornix        256     200     200
+SRS063287.1.L50.npo Buccal mucosa   256     120     120
+SRS062540.1.L50.npo Tongue dorsum   256     3       3
+SRS016335.1.L50.npo Stool   200     135     76
+SRS015574.1.L50.npo Supragingival plaque    230     100     120
+SRS019087.1.L50.npo Anterior nares  220     220     130</pre>
+</div>
+<p>Note that this table is tab-delimited, because I find it easier to read, but you can use anything you like (and is
+supported by <a class="reference external" href="http://www.r-project.org/">R</a>). Next, you can simply type something like this in the <a class="reference external" href="http://www.r-project.org/">R</a> console:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">source</span><span class="p">(</span><span class="s">&#39;utils/Nonpareil.R&#39;</span><span class="p">);</span>
+<span class="n">samples</span> <span class="o">&lt;-</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s">&#39;samples.txt&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">T</span><span class="p">);</span>
+<span class="n">attach</span><span class="p">(</span><span class="n">samples</span><span class="p">);</span>
+<span class="n">np</span> <span class="o">&lt;-</span> <span class="n">Nonpareil</span><span class="o">.</span><span class="n">curve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">File</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">libnames</span><span class="o">=</span><span class="n">Name</span><span class="p">,</span> <span class="n">modelOnly</span><span class="o">=</span><span class="n">TRUE</span><span class="p">);</span>
+<span class="n">Nonpareil</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="s">&#39;bottomright&#39;</span><span class="p">);</span>
+<span class="n">detach</span><span class="p">(</span><span class="n">samples</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Nonpareil curves</a><ul>
+<li><a class="reference internal" href="#for-the-impatient">For the impatient</a></li>
+<li><a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a></li>
+<li><a class="reference internal" href="#nonpareil-legend">Nonpareil.legend()</a></li>
+<li><a class="reference internal" href="#nonpareil-curve-batch">Nonpareil.curve.batch()</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="redundancy.html"
+                        title="previous chapter">Redundancy</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/curves.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="redundancy.html" title="Redundancy"
+             >previous</a> |</li>
+        <li><a href="index.html">Nonpareil 1.6.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,15 +1,12 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
-// @version 1.6
+// @version 2.0
 // @license artistic license 2.0
 
 /*
   ROADMAP
 
-  o To avoid using pre-existing .enve-seq by default
-  o To allow auto-adjustment of parameters if(!ok)
-  o To report employed parameters
-  o To send errors via say(), so they can be captured in the log file.
+  o To report employed parameters and read length
   
 */
 
@@ -21,6 +18,7 @@
 #include "enveomics/sequence.h"
 
 #define LARGEST_PATH 2048
+#define NP_VERSION 2.0
 
 using namespace std;
 
@@ -30,7 +28,7 @@ void help(const char *msg){
    	<< "   Fast and memory-efficient method to generate Nonpareil curves in large sets of short reads." << endl
 	<< endl
    	<< "USAGE" << endl
-	<< "   nonpareil -s sequences.fa [options]" << endl
+	<< "   nonpareil -s sequences.fa -b output [options]" << endl
 	<< "   nonpareil -h" << endl
 	<< "   nonpareil -V" << endl
 	<< endl
@@ -75,19 +73,10 @@ void help(const char *msg){
 	<< "   [ System resources ]" << endl
 	<< "   -R <int> : Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding" << endl
 	<< "              non-sequence elements like headers or quality).  This is particularly important when running in multiple" << endl
-	<< "              cores (see -t and -T).  This value is approximated.  By default 1024." << endl
+	<< "              cores (see -t).  This value is approximated.  By default 1024." << endl
 	<< "              Maximum value in this version: " << (UINT_MAX/1024) << endl
 	<< "   -t <int> : Number of threads.  Highest efficiency when the number of sub-samples (see -n) is multiple of the number" << endl
 	<< "              of threads.  By default: 2." << endl
-	<< "   -T <int> : Number of threads for I/O-expensive tasks.  The performance depends on the speed of the connection (bus)" << endl
-	<< "              to the hard drive containing the input file (see -s).  We tested speedup on a machine with 16 CPUs and a" << endl
-	<< "              local hard drive, and observed significant increase until four threads, subsequently dropping. Actually," << endl
-	<< "              using more than five threads increased running times (compared to times with four threads). If you use a" << endl
-	<< "              disk mounted remotely (e.g. NFS), avoid using this option.  By default 1." << endl
-	<< "            IMPORTANT NOTE: If all sequences are loaded in RAM (see -R), then I/O impact is minimal (and un-threaded)." << endl
-	<< "              In that case, this value can equal the number of regular threads (see -t) with minor or no impact on the" << endl
-	<< "              performance.   In fact, this value is set to -t (regular threads) by default if it is not explicitly set" << endl
-	<< "              and -R (RAM to be used) is large enough to cover all sequences." << endl
 	<< endl
 	<< "   [ Misc ]" << endl
 	<< "   -A       : Autoadjust parameters and re-run.  Evaluates the results looking for common problems, adjusts parameters" << endl
@@ -112,13 +101,14 @@ void help(const char *msg){
 }
 
 int main(int argc, char *argv[]) {
-   cout << "nonpareil v1.6" << endl;
+   cout << "nonpareil v" << NP_VERSION << endl;
    if(argc<=1) help("");
    
    // Vars
-   char		*file, *format=(char *)"fasta", *alldata, *outfile=(char *)"-", *namFile, *seqFile,
-   		*cntfile, *baseout;
-   double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.97, ovl=0.50, *sample_result;
+   char		*file, *format=(char *)"fasta", *alldata, *cntfile, *outfile=(char *)"-", *namFile,
+   		*seqFile, *baseout;
+   double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.97, ovl=0.50, *sample_result,
+   		avg_seq_len;
    int		v=7, largest_seq, rseed=time(NULL), n=1024, thr=2, ram=1024, *mates, samples_no,
    		sample_i, sample_after_20, sampling_points;
    unsigned int	total_seqs, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
@@ -127,6 +117,7 @@ int main(int argc, char *argv[]) {
    samplepar_t 	samplepar;
 
    alldata = (char *)"";
+   cntfile = (char *)"";
    
    // GetOpt
    int		optchr;
@@ -153,7 +144,7 @@ int main(int argc, char *argv[]) {
          case 's': file = optarg;		break;
 	 case 'S': min_sim=atof(optarg);	break;
 	 case 't': thr = atoi(optarg);		break;
-	 case 'T': ;				break; // For compatibility
+	 case 'T': ;				break; // For backwards compatibility
 	 case 'v': v = atoi(optarg);		break;
 	 case 'V': return 0;
 	 case 'x': qry_portion = atof(optarg);	break;
@@ -186,23 +177,25 @@ int main(int argc, char *argv[]) {
 	 open_log(logfile);
       }
    }
-   if(alldata && (strlen(alldata)>0)) remove(alldata);
-   if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) remove(outfile);
+   if(alldata && (strlen(alldata)>0)) unlink(alldata);
+   if(cntfile && (strlen(cntfile)>0)) unlink(cntfile);
+   if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) unlink(outfile);
    srand(rseed);
    
    // Parse file
    say("1s$", "Counting sequences");
    namFile = (char *)malloc(LARGEST_PATH * (sizeof *namFile));
    seqFile = (char *)malloc(LARGEST_PATH * (sizeof *seqFile));
-   total_seqs = build_index(file, format, namFile, seqFile, largest_seq);
+   total_seqs = build_index(file, format, namFile, seqFile, largest_seq, avg_seq_len);
    if(largest_seq<1) error("Your sequences are empty or an internal error occurred.  Largest sequence is ", largest_seq);
    say("2sss$", "The file ", seqFile, " was just created");
    say("4sis$", "Longest sequence has ", largest_seq, " characters");
+   say("4sfs$", "Average read length is ", avg_seq_len, " bp");
    if(total_seqs==0) error("The file you provided do not contain sequences.  Before re-run please delete the file", seqFile);
    say("1sus$", "Reading file with ", total_seqs, " sequences");
 
-   // Re-wire query portion
 restart_vars:
+   // Re-wire query portion
    if(qry_portion!=0) hX = (size_t)total_seqs*qry_portion;
    qry_portion = (double)hX/total_seqs;
 
@@ -238,13 +231,17 @@ restart_samples:
    sample_t	sample_summary[sampling_points];
    
    sample_i=sample_after_20=0;
+   samplepar.np_version = NP_VERSION;
    samplepar.replicates = n;
    samplepar.mates = &mates;
    samplepar.mates_size = qry_seqs_no;
    samplepar.portion_min = min;
    samplepar.portion_max = max;
    samplepar.portion_itv = itv;
+   samplepar.seq_overlap = ovl;
    samplepar.total_reads = total_seqs;
+   samplepar.max_read_len = largest_seq;
+   samplepar.avg_read_len = avg_seq_len;
    samplepar.portion_as_label = portion_label;
    
    say("1s$", "Sub-sampling library");
@@ -323,6 +320,9 @@ restart_checkings:
    if(ok) say("1s$", "Everything seems correct");
    
 exit:
+   // Clean temporals
+   unlink(namFile);
+   unlink(seqFile);
    close_log();
    return 0;
 }

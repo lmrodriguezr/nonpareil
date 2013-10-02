@@ -25,6 +25,9 @@ void error(const char *msg, const char *val){
    cerr << "Fatal error:" << endl << msg;
    if(val!=NULL && strlen(val)>0) cerr << ": " << endl << val;
    cerr << endl;
+   say("0ss", "Fatal error: ", msg);
+   if(val!=NULL && strlen(val)>0) say("0!ss", ": ", val);
+   say("0!$");
    exit(1);
 }
 

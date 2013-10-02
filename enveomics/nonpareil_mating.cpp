@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <pthread.h>
+#include <sys/types.h>
 
 #include "universal.h"
 #include "sequence.h"
@@ -34,7 +35,7 @@ size_t nonpareil_mate(int *&result,
    // Set subsampling
    //sampleFile = (char *)malloc(LARGEST_PATH * (sizeof *sampleFile));
    sampleFile = new char[LARGEST_PATH];
-   sprintf(sampleFile, "%s.subsample", file);
+   sprintf(sampleFile, "%s.subsample.%d", file, getpid());
    say("3ss$", "Building query set at ", sampleFile);
    qry_seqs = sub_sample_seqs(file, sampleFile, matepar.qryportion, (char *)"enveomics-seq");
    say("4sus$", "Query set built with ", qry_seqs, " sequences");
@@ -83,6 +84,8 @@ size_t nonpareil_mate(int *&result,
       for(int a=0; a<size_blockA; a++) delete [] blockA[a];
       delete[] blockA;
    }
+
+   unlink(sampleFile);
 
    return qry_seqs;
 }

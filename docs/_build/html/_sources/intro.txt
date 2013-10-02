@@ -1,0 +1,14 @@
+.. Introduction to Nonpareil
+
+Nonpareil in short
+==================
+
+
+
+.. Indices and tables
+ ==================
+ 
+ * :ref:`genindex`
+ * :ref:`modindex`
+ * :ref:`search`
+

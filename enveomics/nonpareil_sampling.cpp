@@ -106,7 +106,7 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
    FILE			*alldatah, *summaryh;
    bool			reportAllData=false;
    int			reportSummary=0;
-   char			*text, *label, *sep;
+   char			*text, *label, *sep, *header=(char*)"";
    sample_t		s;
 
    s.portion = samplepar.portion;
@@ -123,6 +123,17 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
       reportSummary=1;
    }else if(strlen(outfile)>0){
       reportSummary=2;
+   }
+   
+   if(samplepar.portion==samplepar.portion_min){
+      header = new char[LARGEST_LINE];
+      sprintf(header, "# @impl: Nonpareil\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %d\n# @overlap: %.2f\n",
+      		samplepar.np_version,
+		samplepar.max_read_len,
+      		samplepar.avg_read_len,
+		samplepar.total_reads,
+		samplepar.seq_overlap*100.0
+	);
    }
    
    if(sample_number>0){
@@ -168,9 +179,9 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
    sprintf(text, "%s%s%.5f%s%.5f%s%.5f%s%.5f%s%.5f",
    		label, sep, s.avg, sep, s.sd, sep, s.q1, sep, s.q2, sep, s.q3);
    if(reportSummary==1) {
-      fprintf(summaryh, "%s\n", text);
+      fprintf(summaryh, "%s%s\n", header, text);
       fclose(summaryh);
-   } else if(reportSummary==2) printf("%s\n", text);
+   } else if(reportSummary==2) printf("%s%s\n", header, text);
 
    return s;
 }

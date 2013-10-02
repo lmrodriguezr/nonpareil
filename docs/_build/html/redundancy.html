@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Redundancy &mdash; Nonpareil 1.6.2 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.6.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Nonpareil 1.6.2 documentation" href="index.html" />
+    <link rel="prev" title="Preprocess the reads" href="preprocess.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="preprocess.html" title="Preprocess the reads"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Nonpareil 1.6.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="redundancy">
+<h1>Redundancy<a class="headerlink" href="#redundancy" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="for-the-impatient">
+<h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Permalink to this headline">¶</a></h2>
+<p>Even if you&#8217;re in a hurry, taking a look at <a class="reference internal" href="preprocess.html"><em>Preprocess the reads</em></a> is very important. If you already did, you can simply run:</p>
+<div class="highlight-python"><pre>nonpareil -s reads.fa -b output</pre>
+</div>
+<p>Where <tt class="docutils literal"><span class="pre">reads.fa</span></tt> is the file containing the trimmed single reads, and <tt class="docutils literal"><span class="pre">output</span></tt> is the prefix
+of the output files to be created.</p>
+</div>
+<div class="section" id="mandatory-options">
+<h2>Mandatory options<a class="headerlink" href="#mandatory-options" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-s <var>&lt;str&gt;</var></span></kbd></td>
+<td>Path to the (input) file containing the sequences.  This is lowercase S.</td></tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="additional-options">
+<h2>Additional options<a class="headerlink" href="#additional-options" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>Input/Output</strong></dt>
+<dd><table class="first last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-a <var>&lt;str&gt;</var></span></kbd></td>
+<td>Path to the (output) file where all data must be saved.  This report is not created by default.  See the
+OUTPUT section.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-b <var>&lt;str&gt;</var></span></kbd></td>
+<td>Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files
+with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-C <var>&lt;str&gt;</var></span></kbd></td>
+<td>Path to the (output) file where the mating vector is to be saved.  This is a capital C.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-f <var>&lt;str&gt;</var></span></kbd></td>
+<td>The format of the sequences.  Can be &#8216;fasta&#8217; or &#8216;fastq&#8217;.  By default: &#8216;fasta&#8217;</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-F</span></kbd></td>
+<td>Report the sampled portions as a fraction of the library instead of the number of reads.  See -a, -o and
+the OUTPUT section.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-l <var>&lt;str&gt;</var></span></kbd></td>
+<td>Path to the (output) file where the log of the run must be saved. By default the log is sent only to the
+STDERR.  If set, the log is sent to both the STDERR and the log file.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-o <var>&lt;str&gt;</var></span></kbd></td>
+<td>Path to the (output) file where summary is to be saved.   By default the summary is sent to stdout (same
+behavior as using a dash &#8216;-&#8216;).  If an empty string &#8216;&#8217; is provided, does not produce the summary. See the
+OUTPUT section.</td></tr>
+</tbody>
+</table>
+</dd>
+<dt><strong>Sampling</strong></dt>
+<dd><table class="first last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-i <var>&lt;num&gt;</var></span></kbd></td>
+<td>Interval between sampling portions.  By default: 0.01.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-m <var>&lt;num&gt;</var></span></kbd></td>
+<td>Minimum value of sampling portion.  By default: 0.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-M <var>&lt;num&gt;</var></span></kbd></td>
+<td>Maximum value of sampling portion.  By default: 1.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n <var>&lt;int&gt;</var></span></kbd></td>
+<td>Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t),
+it is rounded to the next (upper) multiple.  By default: 1024.</td></tr>
+</tbody>
+</table>
+</dd>
+<dt><strong>Mating</strong></dt>
+<dd><table class="first last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-c</span></kbd></td>
+<td>Do not use reverse-complement.  This is useful for single stranded sequences data (like RNA).  This is a
+lowercase C.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-L <var>&lt;num&gt;</var></span></kbd></td>
+<td>Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is
+evaluated for the aligned region only.  By default: 50.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-N</span></kbd></td>
+<td>Treat Ns as mismatches.  By default, Ns (unknown nucleotides) match any nucleotide (even another N).</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-S <var>&lt;num&gt;</var></span></kbd></td>
+<td>Similarity threshold to group two reads together.   Reducing this option will increase sensitivity while
+increasing running time.  By default: 0.97.  This is uppercase S.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-x <var>&lt;num&gt;</var></span></kbd></td>
+<td>Probability of taking a sequence into account as query for the construction of the curve.  Higher values
+reduce accuracy but increase speed.  This is lower case x.  If set, overides -X.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-X <var>&lt;int&gt;</var></span></kbd></td>
+<td>Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads.</td></tr>
+</tbody>
+</table>
+</dd>
+<dt><strong>System resources</strong></dt>
+<dd><table class="first last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-R <var>&lt;int&gt;</var></span></kbd></td>
+<td>Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding
+non-sequence elements like headers or quality).  This is particularly important when running in multiple
+cores (see -t and -T).  This value is approximated.  By default 1024.
+Maximum value in this version: 4194303</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-t <var>&lt;int&gt;</var></span></kbd></td>
+<td>Number of threads.  Highest efficiency when the number of sub-samples (see -n) is multiple of the number
+of threads.  By default: 2.</td></tr>
+</tbody>
+</table>
+</dd>
+<dt><strong>Misc</strong></dt>
+<dd><table class="first last docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-A</span></kbd></td>
+<td>Autoadjust parameters and re-run.  Evaluates the results looking for common problems, adjusts parameters
+and re-run the analyses.  THIS IS EXPERIMENTAL CODE.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-h</span></kbd></td>
+<td>Display this message and exit.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-r <var>&lt;int&gt;</var></span></kbd></td>
+<td>Random generator seed.  By default current time.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-v <var>&lt;int&gt;</var></span></kbd></td>
+<td>Verbosity level, for debugging purposes.  By default 7.  This is lowercase V.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-V</span></kbd></td>
+<td>Show version information and exit.  This is uppercase V.</td></tr>
+</tbody>
+</table>
+</dd>
+</dl>
+</div>
+<div class="section" id="input">
+<h2>Input<a class="headerlink" href="#input" title="Permalink to this headline">¶</a></h2>
+<p>Sequences must be in FastA or FastQ format. See <a class="reference internal" href="preprocess.html"><em>Preprocess the reads</em></a>.</p>
+</div>
+<div class="section" id="output">
+<h2>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>Redundancy summary: <tt class="docutils literal"><span class="pre">.npo</span></tt> file</dt>
+<dd>Tab-delimited file with six columns. The first column indicates the sequencing effort (in number of reads), and the
+remaining columns indicate the summary of the distribution of redundancy (from the replicates, 1,024 by default) at
+the given sequencing effort. These five columns are: average redundancy, standard deviation, quartile 1, median
+(quartile 2), and quartile 3.</dd>
+<dt>Redundancy values: <tt class="docutils literal"><span class="pre">.npa</span></tt> file</dt>
+<dd>Tab-delimited file with three columns. Similar to the .npo files, it contains information about the redundancy at
+each sequencing effort, but it provides ALL the results from the replicates, not only the summary at each point. The
+first column indicates the sequencing effort (as a fraction of the dataset), the second column indicates the ID of
+the replicate (a number used only to introduce some controlled noise in plots), and the third column indicates the
+estimated redundancy value.</dd>
+<dt>Mates distribution: <tt class="docutils literal"><span class="pre">.npc</span></tt> file</dt>
+<dd>Raw list with the number of reads in the dataset matching a query read. A set of query reads is randomly drawn by
+Nonpareil (1,000 by default), and compared against all reads in the dataset. Each line on this file corresponds to a
+query read (the order is not important). We have seen certain correspondance between these numbers and the distribution
+of abundances in the community (compared, for example, as rank-abundance plots), but this file is provided only for
+quality-control purposes and comparisons with other tools.</dd>
+<dt>Log: <tt class="docutils literal"><span class="pre">.npl</span></tt> file</dt>
+<dd>A verbose log of internal Nonpareil processing. The number to the left (inside squared brackets) indicate the CPU time
+(in minutes). This file also provide quality assessment of the Nonpareil run (automated consistency evaluation). Ideally,
+the last line should read &#8220;Everything seems correct&#8221;. Otherwise, it suggests alternative parameters that may improve the
+estimation.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Redundancy</a><ul>
+<li><a class="reference internal" href="#for-the-impatient">For the impatient</a></li>
+<li><a class="reference internal" href="#mandatory-options">Mandatory options</a></li>
+<li><a class="reference internal" href="#additional-options">Additional options</a></li>
+<li><a class="reference internal" href="#input">Input</a></li>
+<li><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="preprocess.html"
+                        title="previous chapter">Preprocess the reads</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/redundancy.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="preprocess.html" title="Preprocess the reads"
+             >previous</a> |</li>
+        <li><a href="index.html">Nonpareil 1.6.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

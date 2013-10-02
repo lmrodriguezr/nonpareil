@@ -9,22 +9,24 @@
 #include <string>
 #include <bitset>
 #include <stdio.h>
+#include <sys/types.h>
 
 #include "universal.h"
 #include "sequence.h"
 
 using namespace std;
 
-size_t count_seqs(char *file, const char *format, int &largest_line){
+size_t count_seqs(char *file, const char *format, int &largest_line, double &avg_line){
    // Vars
    ifstream	fileh;
-   unsigned int	N=0;
+   unsigned int	N=0, nline=0, totlen=0;
    int		maxlen=0;
    char		start;
+   bool		isFastQ=false;
    
    // Format
    if(strcmp(format, "fasta")==0) {start = '>';}
-   else if(strcmp(format, "fastq")==0) {start = '@';}
+   else if(strcmp(format, "fastq")==0) {start = '@'; isFastQ=true;}
    else if(strcmp(format, "enveomics-seq")==0){start = '>';}
    else {error("Unsupported format", format);}
    
@@ -35,50 +37,65 @@ size_t count_seqs(char *file, const char *format, int &largest_line){
       string line;
       getline(fileh, line);
       if(line.length() > maxlen) maxlen = line.length();
-      if(line[0]==start) N++; 
-      if(N==UINT_MAX-1) error("Unable to represent the number of reads, limit reached", UINT_MAX-1);
+      if((isFastQ & nline%4==0) | (!isFastQ & line[0]==start)) N++;
+      else totlen += line.length();
+      if(totlen==UINT_MAX-1) error("Unable to represent the number of nucleotides, limit reached", UINT_MAX-1);
+      nline++;
    }
    fileh.close();
    
    largest_line = maxlen;
+   avg_line = (double)totlen/N;
    return N;
 }
 
+size_t count_seqs(char *file, const char *format, int &largest_line){
+   double dummy;
+   return count_seqs(file, format, largest_line, dummy);
+}
+
 size_t count_seqs(char *file, const char *format){
-   int	dummy;
-   return count_seqs(file, format, dummy);
+   int   dummy1;
+   double dummy2;
+   return count_seqs(file, format, dummy1, dummy2);
+}
+
+size_t count_seqs(char *file, int &largest_line, double &avg_line){
+   return count_seqs(file, "fasta", largest_line, avg_line);
 }
 
 size_t count_seqs(char *file, int &largest_line){
-   return count_seqs(file, "fasta", largest_line);
+   double dummy;
+   return count_seqs(file, largest_line, dummy);
 }
 
 size_t count_seqs(char *file){
-   int dummy;
-   return count_seqs(file, dummy);
+   int   dummy1;
+   double dummy2;
+   return count_seqs(file, dummy1, dummy2);
 }
 
 
-size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut, int &largest_seq){
+size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut, int &largest_seq, double &avg_seq){
    // Vars
-   unsigned int	N=0;
+   unsigned int	N=0, nline=0, totlen=0;
    int		maxlen=0;
-   char		start, end, *namFile, *seqFile;
-   bool		inSeq=false;
+   char		start, *namFile, *seqFile;
+   bool		inSeq=false, isFastQ=false;
    string	seq, name;
    ifstream	infileh, testseq, testnam;
    ofstream	seqfileh, namfileh;
    
    // Format
-   if(strcmp(format, "fasta")==0) {start = '>'; end='\n';}
-   else if(strcmp(format, "fastq")==0) {start = '@'; end='+';}
+   if(strcmp(format, "fasta")==0) {start = '>';}
+   else if(strcmp(format, "fastq")==0) {start = '@'; isFastQ=true;}
    else {error("Unsupported format", format);}
    
    // Files
    seqFile = new char[strlen(sourceFile)+10];
-   sprintf(seqFile, "%s.enve-seq", sourceFile);
+   sprintf(seqFile, "%s.enve-seq.%d", sourceFile, getpid());
    namFile = new char[strlen(sourceFile)+10];
-   sprintf(namFile, "%s.enve-nam", sourceFile);
+   sprintf(namFile, "%s.enve-nam.%d", sourceFile, getpid());
    namFileOut = namFile;
    seqFileOut = seqFile;
 
@@ -89,7 +106,7 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
       testnam.open(namFile, ios::in);
       if(testnam.is_open()){
 	 testnam.close();
-         N = count_seqs(seqFile, "enveomics-seq", largest_seq);
+         N = count_seqs(seqFile, "enveomics-seq", largest_seq, avg_seq);
 	 return N;
       }
    }
@@ -106,23 +123,28 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    while(!infileh.eof()){
       string line;
       getline(infileh, line);
-      if(line[0]==start){
+      if((isFastQ & nline%4==0) | (!isFastQ & line[0]==start)){
          if(seq.length()>0){
 	    namfileh << ">" << ++N << endl << name << endl;
 	    seqfileh << ">" <<   N << endl <<  seq << endl;
+	    totlen += seq.length();
 	    if(seq.length() > maxlen) maxlen = seq.length();
-	    if(N==UINT_MAX-1) error("Impossible to represent the number of reads while indexing, limit reached", UINT_MAX-1);
+	    if(totlen==UINT_MAX-1) error("Impossible to represent the number of nucleotides while indexing, limit reached", UINT_MAX-1);
 	 }
-         name = line.substr(1);
+         name = line.length()>1 ? line.substr(1) : "";
 	 seq = (string)"";
 	 inSeq = true;
-      }else if(line[0]==end) inSeq = false;
-      else if(inSeq) seq.append(line);
+      }else{
+	 if(inSeq) seq.append(line);
+	 if(isFastQ) inSeq = false;
+      }
+      nline++;
    }
    if(seq.length()>0){
-      namfileh << ">" << ++N << endl << name << endl;
-      seqfileh << ">" <<   N << endl <<  seq << endl;
+      //namfileh << ">" << ++N << endl << name << endl;
+      //seqfileh << ">" <<   N << endl <<  seq << endl;
       if(seq.length() > maxlen) maxlen = seq.length();
+      totlen += seq.length();
    }
 
    // Close file streams
@@ -131,12 +153,19 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    namfileh.close();
 
    largest_seq = maxlen;
+   avg_seq = (double)totlen/N;
    return N;
 }
 
+size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut, int &largest_seq){
+   double dummy;
+   return build_index(sourceFile, format, namFileOut, seqFileOut, largest_seq, dummy);
+}
+
 size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut){
-   int dummy;
-   return build_index(sourceFile, format, namFileOut, seqFileOut, dummy);
+   int dummy1;
+   double dummy2;
+   return build_index(sourceFile, format, namFileOut, seqFileOut, dummy1, dummy2);
 }
 
 size_t sub_sample_seqs(char *sourceFile, char *destFile, double portion, char *format){

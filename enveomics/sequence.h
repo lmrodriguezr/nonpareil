@@ -8,23 +8,27 @@
 // #define ENVEOMICS_NUC_T_DEFINE
 
 /**
- * size_t count_seqs(char *file[, const char *format][, int &largest_line]);
+ * size_t count_seqs(char *file[, const char *format][, int &largest_line[, double &avg_line]]);
  * Description:
- *   Counts the number of sequences in the file.
+ *   Counts the number of sequences in the file, and optionally measures the maximum and the average length of the
+ *   sequences.
  * Input:
  *   char *file: Char array with the path to the file.
  *   char *format (optional): Format of the file.  It can be "fasta", "fastq" or "enveomics-seq".  By default "fasta".
  *   int &largest_line (optional): If passed, saves the length of the largest sequence here.
+ *   double &avg_line (optional): If passed, saves the average seuqnce length.
  * Output:
  *   size_t: Number of sequences in the dataset.
  */
+size_t count_seqs(char *file, const char *format, int &largest_line, double &avg_line);
 size_t count_seqs(char *file, const char *format, int &largest_line);
 size_t count_seqs(char *file, const char *format);
+size_t count_seqs(char *file, int &largest_line, double &avg_line);
 size_t count_seqs(char *file, int &largest_line);
 size_t count_seqs(char *file);
 
 /**
- * size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut[, int &largest_seq]);
+ * size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut[, int &largest_seq[, double &avg_seq]]);
  * Description:
  *   Builds an index (enveomics-seq format) for the input file.
  * Input:
@@ -33,7 +37,9 @@ size_t count_seqs(char *file);
  *   char *&namFileOut: Array of chr to be filled with the path of the output file containing the IDs.
  *   char *&seqFileOut: Array of chr to be filled with the path of the output file containing the sequences.
  *   int &largest_seq (optional): If passed, saves the length of the largest sequence here.
+ *   double &avg_seq (optional): If passed, saves the average sequence length here.
  */
+size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut, int &largest_seq, double &avg_seq);
 size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut, int &largest_seq);
 size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut);
 

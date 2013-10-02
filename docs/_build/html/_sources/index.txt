@@ -1,0 +1,31 @@
+.. Nonpareil documentation master file, created by
+   sphinx-quickstart on Mon Sep 16 22:39:30 2013.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Nonpareil
+=========
+
+Nonpareil uses the redundancy of the reads in metagenomic datasets to estimate the average
+coverage and predict the amount of sequences that will be required to achieve "nearly complete
+coverage".
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+
+   installation
+   preprocess
+   redundancy
+   curves
+
+
+
+.. Indices and tables
+ ==================
+ 
+ * :ref:`genindex`
+ * :ref:`modindex`
+ * :ref:`search`
+

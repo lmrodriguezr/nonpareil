@@ -44,14 +44,18 @@ typedef struct {
  *      be filled with the portion, instead of the number of reads.
  */
 typedef struct {
+   double	np_version;
    double	portion;
    double	portion_min;
    double	portion_max;
    double	portion_itv;
+   double	seq_overlap;
    int		replicates;
    int		**mates;
    int		mates_size;
    int		total_reads;
+   int		max_read_len;
+   double	avg_read_len;
    bool		portion_as_label;
 } samplepar_t;
 
