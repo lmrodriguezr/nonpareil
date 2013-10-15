@@ -85,7 +85,7 @@ size_t nonpareil_mate(int *&result,
       delete[] blockA;
    }
 
-   unlink(sampleFile);
+   remove(sampleFile);
 
    return qry_seqs;
 }

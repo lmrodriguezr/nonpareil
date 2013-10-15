@@ -177,9 +177,9 @@ int main(int argc, char *argv[]) {
 	 open_log(logfile);
       }
    }
-   if(alldata && (strlen(alldata)>0)) unlink(alldata);
-   if(cntfile && (strlen(cntfile)>0)) unlink(cntfile);
-   if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) unlink(outfile);
+   if(alldata && (strlen(alldata)>0)) remove(alldata);
+   if(cntfile && (strlen(cntfile)>0)) remove(cntfile);
+   if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) remove(outfile);
    srand(rseed);
    
    // Parse file
@@ -321,8 +321,8 @@ restart_checkings:
    
 exit:
    // Clean temporals
-   unlink(namFile);
-   unlink(seqFile);
+   remove(namFile);
+   remove(seqFile);
    close_log();
    return 0;
 }
