@@ -110,7 +110,7 @@ void say(const char *format, ...){
       }else if(format[i]=='s'){
          sArg = va_arg(arguments, char *);
       }else if(format[i]=='c'){
-         sArg = (char *)va_arg(arguments, int);
+         sprintf(sArg, "%c", va_arg(arguments, int));
       
       // Termination characters
       }else if(format[i]=='$'){

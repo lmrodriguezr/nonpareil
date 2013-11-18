@@ -49,8 +49,8 @@ int nonpareil_sample_portion(double *&result, int threads, samplepar_t samplepar
       samplejob[thr].mutex = &mutex;
       launched_replicates += samplejob[thr].number;
 
-     if(rc=pthread_create(&thread[thr], NULL, &nonpareil_sample_portion_thr, (void *)&samplejob[thr]  ))
-        error("Thread creation failed", (char *)rc);
+     if((rc=pthread_create(&thread[thr], NULL, &nonpareil_sample_portion_thr, (void *)&samplejob[thr]  )))
+        error("Thread creation failed", (char)rc);
    }
 
    // Gather jobs

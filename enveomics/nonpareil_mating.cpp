@@ -122,8 +122,8 @@ void nonpareil_count_mates_block(int *&result, int from_in_result,
      if(matejob[thr].number==0)
         error("Unexpectedly, the thread contains zero load", thr);
      
-     if(rc=pthread_create(&thread[thr], NULL, &nonpareil_count_mates_thr, (void *)&matejob[thr]  ))
-        error("Thread creation failed", (char *)rc);
+     if((rc=pthread_create(&thread[thr], NULL, &nonpareil_count_mates_thr, (void *)&matejob[thr]  )))
+        error("Thread creation failed", (char)rc);
    }
    
    // Gather jobs

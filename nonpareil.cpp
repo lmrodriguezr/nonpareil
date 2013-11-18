@@ -1,12 +1,12 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
-// @version 2.0
+// @version 2.1
 // @license artistic license 2.0
 
 /*
   ROADMAP
 
-  o To report employed parameters and read length
+  o To validate "logarithmic sampling".
   
 */
 
@@ -18,7 +18,7 @@
 #include "enveomics/sequence.h"
 
 #define LARGEST_PATH 2048
-#define NP_VERSION 2.0
+#define NP_VERSION 2.1
 
 using namespace std;
 
@@ -35,14 +35,31 @@ void help(const char *msg){
    	<< "MANDATORY ARGUMENTS" << endl
 	<< "   -s <str> : Path to the (input) file containing the sequences.  This is lowercase S." << endl
 	<< endl
+	<< "COMMON OPTIONS" << endl
+	<< "   -f <str> : The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'" << endl
+	<< "   -b <str> : Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files" << endl
+	<< "              with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set." << endl
+	<< "   -i <num> : Interval between sampling portions.  By default: 0.01." << endl
+	<< "   -n <int> : Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t)," << endl
+	<< "              it is rounded to the next (upper) multiple.  By default: 1024." << endl
+	<< "   -L <num> : Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is" << endl
+	<< "              evaluated for the aligned region only.  By default: 50." << endl
+	<< "   -X <int> : Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads." << endl
+	<< "   -R <int> : Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding" << endl
+	<< "              non-sequence elements like headers or quality).  This is particularly important when running in multiple" << endl
+	<< "              cores (see -t).  This value is approximated.  By default 1024." << endl
+	<< "              Maximum value in this version: " << (UINT_MAX/1024) << endl
+	<< "   -t <int> : Number of threads.  Highest efficiency when the number of sub-samples (see -n) is multiple of the number" << endl
+	<< "              of threads.  By default: 2." << endl
+	<< "   -v <int> : Verbosity level, for debugging purposes.  By default 7.  This is lowercase V." << endl
+	<< "   -V       : Show version information and exit.  This is uppercase V." << endl
+	<< "   -h       : Display this message and exit." << endl
+	<< endl
 	<< "ADDITIONAL OPTIONS" << endl
 	<< "   [ Input/Output ]" << endl
 	<< "   -a <str> : Path to the (output) file where all data must be saved.  This report is not created by default.  See the" << endl
 	<< "              OUTPUT section." << endl
-	<< "   -b <str> : Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files" << endl
-	<< "              with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set." << endl
 	<< "   -C <str> : Path to the (output) file where the mating vector is to be saved.  This is a capital C." << endl
-	<< "   -f <str> : The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'" << endl
 	<< "   -F       : Report the sampled portions as a fraction of the library instead of the number of reads.  See -a, -o and" << endl
 	<< "              the OUTPUT section." << endl
 	<< "   -l <str> : Path to the (output) file where the log of the run must be saved. By default the log is sent only to the" << endl
@@ -52,42 +69,27 @@ void help(const char *msg){
 	<< "              OUTPUT section." << endl
 	<< endl
 	<< "   [ Sampling ]" << endl
-	<< "   -i <num> : Interval between sampling portions.  By default: 0.01." << endl
 	<< "   -m <num> : Minimum value of sampling portion.  By default: 0." << endl
 	<< "   -M <num> : Maximum value of sampling portion.  By default: 1." << endl
-	<< "   -n <int> : Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t),"<< endl
-	<< "              it is rounded to the next (upper) multiple.  By default: 1024." << endl
+	<< "   -d <num> : Take this fraction of the total library every sampling point (logarithmic sampling, not linear).  If set" << endl
+	<< "              to zero, logarithmic sub-sampling is disabled (default). Recommended value: 0.7. EXPERIMENTAL CODE." << endl
 	<< endl
 	<< "   [ Mating ]" << endl
 	<< "   -c       : Do not use reverse-complement.  This is useful for single stranded sequences data (like RNA).  This is a" << endl
 	<< "              lowercase C." << endl
-	<< "   -L <num> : Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is" << endl
-	<< "              evaluated for the aligned region only.  By default: 50." << endl
 	<< "   -N       : Treat Ns as mismatches.  By default, Ns (unknown nucleotides) match any nucleotide (even another N)." << endl
 	<< "   -S <num> : Similarity threshold to group two reads together.   Reducing this option will increase sensitivity while" << endl
-	<< "              increasing running time.  By default: 0.97.  This is uppercase S." << endl
+	<< "              increasing running time.  This is uppercase S." << endl
 	<< "   -x <num> : Probability of taking a sequence into account as query for the construction of the curve.  Higher values" << endl
 	<< "              reduce accuracy but increase speed.  This is lower case x.  If set, overides -X." << endl
-	<< "   -X <int> : Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads." << endl
-	<< endl
-	<< "   [ System resources ]" << endl
-	<< "   -R <int> : Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding" << endl
-	<< "              non-sequence elements like headers or quality).  This is particularly important when running in multiple" << endl
-	<< "              cores (see -t).  This value is approximated.  By default 1024." << endl
-	<< "              Maximum value in this version: " << (UINT_MAX/1024) << endl
-	<< "   -t <int> : Number of threads.  Highest efficiency when the number of sub-samples (see -n) is multiple of the number" << endl
-	<< "              of threads.  By default: 2." << endl
 	<< endl
 	<< "   [ Misc ]" << endl
 	<< "   -A       : Autoadjust parameters and re-run.  Evaluates the results looking for common problems, adjusts parameters" << endl
 	<< "              and re-run the analyses.  THIS IS EXPERIMENTAL CODE." << endl
-	<< "   -h       : Display this message and exit." << endl
 	<< "   -r <int> : Random generator seed.  By default current time." << endl
-	<< "   -v <int> : Verbosity level, for debugging purposes.  By default 7.  This is lowercase V." << endl
-	<< "   -V       : Show version information and exit.  This is uppercase V." << endl
 	<< endl
 	<< "INPUT" << endl
-	<< "   Sequences must be in FastA or FastQ format." << endl
+	<< "   Sequences must be in FastA or FastQ format. FastA comments are not supported (only > headers and sequence lines)." << endl
 	<< endl
 	<< "OUTPUT" << endl
 	<< "   - The summary file contains a tab-delimited table containing the following six columns:  sample size, mean, standard" << endl
@@ -108,7 +110,7 @@ int main(int argc, char *argv[]) {
    char		*file, *format=(char *)"fasta", *alldata, *cntfile, *outfile=(char *)"-", *namFile,
    		*seqFile, *baseout;
    double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.97, ovl=0.50, *sample_result,
-   		avg_seq_len;
+   		avg_seq_len, divide=0;
    int		v=7, largest_seq, rseed=time(NULL), n=1024, thr=2, ram=1024, *mates, samples_no,
    		sample_i, sample_after_20, sampling_points;
    unsigned int	total_seqs, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
@@ -121,13 +123,14 @@ int main(int argc, char *argv[]) {
    
    // GetOpt
    int		optchr;
-   while ((optchr = getopt (argc, argv, "Aa:b:cC:f:Fhi:l:L:m:M:n:No:r:R:s:S:t:T:v:Vx:X:")) != EOF)
+   while ((optchr = getopt (argc, argv, "Aa:b:cC:d:f:Fhi:l:L:m:M:n:No:r:R:s:S:t:T:v:Vx:X:")) != EOF)
       switch(optchr) {
 	 case 'a': alldata = optarg;		break;
 	 case 'A': autoadjust = true;		break;
 	 case 'b': baseout = optarg;		break;
 	 case 'c': revcom = false;		break;
 	 case 'C': cntfile = optarg;		break;
+	 case 'd': divide = atof(optarg);	break;
 	 case 'f': format = optarg;		break;
 	 case 'F': portion_label = true;	break;
 	 case 'h': help("");			break;
@@ -166,6 +169,7 @@ int main(int argc, char *argv[]) {
    if(thr<=0)			help("Bad argument for -t option, accepted values are positive non-zero integers");
    if(qry_portion<0 | qry_portion>1)
    				help("Bad argument for -x option, accepted values are numbers in the range (0, 1]");
+   if(divide<0 | divide>=1)	help("Bad argument for -d option, accepted values are numbers in the range (0, 1)");
    if(baseout && (strlen(baseout)>0)){
       char alldataTmp[LARGEST_PATH], outfileTmp[LARGEST_PATH], cntfileTmp[LARGEST_PATH];
       if(!alldata || (strlen(alldata)<=0)){ sprintf(alldataTmp, "%s.npa", baseout); alldata=alldataTmp; }
@@ -227,7 +231,11 @@ restart_mates:
 
    // Sampling
 restart_samples:
-   sampling_points=(int)ceil((max-min)/itv)+1;
+   if(divide==0){
+      sampling_points=(int)ceil((max-min)/itv)+1;
+   }else{
+      sampling_points=(int)ceil( (log(2) - log(total_seqs))/log(divide) )+2;
+   }
    sample_t	sample_summary[sampling_points];
    
    sample_i=sample_after_20=0;
@@ -245,14 +253,20 @@ restart_samples:
    samplepar.portion_as_label = portion_label;
    
    say("1s$", "Sub-sampling library");
-   for(double a=min; a<=max; a+=itv){
-      if(sampling_points<=sample_i)
-      	error("Unexpected number of sampling points.  This can be due to a precision problem, try decreasing the -i parameter");
-      samplepar.portion = a;
+   double a=min;
+   //for(double a=min; a<=max; a+=itv){
+   while(sample_i < sampling_points){
+      //if(sampling_points<=sample_i)
+	//error("Unexpected number of sampling points.  This can be due to a precision problem, try decreasing the -i parameter");
+      if(divide==0){
+	 samplepar.portion = min + itv*sample_i;
+      }else{
+         samplepar.portion = sample_i==0 ? 0 : pow(divide, sampling_points-sample_i-1);
+      }
       samplepar.replicates = n;
       samples_no = nonpareil_sample_portion(sample_result, thr, samplepar);
       sample_summary[sample_i++] = nonpareil_sample_summary(sample_result, samples_no, alldata, outfile, samplepar);
-      if(a<=0.2) sample_after_20 = sample_i;
+      if(samplepar.portion<=0.2) sample_after_20 = sample_i;
    }
    
    // Check results

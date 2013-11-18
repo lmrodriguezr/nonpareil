@@ -37,7 +37,7 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
       string line;
       getline(fileh, line);
       if(line.length() > maxlen) maxlen = line.length();
-      if((isFastQ & nline%4==0) | (!isFastQ & line[0]==start)) N++;
+      if((isFastQ & (nline%4==0)) | (!isFastQ & (line[0]==start))) N++;
       else totlen += line.length();
       if(totlen==UINT_MAX-1) error("Unable to represent the number of nucleotides, limit reached", UINT_MAX-1);
       nline++;
@@ -123,7 +123,7 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    while(!infileh.eof()){
       string line;
       getline(infileh, line);
-      if((isFastQ & nline%4==0) | (!isFastQ & line[0]==start)){
+      if((isFastQ & (nline%4==0)) | (!isFastQ & (line[0]==start))){
          if(seq.length()>0){
 	    namfileh << ">" << ++N << endl << name << endl;
 	    seqfileh << ">" <<   N << endl <<  seq << endl;
@@ -188,7 +188,7 @@ size_t sub_sample_seqs(char *sourceFile, char *destFile, double portion, char *f
    while(filein.good()){
       string line;
       getline(filein, line);
-      if(line[0]==start | !filein.good()){
+      if((line[0]==start) | !filein.good()){
 	 if((entry.size()>0) && (portion>=1 || ((double)rand()/RAND_MAX <= portion))){
 	    n++;
 	    fileout << entry;
@@ -237,7 +237,7 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
    while(filein.good()){
       string line;
       getline(filein, line);
-      if(line[0]==start | !filein.good()){
+      if((line[0]==start) | !filein.good()){
 	 if(entry.size()>0){
 	    i++;
 	    if(i>=from){
