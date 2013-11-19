@@ -1,0 +1,565 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "NONPAREIL" "1" "November 19, 2013" "2.1" "Nonpareil"
+.SH NAME
+nonpareil \- Nonpareil Documentation
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.sp
+Nonpareil uses the redundancy of the reads in metagenomic datasets to estimate the average
+coverage and predict the amount of sequences that will be required to achieve "nearly complete
+coverage".
+.sp
+Contents:
+.SH INSTALL NONPAREIL
+.SS System requirements
+.sp
+\fBNonpareil binary\fP: Nonpareil requires a C++ compiler. It has been tested on 64\-bit machines with GCC versions ≥4.2.1, running Mac OSX and Red Hat Linux.
+.sp
+\fBNonpareil utilities\fP: Requires \fI\%R\fP\&. No additional libraries are necessary.
+.SS Compilation
+.INDENT 0.0
+.IP 1. 3
+\fBGet the source\fP
+.sp
+Clone the repository from \fI\%GitHub\fP:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+git clone git://github.com/lmrodriguezr/nonpareil.git
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+If you don\(aqt have \fI\%git\fP, you can also download the \fI\%TAR-Ball\fP and unpack it with:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+tar zxvf nonpareil.tar.gz
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP 2. 3
+\fBCompile and install\fP
+.sp
+Change directory into the newly created folder, and compile Nonpareil:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+cd nonpareil
+make
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+If you want to make Nonpareil available system\-wide, just copy the generated binary into a folder listed in the \fB$PATH\fP\&. For example:
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+sudo cp nonpareil /usr/local/bin/
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH PREPROCESS THE READS
+.sp
+Nonpareil expects that the sequencing error is always well below 5%, so we suggest using an expected error cutoff of 1%
+(i.e., Q>20, or 1 error in 100 nucleotides). We recommend to perform this task using SolexaQA.
+.sp
+Ideally, the reads should be in FastA format (althought Nonpareil can read FastQ). To transform FastQ into FastA, you
+can simply use:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# Input: reads.fastq
+# Output: reads.fasta
+cat reads.fastq | paste \- \- \- \- | awk \(aqBEGIN{FS="\et"}{print ">"substr($1,2)"\en"$2}\(aq > reads.fasta
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Also, if you have paired\-end reads, you should use only one sister read per pair in Nonpareil. If you have them interposed
+in the same file, you can separate them using \fI\%FastA.split.pl\fP:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# Input: reads.fasta
+# Output: reads.1.fa and reads.2.fa
+FastA.split.pl reads.fasta reads 2
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH REDUNDANCY
+.SS For the impatient
+.sp
+Even if you\(aqre in a hurry, taking a look at \fBpreprocess\fP is very important. If you already did, you can simply run:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+nonpareil \-s reads.fa \-b output
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Where \fBreads.fa\fP is the file containing the trimmed single reads, and \fBoutput\fP is the prefix
+of the output files to be created.
+.SS Mandatory options
+.INDENT 0.0
+.INDENT 3.5
+.INDENT 0.0
+.TP
+.BI \-s \ <str>
+Path to the (input) file containing the sequences.  This is lowercase S.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SS Additional options
+.INDENT 0.0
+.TP
+.B \fBInput/Output\fP
+.INDENT 7.0
+.TP
+.BI \-a \ <str>
+Path to the (output) file where all data must be saved.  This report is not created by default.  See the
+OUTPUT section.
+.TP
+.BI \-b \ <str>
+Path to the prefix for all the output files.  Replaces the options: \-a, \-C, \-l, and \-o; generating files
+with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.
+.TP
+.BI \-C \ <str>
+Path to the (output) file where the mating vector is to be saved.  This is a capital C.
+.TP
+.BI \-f \ <str>
+The format of the sequences.  Can be \(aqfasta\(aq or \(aqfastq\(aq.  By default: \(aqfasta\(aq
+.TP
+.B \-F
+Report the sampled portions as a fraction of the library instead of the number of reads.  See \-a, \-o and
+the OUTPUT section.
+.TP
+.BI \-l \ <str>
+Path to the (output) file where the log of the run must be saved. By default the log is sent only to the
+STDERR.  If set, the log is sent to both the STDERR and the log file.
+.TP
+.BI \-o \ <str>
+Path to the (output) file where summary is to be saved.   By default the summary is sent to stdout (same
+behavior as using a dash \(aq\-\(aq).  If an empty string \(aq\(aq is provided, does not produce the summary. See the
+OUTPUT section.
+.UNINDENT
+.TP
+.B \fBSampling\fP
+.INDENT 7.0
+.TP
+.BI \-i \ <num>
+Interval between sampling portions.  By default: 0.01.
+.TP
+.BI \-m \ <num>
+Minimum value of sampling portion.  By default: 0.
+.TP
+.BI \-M \ <num>
+Maximum value of sampling portion.  By default: 1.
+.TP
+.BI \-n \ <int>
+Number of sub\-samples to generate per point.  If it is not a multiple of the number of threads (see \-t),
+it is rounded to the next (upper) multiple.  By default: 1024.
+.UNINDENT
+.TP
+.B \fBMating\fP
+.INDENT 7.0
+.TP
+.B \-c
+Do not use reverse\-complement.  This is useful for single stranded sequences data (like RNA).  This is a
+lowercase C.
+.TP
+.BI \-L \ <num>
+Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see \-S) is
+evaluated for the aligned region only.  By default: 50.
+.TP
+.B \-N
+Treat Ns as mismatches.  By default, Ns (unknown nucleotides) match any nucleotide (even another N).
+.TP
+.BI \-S \ <num>
+Similarity threshold to group two reads together.   Reducing this option will increase sensitivity while
+increasing running time.  By default: 0.97.  This is uppercase S.
+.TP
+.BI \-x \ <num>
+Probability of taking a sequence into account as query for the construction of the curve.  Higher values
+reduce accuracy but increase speed.  This is lower case x.  If set, overides \-X.
+.TP
+.BI \-X \ <int>
+Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads.
+.UNINDENT
+.TP
+.B \fBSystem resources\fP
+.INDENT 7.0
+.TP
+.BI \-R \ <int>
+Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding
+non\-sequence elements like headers or quality).  This is particularly important when running in multiple
+cores (see \-t and \-T).  This value is approximated.  By default 1024.
+Maximum value in this version: 4194303
+.TP
+.BI \-t \ <int>
+Number of threads.  Highest efficiency when the number of sub\-samples (see \-n) is multiple of the number
+of threads.  By default: 2.
+.UNINDENT
+.TP
+.B \fBMisc\fP
+.INDENT 7.0
+.TP
+.B \-A
+Autoadjust parameters and re\-run.  Evaluates the results looking for common problems, adjusts parameters
+and re\-run the analyses.  THIS IS EXPERIMENTAL CODE.
+.TP
+.B \-h
+Display this message and exit.
+.TP
+.BI \-r \ <int>
+Random generator seed.  By default current time.
+.TP
+.BI \-v \ <int>
+Verbosity level, for debugging purposes.  By default 7.  This is lowercase V.
+.TP
+.B \-V
+Show version information and exit.  This is uppercase V.
+.UNINDENT
+.UNINDENT
+.SS Input
+.sp
+Sequences must be in FastA or FastQ format. See \fBpreprocess\fP\&.
+.SS Output
+.INDENT 0.0
+.TP
+.B Redundancy summary: \fB\&.npo\fP file
+Tab\-delimited file with six columns. The first column indicates the sequencing effort (in number of reads), and the
+remaining columns indicate the summary of the distribution of redundancy (from the replicates, 1,024 by default) at
+the given sequencing effort. These five columns are: average redundancy, standard deviation, quartile 1, median
+(quartile 2), and quartile 3.
+.TP
+.B Redundancy values: \fB\&.npa\fP file
+Tab\-delimited file with three columns. Similar to the .npo files, it contains information about the redundancy at
+each sequencing effort, but it provides ALL the results from the replicates, not only the summary at each point. The
+first column indicates the sequencing effort (as a fraction of the dataset), the second column indicates the ID of
+the replicate (a number used only to introduce some controlled noise in plots), and the third column indicates the
+estimated redundancy value.
+.TP
+.B Mates distribution: \fB\&.npc\fP file
+Raw list with the number of reads in the dataset matching a query read. A set of query reads is randomly drawn by
+Nonpareil (1,000 by default), and compared against all reads in the dataset. Each line on this file corresponds to a
+query read (the order is not important). We have seen certain correspondance between these numbers and the distribution
+of abundances in the community (compared, for example, as rank\-abundance plots), but this file is provided only for
+quality\-control purposes and comparisons with other tools.
+.TP
+.B Log: \fB\&.npl\fP file
+A verbose log of internal Nonpareil processing. The number to the left (inside squared brackets) indicate the CPU time
+(in minutes). This file also provide quality assessment of the Nonpareil run (automated consistency evaluation). Ideally,
+the last line should read "Everything seems correct". Otherwise, it suggests alternative parameters that may improve the
+estimation.
+.UNINDENT
+.SH NONPAREIL CURVES
+.sp
+The estimation of the \fBredundancy\fP is at the core of Nonpareil, but it\(aqs when those values are transformed
+into average coverage that they become comporable across samples, and become useful for project design and sample
+evaluation.
+.sp
+To build Nonpareil curves, you need two things. First, the Nonpareil.R file (you can find it in the \fButils\fP folder
+of Nonpareil). Second, the \fB\&.npo\fP file (or \fB\-o\fP value, if you used this option) generated in the estimation of
+\fBredundancy\fP\&.
+.SS For the impatient
+.sp
+You can simply open \fI\%R\fP and execute:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+source(\(aqutils/Nonpareil.R\(aq);
+Nonpareil.curve(\(aqoutput.npo\(aq);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Changing \fButils/Nonpareil.R\fP and \fBoutput.npo\fP to point to the actual location of the files.
+.SS Nonpareil.curve()
+.sp
+This function can generate a Nonpareil curve from a \fB\&.npo\fP file. The parameters that this function accepts are:
+.INDENT 0.0
+.TP
+.B file
+Path to the \fB\&.npo\fP file, containing the read redundancy.
+.TP
+.B overlap=NULL
+Value of the \fB\-L\fP parameter (in Nonpareil, the default is \fB50\fP). If not set, it tries to find the value in the
+\fB\&.npo\fP file (supported in Nonpareil ≥2.0), or fails with an error message.
+.TP
+.B factor=1
+Factor by which the number of reads must be multiplied (x\-axis). For example, a factor of 1e\-3 will produce curves
+in Kbp (instead of bp). This option should be used when if an "integer overload" is produced, at risk of reducing
+the accuracy of the curves.
+.TP
+.B plotDispersion=NA
+Indicates if and how the dispersion of replicates is to be represented. If it\(aqs \fBNA\fP no dispersion is plotted.
+Otherwise, it can take the values \fB\(aqsd\(aq\fP: 1 standard deviation around the mean; \fB\(aqci95\(aq\fP: 95% confidence
+interval; \fB\(aqci90\(aq\fP: 90% confidence interval; \fB\(aqci50\(aq\fP: 50% confidence interval; \fB\(aqiq\(aq\fP: Inter\-quartile
+range.
+.TP
+.B xmin=1e3, xmax=10e12
+Range to plot in the x\-axis (Sequencing effort).
+.TP
+.B ymax=1, ymin=1e\-6
+Range to plot in the y\-axis (Average coverage).
+.TP
+.B xlab=NULL,ylab=NULL
+Labels of the axes. If \fBNULL\fP, the default values are set Sequencing effort (\fIunits\fP) for the x\-axis, and
+Estimated average coverage for the y\-axis.
+.TP
+.B r=NA,g=NA,b=NA,
+Values for the red, green, and blue components of the rgb representation of the curve\(aqs color. If \fBNA\fP, random
+values are set. If the numbers are in the range [0,1], they are assumed to be fractions of 1 (as interpreted by
+rgb). Otherwise, they are assumed to be fractions of 256 (as represented in most color palettes).
+.TP
+.B new=TRUE
+Indicates if a new canvas must be created. If \fBFALSE\fP, it requires that Nonpareil.curve() was previously called
+(so a proper canvas exists already). This is useful to create a single plot with several samples (see also
+\fI\%Nonpareil.legend()\fP).
+.TP
+.B plot=TRUE
+Indicates if the curve is to be plotted. If \fBFALSE\fP, no plots are generated, but the estimations are.
+.TP
+.B libname=NA
+Name of the library (to be used in later calls of \fI\%Nonpareil.legend()\fP). If \fBNA\fP the base of the filename
+(withouth .npo) is used.
+.TP
+.B modelOnly=FALSE
+If \fBTRUE\fP, prints only the fitted model. It also causes variables related to dispersion and curve to be
+ignored, and it produces an empty circle denoting the actual size of the dataset and the estimated average
+coverage.
+.TP
+.B plotModel=TRUE
+Indicates whether the fitted model is to be included in the plot. If \fBFALSE\fP, it still fits the model to
+find the estimate of sequencing effort, but the curve of the model is not included in the plot.
+.TP
+.B curve.lwd=2
+Line width of the curve (the observed curve, not the fitted model).
+.TP
+.B curve.alpha=0.4
+Transparency of the curve.
+.TP
+.B model.lwd=1
+Line width of the fitted model line.
+.TP
+.B model.alpha=1
+Transparency of the fitted model line.
+.TP
+.B log=\(aqx\(aq
+Use logarithmic scale in the X or Y\-axis (or both).
+.TP
+.B data.consistency=TRUE
+Check consistency of the input data before plotting and fitting the model.
+.TP
+.B useValue=\(aqmean\(aq
+Value of the distribution of replicates to be used as the curve. The fitted model and the estimated coverage
+is only meaningful when \fBuseValue=\(aqmean\(aq\fP, but all of the following values are supported to allow visual
+inspection of the distribution of replicates: The mean (\fB\(aqmean\(aq\fP) or the median (\fB\(aqmedian\(aq\fP) of the
+distribution (\fB\(aqmedian\(aq\fP); the upper (\fB\(aqub\(aq\fP) or the lower (\fB\(aqlb\(aq\fP) bound of the 95% confidence interval
+(assuming normality); or the first (\fB\(aqq1\(aq\fP) or the third (\fB\(aqq3\(aq\fP) quartile of the ditribution.
+.TP
+.B star=95
+Value of average coverage (in percentage) to be used as \fIalmost complete covereage\fP\&. Usually this value should
+be set to 95 or 99, but other estimations can be useful. For example, setting this value to 60 predicts the
+minimum sequencing effort at which an assembly with N50 larger than 200bp can be achieved with (100bp\-long)
+Illumina reads.
+.TP
+.B read.length=101
+Length of the reads. This value can be found in the \fB\&.npl\fP file, but other estimation (\fIe.g.\fP, the average
+length after trimming) can be used.
+.UNINDENT
+.sp
+\fBValue\fP: A list with the following keys:
+.INDENT 0.0
+.TP
+.B kappa
+Redundancy of the dataset, as calculated by Nonpareil.
+.TP
+.B C
+Estimated abundance\-weighted average coverage.
+.TP
+.B LRstar
+Estimated sequecing effort (in bp) required to reach \fBstar\fP average coverage (95%, by default).
+.TP
+.B LR
+Size of the datasets (in bp).
+.TP
+.B modelR
+Pearson\(aqs correlation coeficient between the calculated values and the fitted model.
+.UNINDENT
+.SS Nonpareil.legend()
+.sp
+This function creates a legend for the Nonpareil curve(s) in the (active) plot. It\(aqs compatible with single
+or multiple calls of \fI\%Nonpareil.curve()\fP (using \fBnew=F\fP in all but the first call) and with
+\fI\%Nonpareil.curve.batch()\fP\&. The parameters that this function accepts are:
+.INDENT 0.0
+.TP
+.B x=NULL
+Position in the X\-axis. If \fBNULL\fP, it\(aqs located at 75% of the maximum value of X. It can also be set to
+any character string supported by xy.coords.
+.TP
+.B y=.3
+Position in the Y\-axis.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \&...
+Any other parameter accepted by \fBlegend()\fP is supported, except for \fBfill\fP and \fBlegend\fP\&.
+.UNINDENT
+.SS Nonpareil.curve.batch()
+.sp
+This function can generate a plot with several Nonpareil curves from \fB\&.npo\fP files. The parameters that this
+function accepts are:
+.INDENT 0.0
+.TP
+.B files
+Vector of characters with the paths to the \fB\&.npo\fP files.
+.TP
+.B overlap=NULL
+Value of the \fB\-L\fP parameter (in Nonpareil, the default is \fB50\fP). It can be a number (if all the curves were
+generated with the same value) or a vector (in the same order of \fBfiles\fP). See the \fBoverlap\fP value of
+\fI\%Nonpareil.curve()\fP\&.
+.TP
+.B r=NA,g=NA,b=NA
+Values of the corresponding \fBr\fP, \fBg\fP, and \fBb\fP in \fI\%Nonpareil.curve()\fP\&. It can be \fBNA\fP (to set random
+colors) or vectors of numbers in the same order of \fBfiles\fP\&.
+.TP
+.B libnames=NA
+Vector of names of the libraries (corresponding to \fBlibname\fP in \fI\%Nonpareil.curve()\fP). It must be characters,
+not factors.
+.TP
+.B read.lengths=NA
+A vector of numbers indicating the length of the reads (corresponding to \fBread.length\fP in \fI\%Nonpareil.curve()\fP).
+If \fBNA\fP, the default is used.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \&...
+Any other parameter accepted by \fI\%Nonpareil.curve()\fP is supported.
+.UNINDENT
+.sp
+\fBValue\fP: A dataframe containing the values generated by \fI\%Nonpareil.curve()\fP\&.
+.sp
+\fBExample\fP: I find it very convenient to first prepare a table with the samples, something like:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+# samples.txt
+File        Name    R       G       B
+# HMP
+SRS063417.1.L50.npo Posterior fornix        256     200     200
+SRS063287.1.L50.npo Buccal mucosa   256     120     120
+SRS062540.1.L50.npo Tongue dorsum   256     3       3
+SRS016335.1.L50.npo Stool   200     135     76
+SRS015574.1.L50.npo Supragingival plaque    230     100     120
+SRS019087.1.L50.npo Anterior nares  220     220     130
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Note that this table is tab\-delimited, because I find it easier to read, but you can use anything you like (and is
+supported by \fI\%R\fP). Next, you can simply type something like this in the \fI\%R\fP console:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+source(\(aqutils/Nonpareil.R\(aq);
+samples <\- read.table(\(aqsamples.txt\(aq, sep=\(aq\et\(aq, h=T);
+attach(samples);
+np <\- Nonpareil.curve.batch(File, 50, r=R, g=G, b=B, libnames=Name, modelOnly=TRUE);
+Nonpareil.legend(\(aqbottomright\(aq);
+detach(samples);
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.SH AUTHOR
+Luis M Rodriguez-R
+.SH COPYRIGHT
+2013, Luis M Rodriguez-R
+.\" Generated by docutils manpage writer.
+.
