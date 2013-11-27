@@ -92,9 +92,9 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    else {error("Unsupported format", format);}
    
    // Files
-   seqFile = new char[strlen(sourceFile)+10];
+   seqFile = new char[strlen(sourceFile)+20];
    sprintf(seqFile, "%s.enve-seq.%d", sourceFile, getpid());
-   namFile = new char[strlen(sourceFile)+10];
+   namFile = new char[strlen(sourceFile)+20];
    sprintf(namFile, "%s.enve-nam.%d", sourceFile, getpid());
    namFileOut = namFile;
    seqFileOut = seqFile;

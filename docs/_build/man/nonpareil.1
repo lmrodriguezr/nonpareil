@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "NONPAREIL" "1" "November 19, 2013" "2.1" "Nonpareil"
+.TH "NONPAREIL" "1" "November 27, 2013" "2.1" "Nonpareil"
 .SH NAME
 nonpareil \- Nonpareil Documentation
 .
@@ -376,6 +376,12 @@ Indicates if and how the dispersion of replicates is to be represented. If it\(a
 Otherwise, it can take the values \fB\(aqsd\(aq\fP: 1 standard deviation around the mean; \fB\(aqci95\(aq\fP: 95% confidence
 interval; \fB\(aqci90\(aq\fP: 90% confidence interval; \fB\(aqci50\(aq\fP: 50% confidence interval; \fB\(aqiq\(aq\fP: Inter\-quartile
 range.
+.TP
+.B returnModelValues=FALSE
+Indicates if the output should include model.x and model.y, with coordinates used to plot the fitted model.
+.TP
+.B returnModelParameters=FALSE
+Indicates if the a and b parameters of the fitted model should be returned.
 .TP
 .B xmin=1e3, xmax=10e12
 Range to plot in the x\-axis (Sequencing effort).

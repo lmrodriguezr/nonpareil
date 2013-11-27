@@ -42,6 +42,12 @@ plotDispersion=NA
    interval; ``'ci90'``: 90% confidence interval; ``'ci50'``: 50% confidence interval; ``'iq'``: Inter-quartile
    range.
 
+returnModelValues=FALSE
+   Indicates if the output should include model.x and model.y, with coordinates used to plot the fitted model.
+
+returnModelParameters=FALSE
+   Indicates if the a and b parameters of the fitted model should be returned.
+
 xmin=1e3, xmax=10e12
    Range to plot in the x-axis (Sequencing effort).
 

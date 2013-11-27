@@ -103,7 +103,7 @@ void help(const char *msg){
 }
 
 int main(int argc, char *argv[]) {
-   cout << "nonpareil v" << NP_VERSION << endl;
+   cout << "Nonpareil v" << NP_VERSION << endl;
    if(argc<=1) help("");
    
    // Vars

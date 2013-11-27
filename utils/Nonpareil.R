@@ -35,7 +35,7 @@ Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA,
 }
 
 Nonpareil.curve <- function(file,overlap=NULL,
-			factor=1,plotDispersion=NA,
+			factor=1,plotDispersion=NA,returnModelValues=FALSE,returnModelParameters=FALSE,
 			xmax=10e12,ymax=1,xmin=1e3,ymin=1e-6,xlab=NULL,ylab=NULL,
 			r=NA,g=NA,b=NA,
 			new=TRUE,plot=TRUE,libname=NA,modelOnly=FALSE, plotModel=TRUE,
@@ -188,8 +188,11 @@ Nonpareil.curve <- function(file,overlap=NULL,
 	      if(modelOnly) model.lty=1;
 	      if(plot & plotModel){
 		 model.x <- exp(seq(log(xmin), log(xmax), length.out=1e3));
-		 lines(horiz.diff*model.x*factor, predict(model, list(x=model.x)),
-			   col=rgb(r,g,b,model.alpha), lty=model.lty, lwd=model.lwd);
+		 model.y <- predict(model, list(x=model.x));
+		 model.x <- model.x*horiz.diff*factor;
+		 lines(model.x, model.y, col=rgb(r,g,b,model.alpha), lty=model.lty, lwd=model.lwd);
+		 if(returnModelValues) { out$model.x <- model.x ; out$model.y <- model.y; }
+		 if(returnModelParameters) { out$model=model }
 		 if(modelOnly) points(max(a$V1), predict(model, list(x=max(a$V1))), col=rgb(r,g,b), pch=21, bg='white');
 		 #if(modelOnly) points(min(a$V1[a$V1>0]), predict(model, list(x=min(a$V1[a$V1>0]))), col=rgb(r,g,b), pch=8, bg='white');
 	      }
