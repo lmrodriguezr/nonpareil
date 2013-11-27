@@ -176,7 +176,7 @@ Nonpareil.curve <- function(file,overlap=NULL,
 	# Model it
 	sel  <- values>0 & values<0.9;
 	x <- a$V1[sel];
-	if(length(x)>10){
+	if((length(x)>10) | ! data.consistency){
 	   y <- values[sel];
 	   data <- list(x=x, y=y)
 	   model <- nls(y ~ Nonpareil.f(x, a, b), data=data, weights=(a$V3[sel]^-1.1), start=list(a=1, b=0.1), lower=c(a=0, b=0), algorithm='port', 
