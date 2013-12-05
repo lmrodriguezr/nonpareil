@@ -41,7 +41,7 @@ Nonpareil.curve <- function(file,overlap=NULL,
 			new=TRUE,plot=TRUE,libname=NA,modelOnly=FALSE, plotModel=TRUE,
 			curve.lwd=2, curve.alpha=0.4, model.lwd=1, model.alpha=1, log='x',
 			data.consistency=TRUE, useValue='mean', star=95,
-			read.length=NA){
+			read.length=NA, ...){
 	
 	# Create environment
 	Nonpareil.__init_globals(!new);
@@ -137,7 +137,7 @@ Nonpareil.curve <- function(file,overlap=NULL,
 			else{			xlab <- paste('Sequencing effort (by ', factor, 'bp)', sep='') }
 			if(is.null(ylab)) ylab <- 'Estimated average coverage';
 
-			plot(1, t='n', xlim=c(xmin, xmax), ylim=c(ymin, ymax), xlab=xlab, ylab=ylab, log=log);
+			plot(1, t='n', xlim=c(xmin, xmax), ylim=c(ymin, ymax), xlab=xlab, ylab=ylab, log=log, ...);
 			abline(h=c(1,star/100), lty=2, col='red');
 			abline(v=10^seq(0,15,by=3), lty=2, col='gray80')
 		}

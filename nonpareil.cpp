@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
    // Vars
    char		*file, *format=(char *)"fasta", *alldata, *cntfile, *outfile=(char *)"-", *namFile,
    		*seqFile, *baseout;
-   double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.97, ovl=0.50, *sample_result,
+   double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50, *sample_result,
    		avg_seq_len, divide=0;
    int		v=7, largest_seq, rseed=time(NULL), n=1024, thr=2, ram=1024, *mates, samples_no,
    		sample_i, sample_after_20, sampling_points;
