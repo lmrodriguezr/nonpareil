@@ -18,6 +18,7 @@ Nonpareil.antif <- function(y,a,b){ return(exp(qgamma(y,a,b))-1) }
 # NONPAREIL CURVES
 Nonpareil.curve.batch <- function(files, overlap, r=NA, g=NA, b=NA, libnames=NA, read.lengths=NA, ...){
    if(!is.vector(files)) files = as.vector(files);
+   if(missing(overlap)) overlap=rep(NULL, length(files));
    new=TRUE;
    for(i in 1:length(files)){
       o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i],
