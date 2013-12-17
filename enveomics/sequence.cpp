@@ -230,7 +230,7 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
    if(!seqs) error("Impossible to allocate memory for that many sequences", number);
    for(size_t a=0; a<(size_t)number; a++){
       seqs[a] = new char[largest_seq+1];
-      if(!seqs[a]) error("Impossible to allocate memory for another sequence", a);
+      if(!seqs[a]) error("Impossible to allocate memory for another sequence", (unsigned int)a);
    }
    
    // Read the file
