@@ -1,28 +1,39 @@
 
-gpp=g++
+# Makefile for Nonpareil
+# @update Dec 16 2013
+# @author Luis M. Rodriguez-R <lmrodriguez at gmail dot com>
 
-all:
-	$(gpp) universal.cpp -c
-	$(gpp) sqlite.cpp -c
-	$(gpp) regex.cpp -c
-	$(gpp) go.cpp -c
+include ../globals.mk
+
+mpiflags=-DENVEOMICS_MULTI_NODE
+CPPFLAGS=-c -Wall
+
+all: go sequence nonpareil
 
 go:
-	$(gpp) universal.cpp -c
-	$(gpp) sqlite.cpp -c
-	$(gpp) regex.cpp -c
-	$(gpp) go.cpp -c
+	$(cpp) universal.cpp $(CPPFLAGS)
+	$(cpp) sqlite.cpp $(CPPFLAGS)
+	$(cpp) regex.cpp $(CPPFLAGS)
+	$(cpp) go.cpp $(CPPFLAGS)
 
 sequence:
-	$(gpp) universal.cpp -c
-	$(gpp) sequence.cpp -c
+	$(cpp) universal.cpp $(CPPFLAGS)
+	$(cpp) sequence.cpp $(CPPFLAGS)
 
 nonpareil:
-	$(gpp) universal.cpp -c
-	$(gpp) sequence.cpp -c
-	$(gpp) nonpareil_mating.cpp -c
-	$(gpp) nonpareil_sampling.cpp -c
+	$(cpp) universal.cpp $(CPPFLAGS)
+	$(cpp) multinode.cpp $(CPPFLAGS)
+	$(cpp) sequence.cpp $(CPPFLAGS)
+	$(cpp) nonpareil_mating.cpp $(CPPFLAGS)
+	$(cpp) nonpareil_sampling.cpp $(CPPFLAGS)
 
+nonpareil-mpi:
+	$(mpicpp) $(mpiflags) universal.cpp $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) multinode.cpp $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) sequence.cpp $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) nonpareil_mating.cpp $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) nonpareil_sampling.cpp $(CPPFLAGS)
+	
 clean:
 	rm *.o
 

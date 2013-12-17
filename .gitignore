@@ -1,2 +1,3 @@
 enveomics/*.o
 nonpareil
+nonpareil-mpi

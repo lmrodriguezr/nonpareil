@@ -1,30 +1,34 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
-// @version 2.1
+// @version 2.2
 // @license artistic license 2.0
 
 /*
   ROADMAP
 
   o To validate "logarithmic sampling".
+  o MPI'ize
   
 */
 
 #include <math.h>
 #include <getopt.h>
+#include "enveomics/universal.h"
+#include "enveomics/multinode.h"
+#include "enveomics/sequence.h"
 #include "enveomics/nonpareil_mating.h"
 #include "enveomics/nonpareil_sampling.h"
-#include "enveomics/universal.h"
-#include "enveomics/sequence.h"
 
 #define LARGEST_PATH 2048
-#define NP_VERSION 2.1
+#define NP_VERSION 2.2
 
 using namespace std;
+int processID;
+int processes;
 
 void help(const char *msg){
-   if(msg!=NULL && strlen(msg) != 0) cerr << endl << msg << endl << endl;
-   cerr << "AIM"<< endl
+   if(processID==0 && msg!=NULL && strlen(msg) != 0) cerr << endl << msg << endl << endl;
+   if(processID==0) cerr << "AIM"<< endl
    	<< "   Fast and memory-efficient method to generate Nonpareil curves in large sets of short reads." << endl
 	<< endl
    	<< "USAGE" << endl
@@ -99,11 +103,13 @@ void help(const char *msg){
 	<< "     non-unique) reads. The values in the summary file are computed for the distribution of the last column categorized" << endl
 	<< "     by the first column.  See -a." << endl
 	;
-   exit(1);
+   finalize_multinode();
+   if(processID==0){ exit(1); }else{ exit(0); }
 }
 
 int main(int argc, char *argv[]) {
-   cout << "Nonpareil v" << NP_VERSION << endl;
+   init_multinode(argc, argv, processID, processes);
+   if(processID==0) cout << "Nonpareil v" << NP_VERSION << endl;
    if(argc<=1) help("");
    
    // Vars
@@ -149,7 +155,7 @@ int main(int argc, char *argv[]) {
 	 case 't': thr = atoi(optarg);		break;
 	 case 'T': ;				break; // For backwards compatibility
 	 case 'v': v = atoi(optarg);		break;
-	 case 'V': return 0;
+	 case 'V': finalize_multinode(); return 0;
 	 case 'x': qry_portion = atof(optarg);	break;
 	 case 'X': hX = atoi(optarg);		break;
       }
@@ -184,40 +190,54 @@ int main(int argc, char *argv[]) {
    if(alldata && (strlen(alldata)>0)) remove(alldata);
    if(cntfile && (strlen(cntfile)>0)) remove(cntfile);
    if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) remove(outfile);
-   srand(rseed);
+   srand(rseed+processID);
    
    // Parse file
-   say("1s$", "Counting sequences");
+   if(processID==0) say("1s$", "Counting sequences");
    namFile = (char *)malloc(LARGEST_PATH * (sizeof *namFile));
    seqFile = (char *)malloc(LARGEST_PATH * (sizeof *seqFile));
-   total_seqs = build_index(file, format, namFile, seqFile, largest_seq, avg_seq_len);
-   if(largest_seq<1) error("Your sequences are empty or an internal error occurred.  Largest sequence is ", largest_seq);
-   say("2sss$", "The file ", seqFile, " was just created");
-   say("4sis$", "Longest sequence has ", largest_seq, " characters");
-   say("4sfs$", "Average read length is ", avg_seq_len, " bp");
-   if(total_seqs==0) error("The file you provided do not contain sequences.  Before re-run please delete the file", seqFile);
-   say("1sus$", "Reading file with ", total_seqs, " sequences");
+   if(processID==0){
+      total_seqs = build_index(file, format, namFile, seqFile, largest_seq, avg_seq_len);
+      if(largest_seq<1) error("Your sequences are empty or an internal error occurred.  Largest sequence is ", largest_seq);
+      say("2sss$", "The file ", seqFile, " was just created");
+      say("4sis$", "Longest sequence has ", largest_seq, " characters");
+      say("4sfs$", "Average read length is ", avg_seq_len, " bp");
+      if(total_seqs==0) error("The file you provided do not contain sequences.  Before re-run please delete the file", seqFile);
+      say("1sus$", "Reading file with ", total_seqs, " sequences");
+   }
+   total_seqs = broadcast_int(total_seqs);
+   namFile = broadcast_char(namFile, LARGEST_PATH);
+   seqFile = broadcast_char(seqFile, LARGEST_PATH);
+   largest_seq = broadcast_int(largest_seq);
+   avg_seq_len = broadcast_double(avg_seq_len);
 
 restart_vars:
-   // Re-wire query portion
-   if(qry_portion!=0) hX = (size_t)total_seqs*qry_portion;
-   qry_portion = (double)hX/total_seqs;
-
-   // Prepare memory arguments
-   if(ram > UINT_MAX/1024) error("The memory to allocate is huge, I cannot manage such a big number.  Reduce -R and try again", ram);
-   ram_Kb = ram*1024;
-   required_ram_Kb = 2*(int)hX*sizeof(int)*thr/1024 + 2048; //<- 2Mb to store other things (usually <1Mb)
-   if(ram_Kb < required_ram_Kb)
-      error("The amount of memory allowed is lesser than the minimum required, increase -R to at least", (double)required_ram_Kb/1024);
-   lines_in_ram = (ram_Kb - required_ram_Kb)/(largest_seq + 3); // <- This is Kibi-lines, not lines
-   if(lines_in_ram > UINT_MAX/1024){
-      say("1sfs$", "WARNING: Unable to represent RAM in bits, lowering to ", (double)UINT_MAX/(1024*1024), "Mb");
-      lines_in_ram = UINT_MAX;
-   }else lines_in_ram *= 1024; // <- Beware, I am rounding down to the Kibi.  This is NOT the actual count.
-   say("3sfsisfs$",
-   	"Sequences to store in ", (double)(ram_Kb - required_ram_Kb)/1024, "Mb free: ", lines_in_ram,
-	" (", (double)lines_in_ram*100.0/total_seqs, "%)");
-
+   if(processID==0){
+      // Re-wire query portion
+      if(qry_portion!=0) hX = (size_t)total_seqs*qry_portion;
+      qry_portion = (double)hX/total_seqs;
+      
+      // Prepare memory arguments
+      if(ram > UINT_MAX/1024) error("The memory to allocate is huge, I cannot manage such a big number.  Reduce -R and try again", ram);
+      ram_Kb = ram*1024;
+      required_ram_Kb = 2*(int)hX*sizeof(int)*thr/1024 + 2048; //<- 2Mb to store other things (usually <1Mb)
+      if(ram_Kb < required_ram_Kb)
+	 error("The amount of memory allowed is lesser than the minimum required, increase -R to at least", (double)required_ram_Kb/1024);
+      lines_in_ram = (ram_Kb - required_ram_Kb)/(largest_seq + 3); // <- This is Kibi-lines, not lines
+      if(lines_in_ram > UINT_MAX/1024){
+	 say("1sfs$", "WARNING: Unable to represent RAM in bits, lowering to ", (double)UINT_MAX/(1024*1024), "Mb");
+	 lines_in_ram = UINT_MAX;
+      }else lines_in_ram *= 1024; // <- Beware, I am rounding down to the Kibi.  This is NOT the actual count.
+      say("3sfsisfs$",
+	   "Sequences to store in ", (double)(ram_Kb - required_ram_Kb)/1024, "Mb free: ", lines_in_ram,
+	   " (", (double)lines_in_ram*100.0/total_seqs, "%)");
+   }
+   hX = broadcast_int(hX);
+   qry_portion = broadcast_double(qry_portion);
+   ram_Kb = broadcast_int(ram_Kb);
+   required_ram_Kb = broadcast_int(required_ram_Kb);
+   lines_in_ram = broadcast_int(lines_in_ram);
+   
    // Run comparisons
 restart_mates:
    matepar.overlap = ovl;
@@ -225,12 +245,17 @@ restart_mates:
    matepar.qryportion = qry_portion;
    matepar.revcom = revcom;
    matepar.n_as_mismatch = n_as_mismatch;
-   say("1sfsis$", "Querying library with ", qry_portion, " times the total size (", hX," seqs)");
+   if(processID==0) say("1sfsis$", "Querying library with ", qry_portion, " times the total size (", hX," seqs)");
    qry_seqs_no = nonpareil_mate(mates, seqFile, thr, lines_in_ram, total_seqs, largest_seq, matepar);
-   if(cntfile && (strlen(cntfile)>0)) nonpareil_save_mates(mates, qry_seqs_no, cntfile);
+   if(processID==0 && cntfile && (strlen(cntfile)>0)) nonpareil_save_mates(mates, qry_seqs_no, cntfile);
 
    // Sampling
 restart_samples:
+   // TODO: MPIize subsampling and safely close the slave processes
+   if(processID!=0){
+      finalize_multinode();
+      return 0;
+   }
    if(divide==0){
       sampling_points=(int)ceil((max-min)/itv)+1;
    }else{
@@ -335,8 +360,11 @@ restart_checkings:
    
 exit:
    // Clean temporals
-   remove(namFile);
-   remove(seqFile);
+   if(processID==0){
+      remove(namFile);
+      remove(seqFile);
+   }
+   finalize_multinode();
    close_log();
    return 0;
 }
