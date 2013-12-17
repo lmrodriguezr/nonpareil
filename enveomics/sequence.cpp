@@ -36,7 +36,7 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
    while(fileh.good()){
       string line;
       getline(fileh, line);
-      if(line.length() > maxlen) maxlen = line.length();
+      if(line.length() > (size_t)maxlen) maxlen = line.length();
       if((isFastQ & (nline%4==0)) | (!isFastQ & (line[0]==start))) N++;
       else totlen += line.length();
       if(totlen==UINT_MAX-1) error("Unable to represent the number of nucleotides, limit reached", UINT_MAX-1);
@@ -128,7 +128,7 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
 	    namfileh << ">" << ++N << endl << name << endl;
 	    seqfileh << ">" <<   N << endl <<  seq << endl;
 	    totlen += seq.length();
-	    if(seq.length() > maxlen) maxlen = seq.length();
+	    if(seq.length() > (size_t)maxlen) maxlen = seq.length();
 	    if(totlen==UINT_MAX-1) error("Impossible to represent the number of nucleotides while indexing, limit reached", UINT_MAX-1);
 	 }
          name = line.length()>1 ? line.substr(1) : "";
@@ -143,7 +143,7 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    if(seq.length()>0){
       //namfileh << ">" << ++N << endl << name << endl;
       //seqfileh << ">" <<   N << endl <<  seq << endl;
-      if(seq.length() > maxlen) maxlen = seq.length();
+      if(seq.length() > (size_t)maxlen) maxlen = seq.length();
       totlen += seq.length();
    }
 
@@ -228,7 +228,7 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
    // Memory allocation
    seqs = new char*[number];
    if(!seqs) error("Impossible to allocate memory for that many sequences", number);
-   for(unsigned int a=0; a<number; a++){
+   for(size_t a=0; a<(size_t)number; a++){
       seqs[a] = new char[largest_seq+1];
       if(!seqs[a]) error("Impossible to allocate memory for another sequence", a);
    }
@@ -241,8 +241,8 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
 	 if(entry.size()>0){
 	    i++;
 	    if(i>=from){
-	       if(entry.length() > largest_seq) error("Found a sequences largest than expected", (int)entry.length());
-	       for(int a=0; a<=entry.length(); a++) seqs[n][a] = entry[a];
+	       if(entry.length() > (size_t)largest_seq) error("Found a sequences largest than expected", (int)entry.length());
+	       for(size_t a=0; a<=entry.length(); a++) seqs[n][a] = entry[a];
 	       n++;
 	       if(n >= number) break;
 	    }

@@ -51,7 +51,7 @@ size_t nonpareil_mate(int *&result,
    
    // Blank results
    result = new int[qry_seqs];
-   for(int a=0; a<qry_seqs; a++) result[a] = 0;
+   for(size_t a=0; a<qry_seqs; a++) result[a] = 0;
    
    // Design blocks
    if(processID==0){
@@ -113,7 +113,7 @@ size_t nonpareil_mate(int *&result,
       // END DEBUG
       int *result_sum = new int[qry_seqs];
       reduce_sum_int(result, result_sum, qry_seqs);
-      if(processID==0) for(int a=0; a<qry_seqs; a++) result[a] = result_sum[a];
+      if(processID==0) for(size_t a=0; a<qry_seqs; a++) result[a] = result_sum[a];
    }
    barrier_multinode();
 
@@ -141,7 +141,7 @@ void nonpareil_count_mates_block(int *&result, int from_in_result,
    for(int thr=0; thr<threads; thr++){
      matejob[thr].id = thr; // The ID of the thread
      matejob[thr].from = mates_per_thr*thr; // The first qry sequence to process (in zero-count)
-     matejob[thr].number = (matejob[thr].from+mates_per_thr > sizeBlockA ? sizeBlockA-matejob[thr].from : mates_per_thr); // How many qry sequences to process
+     matejob[thr].number = (matejob[thr].from+mates_per_thr > (size_t)sizeBlockA ? sizeBlockA-matejob[thr].from : mates_per_thr); // How many qry sequences to process
      matejob[thr].from_in_result = from_in_result; // Where to start saving results (in zero-count)
      matejob[thr].par = matepar; // It's cheap to create multiple copies of this, and it's safer than passing a reference.
      matejob[thr].result = &result; // This is only used with mutex (to save RAM)
@@ -173,7 +173,7 @@ void *nonpareil_count_mates_thr(void *matejob_ref){
    if(!result_cp) error("Impossible to allocate memory for the results of the new thread", matejob->id);
    
    // Run comparisons
-   for(int a=0; a<matejob->number; a++) result_cp[a] = 0;
+   for(size_t a=0; a<matejob->number; a++) result_cp[a] = 0;
    nonpareil_count_mates(result_cp, *matejob->blockA, *matejob->blockB,
    	matejob->from, matejob->number, 0, matejob->size_blockB,
 	(matejob->id==0?(int)ceil((double)matejob->number/100.0):0), matejob->par);
@@ -183,7 +183,7 @@ void *nonpareil_count_mates_thr(void *matejob_ref){
       if(processID==0) say("4sisis>", "Thread ", matejob->id, " completed ", matejob->number," comparisons, joining results");
       int *&result_ref = *matejob->result;
       //					     v--> position + first of the block + first of the thread
-      for(int i=0; i<matejob->number; i++) result_ref[i + matejob->from_in_result + matejob->from] += result_cp[i];
+      for(size_t i=0; i<matejob->number; i++) result_ref[i + matejob->from_in_result + matejob->from] += result_cp[i];
    pthread_mutex_unlock( matejob->mutex );
 
    return (void *)0;
