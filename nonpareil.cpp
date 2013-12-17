@@ -210,6 +210,7 @@ int main(int argc, char *argv[]) {
    seqFile = broadcast_char(seqFile, LARGEST_PATH);
    largest_seq = broadcast_int(largest_seq);
    avg_seq_len = broadcast_double(avg_seq_len);
+   barrier_multinode();
 
 restart_vars:
    if(processID==0){
@@ -237,6 +238,7 @@ restart_vars:
    ram_Kb = broadcast_int(ram_Kb);
    required_ram_Kb = broadcast_int(required_ram_Kb);
    lines_in_ram = broadcast_int(lines_in_ram);
+   barrier_multinode();
    
    // Run comparisons
 restart_mates:
@@ -248,14 +250,10 @@ restart_mates:
    if(processID==0) say("1sfsis$", "Querying library with ", qry_portion, " times the total size (", hX," seqs)");
    qry_seqs_no = nonpareil_mate(mates, seqFile, thr, lines_in_ram, total_seqs, largest_seq, matepar);
    if(processID==0 && cntfile && (strlen(cntfile)>0)) nonpareil_save_mates(mates, qry_seqs_no, cntfile);
+   barrier_multinode();
 
    // Sampling
 restart_samples:
-   // TODO: MPIize subsampling and safely close the slave processes
-   if(processID!=0){
-      finalize_multinode();
-      return 0;
-   }
    if(divide==0){
       sampling_points=(int)ceil((max-min)/itv)+1;
    }else{
@@ -277,6 +275,11 @@ restart_samples:
    samplepar.avg_read_len = avg_seq_len;
    samplepar.portion_as_label = portion_label;
    
+   // TODO: MPIize subsampling and safely close the slave processes
+   if(processID!=0){
+      finalize_multinode();
+      return 0;
+   }
    say("1s$", "Sub-sampling library");
    double a=min;
    //for(double a=min; a<=max; a+=itv){

@@ -14,8 +14,12 @@
 #include <algorithm>
 
 #include "universal.h"
+#include "multinode.h"
 #include "sequence.h"
 #include "nonpareil_sampling.h"
+
+extern int processID;
+extern int processes;
 
 #define LARGEST_LABEL	128
 #define LARGEST_LINE	2048
