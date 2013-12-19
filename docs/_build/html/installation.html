@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Install Nonpareil &mdash; Nonpareil 2.1.r2 documentation</title>
+    <title>Install Nonpareil &mdash; Nonpareil 2.2 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.1.r2',
+        VERSION:     '2.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.1.r2 documentation" href="index.html" />
+    <link rel="top" title="Nonpareil 2.2 documentation" href="index.html" />
     <link rel="next" title="Preprocess the reads" href="preprocess.html" />
     <link rel="prev" title="Nonpareil" href="index.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="index.html" title="Nonpareil"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.1.r2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -54,6 +54,8 @@
 <div class="section" id="system-requirements">
 <h2>System requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
 <p><strong>Nonpareil binary</strong>: Nonpareil requires a C++ compiler. It has been tested on 64-bit machines with GCC versions ≥4.2.1, running Mac OSX and Red Hat Linux.</p>
+<p><strong>Nonpareil MPI</strong>: If you want to compile Nonpareil with MPI support, you will need <a class="reference external" href="http://www.open-mpi.org/">OpenMPI</a> (v &gt; 1.4.3 tested). Other implementations of MPI could work, but
+are yet untested.</p>
 <p><strong>Nonpareil utilities</strong>: Requires <a class="reference external" href="http://www.r-project.org/">R</a>. No additional libraries are necessary.</p>
 </div>
 <div class="section" id="compilation">
@@ -71,6 +73,9 @@
 <p>Change directory into the newly created folder, and compile Nonpareil:</p>
 <div class="highlight-python"><pre>cd nonpareil
 make</pre>
+</div>
+<p>If you want to compile Nonpareil MPI (see also <a class="reference internal" href="mpi.html"><em>MPI support</em></a>), just run:</p>
+<div class="highlight-python"><pre>make nonpareil-mpi</pre>
 </div>
 <p>If you want to make Nonpareil available system-wide, just copy the generated binary into a folder listed in the <tt class="docutils literal"><span class="pre">$PATH</span></tt>. For example:</p>
 <div class="highlight-python"><pre>sudo cp nonpareil /usr/local/bin/</pre>
@@ -135,7 +140,7 @@ make</pre>
         <li class="right" >
           <a href="index.html" title="Nonpareil"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.1.r2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

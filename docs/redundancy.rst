@@ -1,6 +1,8 @@
 Redundancy
 ==========
 
+If you have large files (>1Gb) and access to a cluster, take a look at :doc:`mpi`.
+
 For the impatient
 -----------------
 

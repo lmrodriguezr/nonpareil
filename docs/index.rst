@@ -19,6 +19,7 @@ Contents:
    preprocess
    redundancy
    curves
+   mpi
 
 
 

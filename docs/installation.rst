@@ -6,6 +6,9 @@ System requirements
 
 **Nonpareil binary**: Nonpareil requires a C++ compiler. It has been tested on 64-bit machines with GCC versions ≥4.2.1, running Mac OSX and Red Hat Linux.
 
+**Nonpareil MPI**: If you want to compile Nonpareil with MPI support, you will need OpenMPI_ (v > 1.4.3 tested). Other implementations of MPI could work, but
+are yet untested.
+
 **Nonpareil utilities**: Requires R_. No additional libraries are necessary.
 
 Compilation
@@ -28,6 +31,10 @@ Compilation
       cd nonpareil
       make
 
+   If you want to compile Nonpareil MPI (see also :doc:`mpi`), just run::
+      
+      make nonpareil-mpi
+   
    If you want to make Nonpareil available system-wide, just copy the generated binary into a folder listed in the ``$PATH``. For example::
 
       sudo cp nonpareil /usr/local/bin/
@@ -35,4 +42,5 @@ Compilation
 .. _R: http://www.r-project.org/
 .. _git: http://git-scm.com/
 .. _GitHub: https://github.com/lmrodriguezr/nonpareil
+.. _OpenMPI: http://www.open-mpi.org/
 .. _TAR-Ball: https://github.com/lmrodriguezr/nonpareil/tarball/master

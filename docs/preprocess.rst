@@ -2,7 +2,7 @@ Preprocess the reads
 ====================
 
 Nonpareil expects that the sequencing error is always well below 5%, so we suggest using an expected error cutoff of 1%
-(i.e., Q>20, or 1 error in 100 nucleotides). We recommend to perform this task using SolexaQA.
+(*i.e.*, Q>20, or 1 error in 100 nucleotides). We recommend to perform this task using SolexaQA_.
 
 Ideally, the reads should be in FastA format (althought Nonpareil can read FastQ). To transform FastQ into FastA, you
 can simply use::
@@ -20,4 +20,5 @@ in the same file, you can separate them using FastA.split.pl_::
     FastA.split.pl reads.fasta reads 2
 
 .. _FastA.split.pl: https://github.com/lmrodriguezr/enveomics/blob/master/Scripts/FastA.split.pl
+.. _SolexaQA: http://solexaqa.sourceforge.net/
 
