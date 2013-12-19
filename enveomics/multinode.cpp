@@ -59,6 +59,16 @@ char broadcast_char(char value){
 void reduce_sum_int(int *send, int *receive, int size){
    MPI::COMM_WORLD.Reduce(send, receive, size, MPI::INT, MPI::SUM, 0);
 }
+void reduce_sum_int(int send, int receive){
+   int *send_ar = new int[1], *receive_ar = new int[1];
+   send_ar[0] = send;
+   MPI::COMM_WORLD.Reduce(send_ar, receive_ar, 1, MPI::INT, MPI::SUM, 0);
+   receive = receive_ar[0];
+}
+
+void reduce_sum_double(double *send, double *receive, int size){
+   MPI::COMM_WORLD.Reduce(send, receive, size, MPI::DOUBLE, MPI::SUM, 0);
+}
 
 #else
 void init_multinode(int& argc, char**& argv, int& pid, int& pp){
@@ -72,5 +82,7 @@ char*	broadcast_char(char* value, size_t size){return(value);}
 char	broadcast_char(char value){return(value);}
 void	barrier_multinode(){}
 void	reduce_sum_int(int *send, int *receive, int size){}
+void	reduce_sum_int(int send, int receive){}
+void	reduce_sum_double(double *send, double *receive, int size){}
 #endif
 

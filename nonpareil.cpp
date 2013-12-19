@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
       if(!alldata || (strlen(alldata)<=0)){ sprintf(alldataTmp, "%s.npa", baseout); alldata=alldataTmp; }
       if(!cntfile || (strlen(cntfile)<=0)){ sprintf(cntfileTmp, "%s.npc", baseout); cntfile=cntfileTmp; }
       if(!outfile || (strcmp(outfile, "-")==0)){ sprintf(outfileTmp, "%s.npo", baseout); outfile=outfileTmp; }
-      if(!log_is_open()) {
+      if(processID==0 && !log_is_open()) {
          char logfile[LARGEST_PATH];
 	 sprintf(logfile, "%s.npl", baseout);
 	 open_log(logfile);
@@ -275,26 +275,32 @@ restart_samples:
    samplepar.avg_read_len = avg_seq_len;
    samplepar.portion_as_label = portion_label;
    
+   if(processID==0) say("1s$", "Sub-sampling library");
+   double a=min;
+   //for(double a=min; a<=max; a+=itv){
+   if(processID==0){
+      while(sample_i < sampling_points){
+	 //if(sampling_points<=sample_i)
+	   //error("Unexpected number of sampling points.  This can be due to a precision problem, try decreasing the -i parameter");
+	 if(divide==0){
+	    samplepar.portion = min + itv*sample_i;
+	 }else{
+	    samplepar.portion = sample_i==0 ? 0 : pow(divide, sampling_points-sample_i-1);
+	 }
+	 samplepar.replicates = n;
+	 
+	 samples_no = nonpareil_sample_portion(sample_result, thr, samplepar);
+	 if(processID==0){
+	    sample_summary[sample_i++] = nonpareil_sample_summary(sample_result, samples_no, alldata, outfile, samplepar);
+	    if(samplepar.portion<=0.2) sample_after_20 = sample_i;
+	 }
+      }
+   }
+   
    // TODO: MPIize subsampling and safely close the slave processes
    if(processID!=0){
       finalize_multinode();
       return 0;
-   }
-   say("1s$", "Sub-sampling library");
-   double a=min;
-   //for(double a=min; a<=max; a+=itv){
-   while(sample_i < sampling_points){
-      //if(sampling_points<=sample_i)
-	//error("Unexpected number of sampling points.  This can be due to a precision problem, try decreasing the -i parameter");
-      if(divide==0){
-	 samplepar.portion = min + itv*sample_i;
-      }else{
-         samplepar.portion = sample_i==0 ? 0 : pow(divide, sampling_points-sample_i-1);
-      }
-      samplepar.replicates = n;
-      samples_no = nonpareil_sample_portion(sample_result, thr, samplepar);
-      sample_summary[sample_i++] = nonpareil_sample_summary(sample_result, samples_no, alldata, outfile, samplepar);
-      if(samplepar.portion<=0.2) sample_after_20 = sample_i;
    }
    
    // Check results
@@ -366,9 +372,9 @@ exit:
    if(processID==0){
       remove(namFile);
       remove(seqFile);
+      close_log();
    }
    finalize_multinode();
-   close_log();
    return 0;
 }
 

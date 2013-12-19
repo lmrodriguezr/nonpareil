@@ -39,7 +39,7 @@ int nonpareil_sample_portion(double *&result, int threads, samplepar_t samplepar
    for(int a=0; a<samplepar.replicates; a++) result[a] = 0.0;
    
    // Set sample
-   say("4sfs^", "Sampling at ", samplepar.portion*100, "%");
+   if(processID==0) say("4sfs^", "Sampling at ", samplepar.portion*100, "%");
    samples_per_thr = (int)ceil((double)samplepar.replicates/(double)threads);
    threads = (int)ceil((double)samplepar.replicates/samples_per_thr);
    
@@ -53,15 +53,15 @@ int nonpareil_sample_portion(double *&result, int threads, samplepar_t samplepar
       samplejob[thr].mutex = &mutex;
       launched_replicates += samplejob[thr].number;
 
-     if((rc=pthread_create(&thread[thr], NULL, &nonpareil_sample_portion_thr, (void *)&samplejob[thr]  )))
-        error("Thread creation failed", (char)rc);
+      if((rc=pthread_create(&thread[thr], NULL, &nonpareil_sample_portion_thr, (void *)&samplejob[thr]  )))
+	 error("Thread creation failed", (char)rc);
    }
 
    // Gather jobs
    for(int thr=0; thr<threads; thr++){
-      pthread_join(thread[thr], NULL);
+      if(thr%processes == processID) pthread_join(thread[thr], NULL);
    }
-   
+
    // Return
    return launched_replicates;
 }

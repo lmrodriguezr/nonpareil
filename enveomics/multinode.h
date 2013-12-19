@@ -32,6 +32,8 @@ char*	broadcast_char(char* value, size_t size);
 char	broadcast_char(char value);
 void	barrier_multinode();
 void	reduce_sum_int(int *send, int *receive, int size);
+void	reduce_sum_int(int send, int receive);
+void	reduce_sum_double(double *send, double *receive, int size);
 
 #endif
 

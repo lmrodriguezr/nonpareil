@@ -104,7 +104,7 @@ size_t nonpareil_mate(int *&result,
    }
    barrier_multinode();
    
-   // Summarize multi-node results
+   // Reduce multi-node results
    if(processes>1){
       // DEBUG
       //char *cntfile = new char[123];
