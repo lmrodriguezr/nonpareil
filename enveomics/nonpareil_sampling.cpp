@@ -14,12 +14,12 @@
 #include <algorithm>
 
 #include "universal.h"
-#include "multinode.h"
+// #include "multinode.h"
 #include "sequence.h"
 #include "nonpareil_sampling.h"
 
-extern int processID;
-extern int processes;
+//extern int processID;
+//extern int processes;
 
 #define LARGEST_LABEL	128
 #define LARGEST_LINE	2048
@@ -39,7 +39,8 @@ int nonpareil_sample_portion(double *&result, int threads, samplepar_t samplepar
    for(int a=0; a<samplepar.replicates; a++) result[a] = 0.0;
    
    // Set sample
-   if(processID==0) say("4sfs^", "Sampling at ", samplepar.portion*100, "%");
+   //if(processID==0)
+   say("4sfs^", "Sampling at ", samplepar.portion*100, "%");
    samples_per_thr = (int)ceil((double)samplepar.replicates/(double)threads);
    threads = (int)ceil((double)samplepar.replicates/samples_per_thr);
    
@@ -59,7 +60,8 @@ int nonpareil_sample_portion(double *&result, int threads, samplepar_t samplepar
 
    // Gather jobs
    for(int thr=0; thr<threads; thr++){
-      if(thr%processes == processID) pthread_join(thread[thr], NULL);
+      //if(thr%processes == processID)
+      pthread_join(thread[thr], NULL);
    }
 
    // Return

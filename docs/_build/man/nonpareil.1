@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "NONPAREIL" "1" "December 19, 2013" "2.2" "Nonpareil"
+.TH "NONPAREIL" "1" "December 23, 2013" "2.2" "Nonpareil"
 .SH NAME
 nonpareil \- Nonpareil Documentation
 .
@@ -678,7 +678,7 @@ Comparing reads, which is threaded and multi\-node. This is by far the most expe
 across CPUs on each machine. This process is linear in time with the size of the input file.
 .IP 3. 3
 Subsampling, which is threaded but not multi\-node. This step is not too expensive, and it\(aqs nearly constant time. With default parameters,
-it takes about 3 minutes of CPU time, but it grows if you reduce \fB\-i\fP\&. The time on this step is reduced by more threads (\fB\-t\fP), but
+it takes about 2 minutes with 64 threads, but it grows if you reduce \fB\-i\fP\&. The time on this step is reduced by more threads (\fB\-t\fP), but
 not by more machines.
 .UNINDENT
 .TP

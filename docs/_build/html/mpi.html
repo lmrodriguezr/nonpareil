@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>MPI support &mdash; Nonpareil 2.2 documentation</title>
+    <title>MPI support &mdash; Nonpareil 2.2r1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.2',
+        VERSION:     '2.2r1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.2 documentation" href="index.html" />
+    <link rel="top" title="Nonpareil 2.2r1 documentation" href="index.html" />
     <link rel="prev" title="Nonpareil curves" href="curves.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="curves.html" title="Nonpareil curves"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.2r1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -114,7 +114,7 @@ of the input file.</li>
 <li>Comparing reads, which is threaded and multi-node. This is by far the most expensive step, and it is distributed across machines and
 across CPUs on each machine. This process is linear in time with the size of the input file.</li>
 <li>Subsampling, which is threaded but not multi-node. This step is not too expensive, and it&#8217;s nearly constant time. With default parameters,
-it takes about 3 minutes of CPU time, but it grows if you reduce <tt class="docutils literal"><span class="pre">-i</span></tt>. The time on this step is reduced by more threads (<tt class="docutils literal"><span class="pre">-t</span></tt>), but
+it takes about 2 minutes with 64 threads, but it grows if you reduce <tt class="docutils literal"><span class="pre">-i</span></tt>. The time on this step is reduced by more threads (<tt class="docutils literal"><span class="pre">-t</span></tt>), but
 not by more machines.</li>
 </ol>
 </dd>
@@ -182,7 +182,7 @@ attain shorter running times by increasing the RAM (<tt class="docutils literal"
         <li class="right" >
           <a href="curves.html" title="Nonpareil curves"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.2r1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

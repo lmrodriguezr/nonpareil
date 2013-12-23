@@ -254,31 +254,33 @@ restart_mates:
 
    // Sampling
 restart_samples:
-   if(divide==0){
-      sampling_points=(int)ceil((max-min)/itv)+1;
-   }else{
-      sampling_points=(int)ceil( (log(2) - log(total_seqs))/log(divide) )+2;
-   }
    sample_t	sample_summary[sampling_points];
-   
-   sample_i=sample_after_20=0;
-   samplepar.np_version = NP_VERSION;
-   samplepar.replicates = n;
-   samplepar.mates = &mates;
-   samplepar.mates_size = qry_seqs_no;
-   samplepar.portion_min = min;
-   samplepar.portion_max = max;
-   samplepar.portion_itv = itv;
-   samplepar.seq_overlap = ovl;
-   samplepar.total_reads = total_seqs;
-   samplepar.max_read_len = largest_seq;
-   samplepar.avg_read_len = avg_seq_len;
-   samplepar.portion_as_label = portion_label;
-   
-   if(processID==0) say("1s$", "Sub-sampling library");
-   double a=min;
-   //for(double a=min; a<=max; a+=itv){
+   size_t	dummy=0;
    if(processID==0){
+      if(divide==0){
+	 sampling_points=(int)ceil((max-min)/itv)+1;
+      }else{
+	 sampling_points=(int)ceil( (log(2) - log(total_seqs))/log(divide) )+2;
+      }
+      
+      sample_i=sample_after_20=0;
+      samplepar.np_version = NP_VERSION;
+      samplepar.replicates = n;
+      samplepar.mates = &mates;
+      samplepar.mates_size = qry_seqs_no;
+      samplepar.portion_min = min;
+      samplepar.portion_max = max;
+      samplepar.portion_itv = itv;
+      samplepar.seq_overlap = ovl;
+      samplepar.total_reads = total_seqs;
+      samplepar.max_read_len = largest_seq;
+      samplepar.avg_read_len = avg_seq_len;
+      samplepar.portion_as_label = portion_label;
+   
+      say("1s$", "Sub-sampling library");
+      double a=min;
+      
+      //for(double a=min; a<=max; a+=itv){
       while(sample_i < sampling_points){
 	 //if(sampling_points<=sample_i)
 	   //error("Unexpected number of sampling points.  This can be due to a precision problem, try decreasing the -i parameter");
@@ -290,13 +292,15 @@ restart_samples:
 	 samplepar.replicates = n;
 	 
 	 samples_no = nonpareil_sample_portion(sample_result, thr, samplepar);
-	 if(processID==0){
+	 //if(processID==0){
 	    sample_summary[sample_i++] = nonpareil_sample_summary(sample_result, samples_no, alldata, outfile, samplepar);
 	    if(samplepar.portion<=0.2) sample_after_20 = sample_i;
-	 }
+	 //}
       }
+      dummy = 1;
    }
-   
+   dummy = broadcast_int(dummy);
+   barrier_multinode();
    // Check results
 restart_checkings:
    if(processID==0){
@@ -361,7 +365,10 @@ restart_checkings:
 	 ok = false;
       }
       if(ok) say("1s$", "Everything seems correct");
+      dummy = 2;
    }
+   dummy = broadcast_int(dummy);
+   barrier_multinode();
    
 exit:
    // Clean temporals

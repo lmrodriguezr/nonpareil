@@ -75,7 +75,7 @@ Should I use more machines or more threads?
       across CPUs on each machine. This process is linear in time with the size of the input file.
 
    3. Subsampling, which is threaded but not multi-node. This step is not too expensive, and it's nearly constant time. With default parameters,
-      it takes about 3 minutes of CPU time, but it grows if you reduce ``-i``. The time on this step is reduced by more threads (``-t``), but
+      it takes about 2 minutes with 64 threads, but it grows if you reduce ``-i``. The time on this step is reduced by more threads (``-t``), but
       not by more machines.
 
 How can I evaluate the performance in pilot runs?
