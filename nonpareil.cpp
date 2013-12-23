@@ -299,7 +299,7 @@ restart_samples:
    
    // Check results
 restart_checkings:
-   if(processID!=0){
+   if(processID==0){
       say("1s>", "Evaluating consistency");
       ok = true;
       // Low sequencing depth
