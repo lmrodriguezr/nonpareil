@@ -297,75 +297,71 @@ restart_samples:
       }
    }
    
-   // TODO: MPIize subsampling and safely close the slave processes
-   if(processID!=0){
-      finalize_multinode();
-      return 0;
-   }
-   
    // Check results
 restart_checkings:
-   say("1s>", "Evaluating consistency");
-   ok = true;
-   // Low sequencing depth
-   if(sample_after_20<=sample_i && sample_summary[sample_after_20].q2==0.0){
-      say("1s$", "WARNING: The estimation at 20% has median zero, possibly reflecting inaccurate estimations");
-      if(qry_portion<1.0 && hX<3000){
-         if(autoadjust){
-	    hX = 0;
-	    qry_portion *= 2.0;
-	    if(qry_portion >= 1.0) qry_portion = 1.0;
-	    say("1sf$", "AUTOADJUST: -x ", qry_portion);
-	    goto restart_vars;
-	 } else say("1sf$", "To increase the sensitivity of the estimations increase the -x parameter, currently set at ", qry_portion);
-      } else if(ovl > 0.25) {
-         if(autoadjust){
-	         if(ovl>1.0)  ovl = 1.0;// This should never happen
-	    else if(ovl>0.75) ovl = 0.75;
-	    else if(ovl>0.5)  ovl = 0.5;
-	    else if(ovl>0.25) ovl = 0.25;
-	    else error("Impossible to reduce the -L parameter further, sequencing depth under detection level");
-	    say("1sf$", "AUTOADJUST: -L ", ovl*100);
-	    goto restart_mates;
-	 }else say("1sf$", "To increase the sensitivity of the estimations decrease the -L parameter, currently set at ", ovl*100);
-      } else {
-	 say("1s$", "The portion used as query (-x) is currently set to the maximum, and the overlap (-L) is set to the minimum");
-         say("1s$", "The dataset is probably too small for reliable estimations");
-	 if(min_sim>0.75) say("1s$", "You could decrease the similarity (-S) but values other than 0.95 are untested");
-         error("Sequencing depth under detection limit.");
+   if(processID!=0){
+      say("1s>", "Evaluating consistency");
+      ok = true;
+      // Low sequencing depth
+      if(sample_after_20<=sample_i && sample_summary[sample_after_20].q2==0.0){
+	 say("1s$", "WARNING: The estimation at 20% has median zero, possibly reflecting inaccurate estimations");
+	 if(qry_portion<1.0 && hX<3000){
+	    if(autoadjust){
+	       hX = 0;
+	       qry_portion *= 2.0;
+	       if(qry_portion >= 1.0) qry_portion = 1.0;
+	       say("1sf$", "AUTOADJUST: -x ", qry_portion);
+	       goto restart_vars;
+	    } else say("1sf$", "To increase the sensitivity of the estimations increase the -x parameter, currently set at ", qry_portion);
+	 } else if(ovl > 0.25) {
+	    if(autoadjust){
+		    if(ovl>1.0)  ovl = 1.0;// This should never happen
+	       else if(ovl>0.75) ovl = 0.75;
+	       else if(ovl>0.5)  ovl = 0.5;
+	       else if(ovl>0.25) ovl = 0.25;
+	       else error("Impossible to reduce the -L parameter further, sequencing depth under detection level");
+	       say("1sf$", "AUTOADJUST: -L ", ovl*100);
+	       goto restart_mates;
+	    }else say("1sf$", "To increase the sensitivity of the estimations decrease the -L parameter, currently set at ", ovl*100);
+	 } else {
+	    say("1s$", "The portion used as query (-x) is currently set to the maximum, and the overlap (-L) is set to the minimum");
+	    say("1s$", "The dataset is probably too small for reliable estimations");
+	    if(min_sim>0.75) say("1s$", "You could decrease the similarity (-S) but values other than 0.95 are untested");
+	    error("Sequencing depth under detection limit.");
+	 }
+	 ok = false;
       }
-      ok = false;
-   }
-   // High sequencing depth
-   if(sample_summary[sample_i-1].avg >= 0.95){
-      say("1s$", "WARNING: The curve reached near-saturation, hence coverage estimations could be unreliable");
-      if(ovl<1.0){
-         if(autoadjust){
-	         if(ovl<0.25)  ovl = 0.25;
-	    else if(ovl<0.5) ovl = 0.5;
-	    else if(ovl<0.75)  ovl = 0.75;
-	    else if(ovl<1.0) ovl = 1.0;
-	    say("1sf$", "AUTOADJUST: -L ", ovl*100.0);
-	    goto restart_mates;
-	 }else say("1sf$", "To avoid saturation increase the -L parameter, currently set at ", ovl*100);
-      } else {
-         say("1s$", "The overlap (-L) is currently set to the maximum, meaning that the actual coverage is probably above 100X");
-	 if(min_sim<1.0) say("1s$", "You could increase the similarity (-S) but values other than 0.95 are untested");
-         error("Sequencing depth above detection limit.");
+      // High sequencing depth
+      if(sample_summary[sample_i-1].avg >= 0.95){
+	 say("1s$", "WARNING: The curve reached near-saturation, hence coverage estimations could be unreliable");
+	 if(ovl<1.0){
+	    if(autoadjust){
+		    if(ovl<0.25)  ovl = 0.25;
+	       else if(ovl<0.5) ovl = 0.5;
+	       else if(ovl<0.75)  ovl = 0.75;
+	       else if(ovl<1.0) ovl = 1.0;
+	       say("1sf$", "AUTOADJUST: -L ", ovl*100.0);
+	       goto restart_mates;
+	    }else say("1sf$", "To avoid saturation increase the -L parameter, currently set at ", ovl*100);
+	 } else {
+	    say("1s$", "The overlap (-L) is currently set to the maximum, meaning that the actual coverage is probably above 100X");
+	    if(min_sim<1.0) say("1s$", "You could increase the similarity (-S) but values other than 0.95 are untested");
+	    error("Sequencing depth above detection limit.");
+	 }
+	 ok = false;
       }
-      ok = false;
+      // Low resolution
+      if(sample_i>5 && sample_summary[5].avg >= 0.95){
+	 say("1s$", "WARNING: The curve reached near-saturation in 6 or less points, hence diversity estimations could be unreliable");
+	 if(autoadjust){
+	    itv *= 0.5;
+	    say("1sf$", "AUTOADJUST: -i ", itv);
+	    goto restart_samples;
+	 }else say("1sf$", "To increase the resolution of the curve increase the -i parameter, currently set at ", itv);
+	 ok = false;
+      }
+      if(ok) say("1s$", "Everything seems correct");
    }
-   // Low resolution
-   if(sample_i>5 && sample_summary[5].avg >= 0.95){
-      say("1s$", "WARNING: The curve reached near-saturation in 6 or less points, hence diversity estimations could be unreliable");
-      if(autoadjust){
-         itv *= 0.5;
-	 say("1sf$", "AUTOADJUST: -i ", itv);
-	 goto restart_samples;
-      }else say("1sf$", "To increase the resolution of the curve increase the -i parameter, currently set at ", itv);
-      ok = false;
-   }
-   if(ok) say("1s$", "Everything seems correct");
    
 exit:
    // Clean temporals
@@ -374,6 +370,7 @@ exit:
       remove(seqFile);
       close_log();
    }
+   barrier_multinode();
    finalize_multinode();
    return 0;
 }
