@@ -42,5 +42,5 @@ install:
 	if [ -e nonpareil ] ; then install -m 0755 nonpareil $(bindir)/ ; fi
 	if [ -e nonpareil-mpi ] ; then install -m 0755 nonpareil-mpi $(bindir)/ ; fi
 	cp docs/_build/man/nonpareil.1 $(mandir)/nonpareil.1
-	$(R) CMD install utils/Nonpareil
-	
+	$(R) CMD INSTALL utils/Nonpareil
+
