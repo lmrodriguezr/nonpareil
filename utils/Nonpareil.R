@@ -46,7 +46,7 @@ Nonpareil.curve.batch <- function(
 	overlap,
 	### Value of the '-L' parameter (in Nonpareil, the default is 50). It can be a number (if all the curves
 	### were generated with the same value) or a vector (in the same order of 'files'). See the 'overlap' value
-	### of 'Nonpareil.curve()'. It's use is discouraged from v2.0 onwards.
+	### of 'Nonpareil.curve()'. Use only with Nonpareil < v2.0.
 	r=NA,
 	### Values of 'r' in 'Nonpareil.curve()' (red value).
 	g=NA,
@@ -58,7 +58,7 @@ Nonpareil.curve.batch <- function(
 	### not factors.
 	read.lengths=NA,
 	### A vector of numbers indicating the length of the reads (corresponding to 'read.length' in 'Nonpareil.curve()').
-	### It use is discouraged from v2.0 onwards.
+	### Use only with Nonpareil < v2.0.
 	...
 	### Any other parameter accepted by 'Nonpareil.curve()' is supported.
 	){
@@ -87,14 +87,74 @@ Nonpareil.curve <- function(
 	### Path to the .npo file, containing the read redundancy.
 	overlap=NULL,
 	### Value of the '-L' parameter (in Nonpareil, the default is 50). If not set, it tries to find the value in the
-	### .npo file (supported in Nonpareil >= 2.0), or fails with an error message.
-			factor=1,plotDispersion=NA,returnModelValues=FALSE,returnModelParameters=FALSE,
-			xmax=10e12,ymax=1,xmin=1e3,ymin=1e-6,xlab=NULL,ylab=NULL,
-			r=NA,g=NA,b=NA,
-			new=TRUE,plot=TRUE,libname=NA,modelOnly=FALSE, plotModel=TRUE,
-			curve.lwd=2, curve.alpha=0.4, model.lwd=1, model.alpha=1, log='x',
-			data.consistency=TRUE, useValue='mean', star=95,
-			read.length=NA, ...){
+	### .npo file (supported in Nonpareil >= 2.0), or fails with an error message. Use only with Nonpareil < v2.0.
+	factor=1,
+	### Multiplier of the sequencing effort. This can be used to express the sequencing effort in units other than
+	### base pairs (bp). For example, to express sequencing effort as Gbp, use factor=1e-9. This can also affect
+	### the fit of the model, and it's considered EXPERIMENTAL.
+	plotDispersion=NA,
+	### Indicates if (and how) dispersion of the replicates should be plotted. It requires modelOnly=FALSE to take
+	### effect. It can be NA, in which case no dispersion is plotted, or any of the following strings: 'sd' (one
+	### standard deviation around the mean), 'ci95' (95% confidence interval), 'ci90' (90% confidence interval),
+	### 'ci50' (50% confidence interval), 'iq' (inter-quartile range).
+	returnModelValues=FALSE,
+	### If TRUE, returns the coordinates of the model as model.x and model.y.
+	returnModelParameters=FALSE,
+	### If TRUE, returns the model itself as model.
+	xmax=10e12,
+	### Maximum sequencing effort to plot.
+	xmin=1e3,
+	### Minimum sequencing effort to plot
+	ymax=1,
+	### Maximum coverage to plot.
+	ymin=1e-6,
+	### Minimum coverage to plot.
+	xlab=NULL,
+	### Label of the X-axis. If NULL, it's set to sequencing effort and the units (see factor).
+	ylab=NULL,
+	### Label of the Y-axis. If NULL, it's set to Estimated average coverage.
+	r=NA,
+	### Red component of the curve's color. If NA, it's randomly set. If <=1, it's assumed to be in the range [0,1]; if
+	### >1, it's assumed to be in the range [0,256].
+	g=NA,
+	### Green component of the curve's color. Same as r.
+	b=NA,
+	### Blue component of the curve's color. Same as r.
+	new=TRUE,
+	### If FALSE, it attempts to use a previous (active) canvas to plot the curve.
+	plot=TRUE,
+	### Determines if the plot should be produced. If FALSE, it still computes the coverage and the model.
+	libname=NA,
+	### Name of the library. If NA, it's determined by the file name. This is useful if you plan to call Nonpareil.legend().
+	modelOnly=FALSE,
+	### If TRUE, the rarefied data is not presented, only the fitted model.
+	plotModel=TRUE,
+	### If FALSE, the model is not plotted (but it's still computed).
+	curve.lwd=2,
+	### Line width of the Nonpareil curve.
+	curve.alpha=0.4,
+	### Alpha value (from 0 to 1) of the Nonpareil curve.
+	model.lwd=1,
+	### Line width of the model.
+	model.alpha=1,
+	### Alpha value (from 0 to 1) of the model.
+	log='x',
+	### Axis to plot in logarithmic scale. It can be 'x' (sequencing effort, default), 'y' (coverage), 'xy' (both logarithmic),
+	### or '' (both linear).
+	data.consistency=TRUE,
+	### If TRUE, it checks the consistency of the data before plotting.
+	useValue='mean',
+	### Controls how the replicates are to be summarized at each point of sequencing effort. It can be any of: 'mean' (average of
+	### the replicates), 'median' (median), 'ub' (upper boundary of the 95% confidence interval), 'lb' (lower boundary of the 95%
+	### confidence interval), 'q1' (quartile 1), 'q3' (quartile 3). Note that the quartile 2 is also 'median'.
+	star=95,
+	### Objective coverage (in percentage). By default: 95, which means the sequencing effort required to reach 95% average
+	### coverage is to be estimated.
+	read.length=NA,
+	### Length of the reads. Use only with Nonpareil < v2.0.
+	...
+	### Any other parameters accepted by plot().
+	){
 	
 	# Create environment
 	Nonpareil.__init_globals(!new);
@@ -259,18 +319,48 @@ Nonpareil.curve <- function(
 	}else{
 	   warning('Insufficient resolution below 90% coverage, skipping model');
 	}
-	return(out)
+	return(out);
+	### A list with the following entries:
+	### 
+	### kappa: "Redundancy" value of the entire dataset.
+	### 
+	### C: Average coverage of the entire dataset.
+	### 
+	### LRstar: Estimated sequencing effort required to reach the objective average coverage (star, 95% by default).
+	### 
+	### LR: Actual sequencing effort of the dataset.
+	### 
+	### modelR: Pearson's R coefficient betweeen the rarefied data and the projected model.
+	### 
+	### model.x (if retturnModelValues=TRUE): Values of sequencing effort in the projected model.
+	### 
+	### model.y (if retturnModelValues=TRUE): Values of average coverage in the projected model.
+	### 
+	### model (if returnModelParameters=TRUE): Fitted model.
+	### 
 }
 
-Nonpareil.legend <- function(x=NULL, y=.3, ...){
-	if(is.null(Nonpareil.LastFactor) || is.null(Nonpareil.LastXmax))
-		stop('There must be at least one active plot to draw a legend.  Use Nonpareil.curve().');
-	if(is.null(x)) x <- 0.75*Nonpareil.LastXmax;
-	legend(x=x, y=y, legend=Nonpareil.OpenNames, fill=Nonpareil.OpenColors, ...);
+Nonpareil.legend <- function(
+	### Generates a legend for Nonpareil plots, after calling Nonpareil.curve() or Nonpareil.curve.batch().
+	x=NULL,
+	### X coordinate, or any character string accepted by legend (e.g., 'bottomright').
+	y=.3,
+	### Y coordinate.
+	...
+	### Any other parameters supported by legend().
+	){
+   if(is.null(Nonpareil.LastFactor) || is.null(Nonpareil.LastXmax))
+      stop('There must be at least one active plot to draw a legend.  Use Nonpareil.curve().');
+   if(is.null(x)) x <- 0.75*Nonpareil.LastXmax;
+   legend(x=x, y=y, legend=Nonpareil.OpenNames, fill=Nonpareil.OpenColors, ...);
 }
 
 ## PREDICTIONS
-Nonpareil.coverageFactor <- function(overlap){
+Nonpareil.coverageFactor <- function(
+	### Factor to transform redundancy into coverage (internal function).
+	overlap
+	### Value of overlap (-L).
+	){
    if(overlap==25){
       return(.845);
    }else if(overlap==50){
@@ -282,5 +372,6 @@ Nonpareil.coverageFactor <- function(overlap){
    }else{
       stop('Unsupported overlap.  Supported values are: 100, 75, 50, and 25.');
    }
+   ### A numeric scalar.
 }
 

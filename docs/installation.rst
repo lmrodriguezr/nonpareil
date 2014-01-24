@@ -24,7 +24,7 @@ Compilation
 
       tar zxvf nonpareil.tar.gz
 
-2. **Compile and install**
+2. **Compile**
 
    Change directory into the newly created folder, and compile Nonpareil::
 
@@ -34,10 +34,29 @@ Compilation
    If you want to compile Nonpareil MPI (see also :doc:`mpi`), just run::
       
       make nonpareil-mpi
-   
-   If you want to make Nonpareil available system-wide, just copy the generated binary into a folder listed in the ``$PATH``. For example::
 
-      sudo cp nonpareil /usr/local/bin/
+   In either case, you can specify the C++ compiler to be used setting the ``cpp`` or ``mpicpp`` variables, respectively. For example::
+      
+      make cpp=/usr/local/bin/g++ nonpareil # This compiles nonpareil with /usr/local/bin/g++
+      make mpicpp=/usr/local/bin/mpic++ nonpareil-mpi # This compiles nonpareil-mpi with /usr/local/bin/mpic++
+
+3. **Install**
+
+   If you want to make Nonpareil available system-wide, just run::
+
+      sudo make install
+
+   If you don't have superuser privileges and/or want to install Nonpareil in a location other than ``/usr/local``, simply set the prefix, for
+   example::
+      
+      make prefix=$HOME/apps install
+
+   You can also change the location of ``R``, if it's not in the ``$PATH`` or you want to use a non-standard installation::
+
+      make prefix=$HOME R=~/bin/R install
+
+   Other variables you can set explicitly for the ``install`` target are ``bindir`` (binaries directory) and ``mandir`` (documentation directory).
+
 
 .. _R: http://www.r-project.org/
 .. _git: http://git-scm.com/

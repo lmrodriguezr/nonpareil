@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Install Nonpareil &mdash; Nonpareil 2.2r1 documentation</title>
+    <title>Install Nonpareil &mdash; Nonpareil 2.3r1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.2r1',
+        VERSION:     '2.3r1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.2r1 documentation" href="index.html" />
+    <link rel="top" title="Nonpareil 2.3r1 documentation" href="index.html" />
     <link rel="next" title="Preprocess the reads" href="preprocess.html" />
     <link rel="prev" title="Nonpareil" href="index.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="index.html" title="Nonpareil"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.2r1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.3r1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -69,7 +69,7 @@ are yet untested.</p>
 <div class="highlight-python"><pre>tar zxvf nonpareil.tar.gz</pre>
 </div>
 </li>
-<li><p class="first"><strong>Compile and install</strong></p>
+<li><p class="first"><strong>Compile</strong></p>
 <p>Change directory into the newly created folder, and compile Nonpareil:</p>
 <div class="highlight-python"><pre>cd nonpareil
 make</pre>
@@ -77,9 +77,23 @@ make</pre>
 <p>If you want to compile Nonpareil MPI (see also <a class="reference internal" href="mpi.html"><em>MPI support</em></a>), just run:</p>
 <div class="highlight-python"><pre>make nonpareil-mpi</pre>
 </div>
-<p>If you want to make Nonpareil available system-wide, just copy the generated binary into a folder listed in the <tt class="docutils literal"><span class="pre">$PATH</span></tt>. For example:</p>
-<div class="highlight-python"><pre>sudo cp nonpareil /usr/local/bin/</pre>
+<p>In either case, you can specify the C++ compiler to be used setting the <tt class="docutils literal"><span class="pre">cpp</span></tt> or <tt class="docutils literal"><span class="pre">mpicpp</span></tt> variables, respectively. For example:</p>
+<div class="highlight-python"><pre>make cpp=/usr/local/bin/g++ nonpareil # This compiles nonpareil with /usr/local/bin/g++
+make mpicpp=/usr/local/bin/mpic++ nonpareil-mpi # This compiles nonpareil-mpi with /usr/local/bin/mpic++</pre>
 </div>
+</li>
+<li><p class="first"><strong>Install</strong></p>
+<p>If you want to make Nonpareil available system-wide, just run:</p>
+<div class="highlight-python"><pre>sudo make install</pre>
+</div>
+<p>If you don&#8217;t have superuser privileges and/or want to install Nonpareil in a location other than <tt class="docutils literal"><span class="pre">/usr/local</span></tt>, simply set the prefix, for
+example:</p>
+<div class="highlight-python"><pre>make prefix=$HOME/apps install</pre>
+</div>
+<p>You can also change the location of <tt class="docutils literal"><span class="pre">R</span></tt>, if it&#8217;s not in the <tt class="docutils literal"><span class="pre">$PATH</span></tt> or you want to use a non-standard installation:</p>
+<div class="highlight-python"><pre>make prefix=$HOME R=~/bin/R install</pre>
+</div>
+<p>Other variables you can set explicitly for the <tt class="docutils literal"><span class="pre">install</span></tt> target are <tt class="docutils literal"><span class="pre">bindir</span></tt> (binaries directory) and <tt class="docutils literal"><span class="pre">mandir</span></tt> (documentation directory).</p>
 </li>
 </ol>
 </div>
@@ -140,11 +154,11 @@ make</pre>
         <li class="right" >
           <a href="index.html" title="Nonpareil"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.2r1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.3r1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Luis M Rodriguez-R.
+        &copy; Copyright 2013-2014, Luis M Rodriguez-R.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>

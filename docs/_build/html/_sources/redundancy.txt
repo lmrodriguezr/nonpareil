@@ -15,19 +15,35 @@ of the output files to be created.
 
 Mandatory options
 -----------------
-
    -s <str>   Path to the (input) file containing the sequences.  This is lowercase S.
+
+Common options
+--------------
+   -f <str>   The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'
+   -b <str>   Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files
+              with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.
+   -i <num>   Interval between sampling portions.  By default: 0.01.
+   -n <int>   Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t),
+              it is rounded to the next (upper) multiple.  By default: 1024.
+   -L <num>   Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is
+              evaluated for the aligned region only.  By default: 50.
+   -X <int>   Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads.
+   -R <int>   Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding
+              non-sequence elements like headers or quality).  This is particularly important when running in multiple
+              cores (see -t).  This value is approximated.  By default 1024.
+              Maximum value in this version: 4194303
+   -t <int>   Number of threads.  Highest efficiency when the number of sub-samples (see -n) is multiple of the number
+              of threads.  By default: 2.
+   -v <int>   Verbosity level, for debugging purposes.  By default 7.  This is lowercase V.
+   -V         Show version information and exit.  This is uppercase V.
+   -h         Display this message and exit.
 
 Additional options
 ------------------
-
 **Input/Output**
    -a <str>   Path to the (output) file where all data must be saved.  This report is not created by default.  See the
               OUTPUT section.
-   -b <str>   Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files
-              with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.
    -C <str>   Path to the (output) file where the mating vector is to be saved.  This is a capital C.
-   -f <str>   The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'
    -F         Report the sampled portions as a fraction of the library instead of the number of reads.  See -a, -o and
               the OUTPUT section.
    -l <str>   Path to the (output) file where the log of the run must be saved. By default the log is sent only to the
@@ -35,41 +51,26 @@ Additional options
    -o <str>   Path to the (output) file where summary is to be saved.   By default the summary is sent to stdout (same
               behavior as using a dash '-').  If an empty string '' is provided, does not produce the summary. See the
               OUTPUT section.
-
+   
 **Sampling**
-   -i <num>   Interval between sampling portions.  By default: 0.01.
    -m <num>   Minimum value of sampling portion.  By default: 0.
    -M <num>   Maximum value of sampling portion.  By default: 1.
-   -n <int>   Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t),
-              it is rounded to the next (upper) multiple.  By default: 1024.
-
+   -d <num>   Take this fraction of the total library every sampling point (logarithmic sampling, not linear).  If set
+              to zero, logarithmic sub-sampling is disabled (default). Recommended value: 0.7. EXPERIMENTAL CODE.
+   
 **Mating**
    -c         Do not use reverse-complement.  This is useful for single stranded sequences data (like RNA).  This is a
               lowercase C.
-   -L <num>   Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is
-              evaluated for the aligned region only.  By default: 50.
    -N         Treat Ns as mismatches.  By default, Ns (unknown nucleotides) match any nucleotide (even another N).
    -S <num>   Similarity threshold to group two reads together.   Reducing this option will increase sensitivity while
-              increasing running time.  By default: 0.97.  This is uppercase S.
+              increasing running time.  This is uppercase S.
    -x <num>   Probability of taking a sequence into account as query for the construction of the curve.  Higher values
               reduce accuracy but increase speed.  This is lower case x.  If set, overides -X.
-   -X <int>   Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads.
-
-**System resources**
-   -R <int>   Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding
-              non-sequence elements like headers or quality).  This is particularly important when running in multiple
-              cores (see -t and -T).  This value is approximated.  By default 1024.
-              Maximum value in this version: 4194303
-   -t <int>   Number of threads.  Highest efficiency when the number of sub-samples (see -n) is multiple of the number
-              of threads.  By default: 2.
 
 **Misc**
    -A         Autoadjust parameters and re-run.  Evaluates the results looking for common problems, adjusts parameters
               and re-run the analyses.  THIS IS EXPERIMENTAL CODE.
-   -h         Display this message and exit.
    -r <int>   Random generator seed.  By default current time.
-   -v <int>   Verbosity level, for debugging purposes.  By default 7.  This is lowercase V.
-   -V         Show version information and exit.  This is uppercase V.
 
 Input
 -----

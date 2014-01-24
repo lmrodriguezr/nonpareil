@@ -1,0 +1,1 @@
+export(Nonpareil.f, Nonpareil.antif, Nonpareil.curve.batch, Nonpareil.curve, Nonpareil.legend, Nonpareil.coverageFactor)

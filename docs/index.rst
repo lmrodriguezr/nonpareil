@@ -10,17 +10,33 @@ Nonpareil uses the redundancy of the reads in metagenomic datasets to estimate t
 coverage and predict the amount of sequences that will be required to achieve "nearly complete
 coverage".
 
-Contents:
+.. This is a comment
+   only:: html or latex or pdf
 
-.. toctree::
-   :maxdepth: 2
 
-   installation
-   preprocess
-   redundancy
-   curves
-   mpi
+.. only:: not man
 
+   Contents:
+
+   .. toctree::
+      :maxdepth: 2
+
+      installation
+      preprocess
+      redundancy
+      curves
+      mpi
+      updates
+
+.. only:: man
+   
+   .. toctree::
+      :maxdepth: 2
+
+      preprocess
+      redundancy
+      curves
+      mpi
 
 
 .. Indices and tables

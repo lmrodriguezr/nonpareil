@@ -28,9 +28,19 @@ nonpareil-mpi:
 nonpareil:
 	cd $(enveomics) && $(MAKE) $@
 	$(cpp) nonpareil.cpp $(np_objs) $(pthread) -o $@
+
 nuc_sampler:
 	cd $(enveomics) && $(MAKE) sequence
 	$(cpp) nuc_sampler.cpp $(universal) $(sequence) $(pthread) -o utils/nuc_sampler
 	
 clean:
 	cd $(enveomics) && $(MAKE) clean
+
+install:
+	if [ ! -d $(bindir) ] ; then mkdir -p $(bindir) ; fi
+	if [ ! -d $(mandir) ] ; then mkdir -p $(mandir) ; fi
+	if [ -e nonpareil ] ; then install -m 0755 nonpareil $(bindir)/ ; fi
+	if [ -e nonpareil-mpi ] ; then install -m 0755 nonpareil-mpi $(bindir)/ ; fi
+	cp docs/_build/man/nonpareil.1 $(mandir)/nonpareil.1
+	$(R) CMD install utils/Nonpareil
+	

@@ -1,3 +1,4 @@
 enveomics/*.o
 nonpareil
 nonpareil-mpi
+!utils/Nonpareil

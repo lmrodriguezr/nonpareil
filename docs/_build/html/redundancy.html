@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Redundancy &mdash; Nonpareil 2.2r1 documentation</title>
+    <title>Redundancy &mdash; Nonpareil 2.3r1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.2r1',
+        VERSION:     '2.3r1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.2r1 documentation" href="index.html" />
+    <link rel="top" title="Nonpareil 2.3r1 documentation" href="index.html" />
     <link rel="next" title="Nonpareil curves" href="curves.html" />
     <link rel="prev" title="Preprocess the reads" href="preprocess.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="preprocess.html" title="Preprocess the reads"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.2r1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.3r1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -74,6 +74,57 @@ of the output files to be created.</p>
 </table>
 </div></blockquote>
 </div>
+<div class="section" id="common-options">
+<h2>Common options<a class="headerlink" href="#common-options" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd><span class="option">-f <var>&lt;str&gt;</var></span></kbd></td>
+<td>The format of the sequences.  Can be &#8216;fasta&#8217; or &#8216;fastq&#8217;.  By default: &#8216;fasta&#8217;</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-b <var>&lt;str&gt;</var></span></kbd></td>
+<td>Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files
+with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-i <var>&lt;num&gt;</var></span></kbd></td>
+<td>Interval between sampling portions.  By default: 0.01.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-n <var>&lt;int&gt;</var></span></kbd></td>
+<td>Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t),
+it is rounded to the next (upper) multiple.  By default: 1024.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-L <var>&lt;num&gt;</var></span></kbd></td>
+<td>Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is
+evaluated for the aligned region only.  By default: 50.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-X <var>&lt;int&gt;</var></span></kbd></td>
+<td>Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-R <var>&lt;int&gt;</var></span></kbd></td>
+<td>Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding
+non-sequence elements like headers or quality).  This is particularly important when running in multiple
+cores (see -t).  This value is approximated.  By default 1024.
+Maximum value in this version: 4194303</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-t <var>&lt;int&gt;</var></span></kbd></td>
+<td>Number of threads.  Highest efficiency when the number of sub-samples (see -n) is multiple of the number
+of threads.  By default: 2.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-v <var>&lt;int&gt;</var></span></kbd></td>
+<td>Verbosity level, for debugging purposes.  By default 7.  This is lowercase V.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-V</span></kbd></td>
+<td>Show version information and exit.  This is uppercase V.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-h</span></kbd></td>
+<td>Display this message and exit.</td></tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
 <div class="section" id="additional-options">
 <h2>Additional options<a class="headerlink" href="#additional-options" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
@@ -87,15 +138,8 @@ of the output files to be created.</p>
 <td>Path to the (output) file where all data must be saved.  This report is not created by default.  See the
 OUTPUT section.</td></tr>
 <tr><td class="option-group">
-<kbd><span class="option">-b <var>&lt;str&gt;</var></span></kbd></td>
-<td>Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files
-with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.</td></tr>
-<tr><td class="option-group">
 <kbd><span class="option">-C <var>&lt;str&gt;</var></span></kbd></td>
 <td>Path to the (output) file where the mating vector is to be saved.  This is a capital C.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-f <var>&lt;str&gt;</var></span></kbd></td>
-<td>The format of the sequences.  Can be &#8216;fasta&#8217; or &#8216;fastq&#8217;.  By default: &#8216;fasta&#8217;</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-F</span></kbd></td>
 <td>Report the sampled portions as a fraction of the library instead of the number of reads.  See -a, -o and
@@ -118,18 +162,15 @@ OUTPUT section.</td></tr>
 <col class="description" />
 <tbody valign="top">
 <tr><td class="option-group">
-<kbd><span class="option">-i <var>&lt;num&gt;</var></span></kbd></td>
-<td>Interval between sampling portions.  By default: 0.01.</td></tr>
-<tr><td class="option-group">
 <kbd><span class="option">-m <var>&lt;num&gt;</var></span></kbd></td>
 <td>Minimum value of sampling portion.  By default: 0.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-M <var>&lt;num&gt;</var></span></kbd></td>
 <td>Maximum value of sampling portion.  By default: 1.</td></tr>
 <tr><td class="option-group">
-<kbd><span class="option">-n <var>&lt;int&gt;</var></span></kbd></td>
-<td>Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t),
-it is rounded to the next (upper) multiple.  By default: 1024.</td></tr>
+<kbd><span class="option">-d <var>&lt;num&gt;</var></span></kbd></td>
+<td>Take this fraction of the total library every sampling point (logarithmic sampling, not linear).  If set
+to zero, logarithmic sub-sampling is disabled (default). Recommended value: 0.7. EXPERIMENTAL CODE.</td></tr>
 </tbody>
 </table>
 </dd>
@@ -143,41 +184,16 @@ it is rounded to the next (upper) multiple.  By default: 1024.</td></tr>
 <td>Do not use reverse-complement.  This is useful for single stranded sequences data (like RNA).  This is a
 lowercase C.</td></tr>
 <tr><td class="option-group">
-<kbd><span class="option">-L <var>&lt;num&gt;</var></span></kbd></td>
-<td>Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is
-evaluated for the aligned region only.  By default: 50.</td></tr>
-<tr><td class="option-group">
 <kbd><span class="option">-N</span></kbd></td>
 <td>Treat Ns as mismatches.  By default, Ns (unknown nucleotides) match any nucleotide (even another N).</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-S <var>&lt;num&gt;</var></span></kbd></td>
 <td>Similarity threshold to group two reads together.   Reducing this option will increase sensitivity while
-increasing running time.  By default: 0.97.  This is uppercase S.</td></tr>
+increasing running time.  This is uppercase S.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-x <var>&lt;num&gt;</var></span></kbd></td>
 <td>Probability of taking a sequence into account as query for the construction of the curve.  Higher values
 reduce accuracy but increase speed.  This is lower case x.  If set, overides -X.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-X <var>&lt;int&gt;</var></span></kbd></td>
-<td>Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads.</td></tr>
-</tbody>
-</table>
-</dd>
-<dt><strong>System resources</strong></dt>
-<dd><table class="first last docutils option-list" frame="void" rules="none">
-<col class="option" />
-<col class="description" />
-<tbody valign="top">
-<tr><td class="option-group">
-<kbd><span class="option">-R <var>&lt;int&gt;</var></span></kbd></td>
-<td>Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding
-non-sequence elements like headers or quality).  This is particularly important when running in multiple
-cores (see -t and -T).  This value is approximated.  By default 1024.
-Maximum value in this version: 4194303</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-t <var>&lt;int&gt;</var></span></kbd></td>
-<td>Number of threads.  Highest efficiency when the number of sub-samples (see -n) is multiple of the number
-of threads.  By default: 2.</td></tr>
 </tbody>
 </table>
 </dd>
@@ -191,17 +207,8 @@ of threads.  By default: 2.</td></tr>
 <td>Autoadjust parameters and re-run.  Evaluates the results looking for common problems, adjusts parameters
 and re-run the analyses.  THIS IS EXPERIMENTAL CODE.</td></tr>
 <tr><td class="option-group">
-<kbd><span class="option">-h</span></kbd></td>
-<td>Display this message and exit.</td></tr>
-<tr><td class="option-group">
 <kbd><span class="option">-r <var>&lt;int&gt;</var></span></kbd></td>
 <td>Random generator seed.  By default current time.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-v <var>&lt;int&gt;</var></span></kbd></td>
-<td>Verbosity level, for debugging purposes.  By default 7.  This is lowercase V.</td></tr>
-<tr><td class="option-group">
-<kbd><span class="option">-V</span></kbd></td>
-<td>Show version information and exit.  This is uppercase V.</td></tr>
 </tbody>
 </table>
 </dd>
@@ -251,6 +258,7 @@ estimation.</dd>
 <li><a class="reference internal" href="#">Redundancy</a><ul>
 <li><a class="reference internal" href="#for-the-impatient">For the impatient</a></li>
 <li><a class="reference internal" href="#mandatory-options">Mandatory options</a></li>
+<li><a class="reference internal" href="#common-options">Common options</a></li>
 <li><a class="reference internal" href="#additional-options">Additional options</a></li>
 <li><a class="reference internal" href="#input">Input</a></li>
 <li><a class="reference internal" href="#output">Output</a></li>
@@ -298,11 +306,11 @@ estimation.</dd>
         <li class="right" >
           <a href="preprocess.html" title="Preprocess the reads"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.2r1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.3r1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013, Luis M Rodriguez-R.
+        &copy; Copyright 2013-2014, Luis M Rodriguez-R.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>

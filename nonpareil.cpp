@@ -1,13 +1,12 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
-// @version 2.2
+// @version 2.3
 // @license artistic license 2.0
 
 /*
   ROADMAP
 
   o To validate "logarithmic sampling".
-  o MPI'ize
   
 */
 
@@ -20,7 +19,7 @@
 #include "enveomics/nonpareil_sampling.h"
 
 #define LARGEST_PATH 2048
-#define NP_VERSION 2.2
+#define NP_VERSION 2.3
 
 using namespace std;
 int processID;
@@ -59,49 +58,8 @@ void help(const char *msg){
 	<< "   -V       : Show version information and exit.  This is uppercase V." << endl
 	<< "   -h       : Display this message and exit." << endl
 	<< endl
-	<< "ADDITIONAL OPTIONS" << endl
-	<< "   [ Input/Output ]" << endl
-	<< "   -a <str> : Path to the (output) file where all data must be saved.  This report is not created by default.  See the" << endl
-	<< "              OUTPUT section." << endl
-	<< "   -C <str> : Path to the (output) file where the mating vector is to be saved.  This is a capital C." << endl
-	<< "   -F       : Report the sampled portions as a fraction of the library instead of the number of reads.  See -a, -o and" << endl
-	<< "              the OUTPUT section." << endl
-	<< "   -l <str> : Path to the (output) file where the log of the run must be saved. By default the log is sent only to the" << endl
-	<< "              STDERR.  If set, the log is sent to both the STDERR and the log file." << endl
-	<< "   -o <str> : Path to the (output) file where summary is to be saved.   By default the summary is sent to stdout (same" << endl
-	<< "              behavior as using a dash '-').  If an empty string '' is provided, does not produce the summary. See the" << endl
-	<< "              OUTPUT section." << endl
+	<< "See all supported arguments and additional documentation at http://nonpareil.readthedocs.org or execute man nonpareil." << endl
 	<< endl
-	<< "   [ Sampling ]" << endl
-	<< "   -m <num> : Minimum value of sampling portion.  By default: 0." << endl
-	<< "   -M <num> : Maximum value of sampling portion.  By default: 1." << endl
-	<< "   -d <num> : Take this fraction of the total library every sampling point (logarithmic sampling, not linear).  If set" << endl
-	<< "              to zero, logarithmic sub-sampling is disabled (default). Recommended value: 0.7. EXPERIMENTAL CODE." << endl
-	<< endl
-	<< "   [ Mating ]" << endl
-	<< "   -c       : Do not use reverse-complement.  This is useful for single stranded sequences data (like RNA).  This is a" << endl
-	<< "              lowercase C." << endl
-	<< "   -N       : Treat Ns as mismatches.  By default, Ns (unknown nucleotides) match any nucleotide (even another N)." << endl
-	<< "   -S <num> : Similarity threshold to group two reads together.   Reducing this option will increase sensitivity while" << endl
-	<< "              increasing running time.  This is uppercase S." << endl
-	<< "   -x <num> : Probability of taking a sequence into account as query for the construction of the curve.  Higher values" << endl
-	<< "              reduce accuracy but increase speed.  This is lower case x.  If set, overides -X." << endl
-	<< endl
-	<< "   [ Misc ]" << endl
-	<< "   -A       : Autoadjust parameters and re-run.  Evaluates the results looking for common problems, adjusts parameters" << endl
-	<< "              and re-run the analyses.  THIS IS EXPERIMENTAL CODE." << endl
-	<< "   -r <int> : Random generator seed.  By default current time." << endl
-	<< endl
-	<< "INPUT" << endl
-	<< "   Sequences must be in FastA or FastQ format. FastA comments are not supported (only > headers and sequence lines)." << endl
-	<< endl
-	<< "OUTPUT" << endl
-	<< "   - The summary file contains a tab-delimited table containing the following six columns:  sample size, mean, standard" << endl
-	<< "     deviation, Q1, Q2, Q3.  The Q* are quartiles of the distribution of portion of matted (non-unique) reads.   Sample" << endl
-	<< "     size is expressed in number of reads.  If -F is used, it is expressed as the portion of the dataset.  See -o." << endl
-	<< "   - The all-data file is a tab-delimited table containing two columns:  sample size and portion of matted (also termed" << endl
-	<< "     non-unique) reads. The values in the summary file are computed for the distribution of the last column categorized" << endl
-	<< "     by the first column.  See -a." << endl
 	;
    finalize_multinode();
    if(processID==0){ exit(1); }else{ exit(0); }

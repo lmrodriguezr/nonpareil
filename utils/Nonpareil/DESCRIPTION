@@ -1,0 +1,15 @@
+Package: Nonpareil
+Title: Ancilliary R code for Nonpareil
+Type: Package
+Version: 2014.01.23
+Author: Luis M. Rodriguez-R <lmrodriguezr@gmail.com>
+Maintainer: Luis M. Rodriguez-R <lmrodriguezr@gmail.com>
+Authors@R: c(person("Luis M.","Rodriguez-R",role=c("aut","cre"),
+	   email="lmrodriguezr@gmail.com"))
+Description: A collection of functions to plot, process and analyze
+ files produced by Nonpareil (http://enve-omics.ce.gatech.edu/nonpareil).
+URL: http://enve-omics.ce.gatech.edu/nonpareil
+Depends: R (>= 2.9)
+License: Artistic-2
+LazyLoad: yes
+Encoding: UTF-8

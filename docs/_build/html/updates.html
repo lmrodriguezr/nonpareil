@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Preprocess the reads &mdash; Nonpareil 2.3r1 documentation</title>
+    <title>Updates history &mdash; Nonpareil 2.3r1 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,8 +24,8 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Nonpareil 2.3r1 documentation" href="index.html" />
-    <link rel="next" title="Redundancy" href="redundancy.html" />
-    <link rel="prev" title="Install Nonpareil" href="installation.html" /> 
+    <link rel="next" title="Preprocess the reads" href="preprocess.html" />
+    <link rel="prev" title="MPI support" href="mpi.html" /> 
   </head>
   <body>
     <div class="related">
@@ -35,10 +35,10 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="redundancy.html" title="Redundancy"
+          <a href="preprocess.html" title="Preprocess the reads"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="installation.html" title="Install Nonpareil"
+          <a href="mpi.html" title="MPI support"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Nonpareil 2.3r1 documentation</a> &raquo;</li> 
       </ul>
@@ -49,21 +49,21 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="preprocess-the-reads">
-<h1>Preprocess the reads<a class="headerlink" href="#preprocess-the-reads" title="Permalink to this headline">¶</a></h1>
-<p>Nonpareil expects that the sequencing error is always well below 5%, so we suggest using an expected error cutoff of 1%
-(<em>i.e.</em>, Q&gt;20, or 1 error in 100 nucleotides). We recommend to perform this task using <a class="reference external" href="http://solexaqa.sourceforge.net/">SolexaQA</a>.</p>
-<p>Ideally, the reads should be in FastA format (althought Nonpareil can read FastQ). To transform FastQ into FastA, you
-can simply use:</p>
-<div class="highlight-python"><pre># Input: reads.fastq
-# Output: reads.fasta
-cat reads.fastq | paste - - - - | awk 'BEGIN{FS="\t"}{print "&gt;"substr($1,2)"\n"$2}' &gt; reads.fasta</pre>
-</div>
-<p>Also, if you have paired-end reads, you should use only one sister read per pair in Nonpareil. If you have them interposed
-in the same file, you can separate them using <a class="reference external" href="https://github.com/lmrodriguezr/enveomics/blob/master/Scripts/FastA.split.pl">FastA.split.pl</a>:</p>
-<div class="highlight-python"><pre># Input: reads.fasta
-# Output: reads.1.fa and reads.2.fa
-FastA.split.pl reads.fasta reads 2</pre>
+  <div class="section" id="updates-history">
+<h1>Updates history<a class="headerlink" href="#updates-history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-s-new-in-2-3">
+<h2>What&#8217;s new in 2.3<a class="headerlink" href="#what-s-new-in-2-3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Updates history.</li>
+<li>Nonpareil R package: No changes in the functions were introduced, but they are now available
+as an R package complete with documentation. See <a class="reference internal" href="curves.html"><em>Nonpareil curves</em></a>.</li>
+<li>Make&#8217;s <tt class="docutils literal"><span class="pre">install</span></tt> target: This includes the installation of binaries, the manual page, and the
+new Nonpareil R package.</li>
+<li>Simplified help: Only mandatory and commonly used arguments are now displayed with <tt class="docutils literal"><span class="pre">nonpareil</span> <span class="pre">-h</span></tt>.
+Complete documentation is maintained both in the manual page (<tt class="docutils literal"><span class="pre">man</span> <span class="pre">nonpareil</span></tt>) and the
+<a class="reference external" href="http://nonpareil.readthedocs.org/">online documentation</a>. In order to maintain a centralized documentation, the complete help messages
+for the Nonpareil R package are now self-contained, and were removed from the <a class="reference external" href="http://nonpareil.readthedocs.org/">online documentation</a>.</li>
+</ul>
 </div>
 </div>
 
@@ -73,15 +73,23 @@ FastA.split.pl reads.fasta reads 2</pre>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Updates history</a><ul>
+<li><a class="reference internal" href="#what-s-new-in-2-3">What&#8217;s new in 2.3</a></li>
+</ul>
+</li>
+</ul>
+
   <h4>Previous topic</h4>
-  <p class="topless"><a href="installation.html"
-                        title="previous chapter">Install Nonpareil</a></p>
+  <p class="topless"><a href="mpi.html"
+                        title="previous chapter">MPI support</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="redundancy.html"
-                        title="next chapter">Redundancy</a></p>
+  <p class="topless"><a href="preprocess.html"
+                        title="next chapter">Preprocess the reads</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/preprocess.txt"
+    <li><a href="_sources/updates.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -108,10 +116,10 @@ FastA.split.pl reads.fasta reads 2</pre>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="redundancy.html" title="Redundancy"
+          <a href="preprocess.html" title="Preprocess the reads"
              >next</a> |</li>
         <li class="right" >
-          <a href="installation.html" title="Install Nonpareil"
+          <a href="mpi.html" title="MPI support"
              >previous</a> |</li>
         <li><a href="index.html">Nonpareil 2.3r1 documentation</a> &raquo;</li> 
       </ul>
