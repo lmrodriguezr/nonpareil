@@ -41,17 +41,16 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
       if(line.length() > (size_t)maxlen) maxlen = line.length();
       if((isFastQ & (nline%4==0)) | (!isFastQ & (line[0]==start))) N++;
       else totlen += line.length();
-      if(totlen > UINT_MAX/10){
-         lastn = N - lastn;
+      if(totlen > UINT_MAX/1000){
 	 avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
-	 cerr << "Partial average length: " << avg_seq << endl;
+	 totlen = 0;
+	 lastn = N;
       }
       nline++;
    }
    fileh.close();
    
    largest_line = maxlen;
-   lastn = N - lastn;
    avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
    return N;
 }
@@ -138,9 +137,9 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
 	    if(seq.length() > (size_t)maxlen) maxlen = seq.length();
 	    totlen += seq.length();
 	    if(totlen > UINT_MAX/10){
-	       lastn = N - lastn;
 	       avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
-	       cerr << "Partial average length: " << avg_seq << endl;
+	       totlen = 0;
+	       lastn = N;
 	    }
 	 }
          name = line.length()>1 ? line.substr(1) : "";
@@ -165,7 +164,6 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    namfileh.close();
 
    largest_seq = maxlen;
-   lastn = N - lastn;
    avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
    return N;
 }
