@@ -39,7 +39,7 @@ void help(const char *msg){
 	<< "   -s <str> : Path to the (input) file containing the sequences.  This is lowercase S." << endl
 	<< endl
 	<< "COMMON OPTIONS" << endl
-	<< "   -f <str> : The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'" << endl
+	<< "   -f <str> : The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'." << endl
 	<< "   -b <str> : Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files" << endl
 	<< "              with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set." << endl
 	<< "   -i <num> : Interval between sampling portions.  By default: 0.01." << endl

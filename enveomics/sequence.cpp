@@ -19,10 +19,12 @@ using namespace std;
 size_t count_seqs(char *file, const char *format, int &largest_line, double &avg_line){
    // Vars
    ifstream	fileh;
-   unsigned int	N=0, nline=0, totlen=0;
+   unsigned int	N=0, nline=0, totlen=0, lastn=0;
    int		maxlen=0;
    char		start;
    bool		isFastQ=false;
+
+   avg_line = 0.0;
    
    // Format
    if(strcmp(format, "fasta")==0) {start = '>';}
@@ -39,13 +41,18 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
       if(line.length() > (size_t)maxlen) maxlen = line.length();
       if((isFastQ & (nline%4==0)) | (!isFastQ & (line[0]==start))) N++;
       else totlen += line.length();
-      if(totlen==UINT_MAX-1) error("Unable to represent the number of nucleotides, limit reached", UINT_MAX-1);
+      if(totlen > UINT_MAX/2){
+         lastn = N - lastn;
+	 avg_line = ( ( avg_line/N )*lastn ) + ((double)totlen/N);
+      }
+      error("Unable to represent the number of nucleotides, limit reached", UINT_MAX-1);
       nline++;
    }
    fileh.close();
    
    largest_line = maxlen;
-   avg_line = (double)totlen/N;
+   lastn = N - lastn;
+   avg_line = ( ( avg_line/N )*lastn ) + ((double)totlen/N);
    return N;
 }
 
@@ -78,14 +85,14 @@ size_t count_seqs(char *file){
 
 size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut, int &largest_seq, double &avg_seq){
    // Vars
-   unsigned int	N=0, nline=0, totlen=0;
+   unsigned int	N=0, nline=0, totlen=0, lastn=0;
    int		maxlen=0;
    char		start, *namFile, *seqFile;
    bool		inSeq=false, isFastQ=false;
    string	seq, name;
    ifstream	infileh, testseq, testnam;
    ofstream	seqfileh, namfileh;
-   
+
    // Format
    if(strcmp(format, "fasta")==0) {start = '>';}
    else if(strcmp(format, "fastq")==0) {start = '@'; isFastQ=true;}
@@ -120,6 +127,7 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    if(!namfileh.is_open()) error("Cannot open the file", namFile);
 
    // Run
+   avg_seq = 0.0;
    while(!infileh.eof()){
       string line;
       getline(infileh, line);
@@ -127,9 +135,12 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
          if(seq.length()>0){
 	    namfileh << ">" << ++N << endl << name << endl;
 	    seqfileh << ">" <<   N << endl <<  seq << endl;
-	    totlen += seq.length();
 	    if(seq.length() > (size_t)maxlen) maxlen = seq.length();
-	    if(totlen==UINT_MAX-1) error("Impossible to represent the number of nucleotides while indexing, limit reached", UINT_MAX-1);
+	    totlen += seq.length();
+	    if(totlen > UINT_MAX/2){
+	       lastn = N - lastn;
+	       avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
+	    }
 	 }
          name = line.length()>1 ? line.substr(1) : "";
 	 seq = (string)"";
@@ -153,7 +164,8 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    namfileh.close();
 
    largest_seq = maxlen;
-   avg_seq = (double)totlen/N;
+   lastn = N - lastn;
+   avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
    return N;
 }
 
