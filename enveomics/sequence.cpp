@@ -41,7 +41,7 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
       if(line.length() > (size_t)maxlen) maxlen = line.length();
       if((isFastQ & (nline%4==0)) | (!isFastQ & (line[0]==start))) N++;
       else totlen += line.length();
-      if(totlen > UINT_MAX/1000){
+      if(totlen > UINT_MAX/10){
 	 avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
 	 totlen = 0;
 	 lastn = N;
