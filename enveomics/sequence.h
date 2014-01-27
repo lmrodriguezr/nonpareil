@@ -8,7 +8,7 @@
 // #define ENVEOMICS_NUC_T_DEFINE
 
 /**
- * size_t count_seqs(char *file[, const char *format][, int &largest_line[, double &avg_line]]);
+ * size_t count_seqs(char *file[, const char *format][, int &largest_line[, double &avg_seq]]);
  * Description:
  *   Counts the number of sequences in the file, and optionally measures the maximum and the average length of the
  *   sequences.
@@ -16,14 +16,14 @@
  *   char *file: Char array with the path to the file.
  *   char *format (optional): Format of the file.  It can be "fasta", "fastq" or "enveomics-seq".  By default "fasta".
  *   int &largest_line (optional): If passed, saves the length of the largest sequence here.
- *   double &avg_line (optional): If passed, saves the average seuqnce length.
+ *   double &avg_seq (optional): If passed, saves the average sequence length.
  * Output:
  *   size_t: Number of sequences in the dataset.
  */
-size_t count_seqs(char *file, const char *format, int &largest_line, double &avg_line);
+size_t count_seqs(char *file, const char *format, int &largest_line, double &avg_seq);
 size_t count_seqs(char *file, const char *format, int &largest_line);
 size_t count_seqs(char *file, const char *format);
-size_t count_seqs(char *file, int &largest_line, double &avg_line);
+size_t count_seqs(char *file, int &largest_line, double &avg_seq);
 size_t count_seqs(char *file, int &largest_line);
 size_t count_seqs(char *file);
 

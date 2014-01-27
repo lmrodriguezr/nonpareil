@@ -16,7 +16,7 @@
 
 using namespace std;
 
-size_t count_seqs(char *file, const char *format, int &largest_line, double &avg_line){
+size_t count_seqs(char *file, const char *format, int &largest_line, double &avg_seq){
    // Vars
    ifstream	fileh;
    unsigned int	N=0, nline=0, totlen=0, lastn=0;
@@ -24,7 +24,7 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
    char		start;
    bool		isFastQ=false;
 
-   avg_line = 0.0;
+   avg_seq = 0.0;
    
    // Format
    if(strcmp(format, "fasta")==0) {start = '>';}
@@ -41,18 +41,18 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
       if(line.length() > (size_t)maxlen) maxlen = line.length();
       if((isFastQ & (nline%4==0)) | (!isFastQ & (line[0]==start))) N++;
       else totlen += line.length();
-      if(totlen > UINT_MAX/2){
+      if(totlen > UINT_MAX/10){
          lastn = N - lastn;
-	 avg_line = ( ( avg_line/N )*lastn ) + ((double)totlen/N);
+	 avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
+	 cerr << "Partial average length: " << avg_seq << endl;
       }
-      error("Unable to represent the number of nucleotides, limit reached", UINT_MAX-1);
       nline++;
    }
    fileh.close();
    
    largest_line = maxlen;
    lastn = N - lastn;
-   avg_line = ( ( avg_line/N )*lastn ) + ((double)totlen/N);
+   avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
    return N;
 }
 
@@ -67,8 +67,8 @@ size_t count_seqs(char *file, const char *format){
    return count_seqs(file, format, dummy1, dummy2);
 }
 
-size_t count_seqs(char *file, int &largest_line, double &avg_line){
-   return count_seqs(file, "fasta", largest_line, avg_line);
+size_t count_seqs(char *file, int &largest_line, double &avg_seq){
+   return count_seqs(file, "fasta", largest_line, avg_seq);
 }
 
 size_t count_seqs(char *file, int &largest_line){
@@ -137,9 +137,10 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
 	    seqfileh << ">" <<   N << endl <<  seq << endl;
 	    if(seq.length() > (size_t)maxlen) maxlen = seq.length();
 	    totlen += seq.length();
-	    if(totlen > UINT_MAX/2){
+	    if(totlen > UINT_MAX/10){
 	       lastn = N - lastn;
 	       avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
+	       cerr << "Partial average length: " << avg_seq << endl;
 	    }
 	 }
          name = line.length()>1 ? line.substr(1) : "";
