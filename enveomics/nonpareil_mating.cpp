@@ -20,7 +20,7 @@
 extern int processID;
 extern int processes;
 
-#define LARGEST_PATH 2048
+#define LARGEST_PATH 4096
 
 using namespace std;
 

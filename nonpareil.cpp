@@ -18,7 +18,7 @@
 #include "enveomics/nonpareil_mating.h"
 #include "enveomics/nonpareil_sampling.h"
 
-#define LARGEST_PATH 2048
+#define LARGEST_PATH 4096
 #define NP_VERSION 2.3
 
 using namespace std;
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
    if(argc<=1) help("");
    
    // Vars
-   char		*file, *format=(char *)"fasta", *alldata, *cntfile, *outfile=(char *)"-", *namFile,
+   char		*file, *format=(char *)"fasta", *alldata, *cntfile, *outfile, *namFile,
    		*seqFile, *baseout;
    double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50, *sample_result,
    		avg_seq_len, divide=0;
@@ -84,6 +84,7 @@ int main(int argc, char *argv[]) {
 
    alldata = (char *)"";
    cntfile = (char *)"";
+   outfile = (char *)"-";
    
    // GetOpt
    int		optchr;
