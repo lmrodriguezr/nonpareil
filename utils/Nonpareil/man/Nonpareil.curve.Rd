@@ -9,7 +9,7 @@
     libname = NA, modelOnly = FALSE, plotModel = TRUE, curve.lwd = 2, 
     curve.alpha = 0.4, model.lwd = 1, model.alpha = 1, log = "x", 
     data.consistency = TRUE, useValue = "mean", star = 95, read.length = NA, 
-    ...)}
+    weights.exp = -1.1, ...)}
 \arguments{
   \item{file}{Path to the .npo file, containing the read redundancy.}
   \item{overlap}{Value of the '-L' parameter (in Nonpareil, the default is 50). If not set, it tries to find the value in the
@@ -51,6 +51,8 @@ confidence interval), 'q1' (quartile 1), 'q3' (quartile 3). Note that the quarti
   \item{star}{Objective coverage (in percentage). By default: 95, which means the sequencing effort required to reach 95\% average
 coverage is to be estimated.}
   \item{read.length}{Length of the reads. Use only with Nonpareil < v2.0.}
+  \item{weights.exp}{Exponent of the weights distribution. If the model fails to converge, sometimes slight modifications in this parameter (e.g.,
+to -1.3) may help.}
   \item{\dots}{Any other parameters accepted by plot().}
 }
 

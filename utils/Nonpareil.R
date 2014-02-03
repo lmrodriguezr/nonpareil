@@ -152,6 +152,9 @@ Nonpareil.curve <- function(
 	### coverage is to be estimated.
 	read.length=NA,
 	### Length of the reads. Use only with Nonpareil < v2.0.
+	weights.exp=-1.1,
+	### Exponent of the weights distribution. If the model fails to converge, sometimes slight modifications in this parameter (e.g.,
+	### to -1.3) may help.
 	...
 	### Any other parameters accepted by plot().
 	){
@@ -292,7 +295,7 @@ Nonpareil.curve <- function(
 	if((length(x)>10) | ! data.consistency){
 	   y <- values[sel];
 	   data <- list(x=x, y=y)
-	   model <- nls(y ~ Nonpareil.f(x, a, b), data=data, weights=(a$V3[sel]^-1.1), start=list(a=1, b=0.1), lower=c(a=0, b=0), algorithm='port', 
+	   model <- nls(y ~ Nonpareil.f(x, a, b), data=data, weights=(a$V3[sel]^weights.exp), start=list(a=1, b=0.1), lower=c(a=0, b=0), algorithm='port', 
 			control=nls.control(minFactor=1e-25000, tol=1e-15, maxiter=1024, warnOnly=T));
 	   #model <- nls(y ~ Nonpareil.f(x, a, b), data=data, start=list(a=1, b=1), 
 	   #		control=nls.control(minFactor=1e-250000000, tol=1e-150000000, maxiter=1024000));
