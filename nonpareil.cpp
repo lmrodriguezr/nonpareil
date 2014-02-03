@@ -19,7 +19,7 @@
 #include "enveomics/nonpareil_sampling.h"
 
 #define LARGEST_PATH 4096
-#define NP_VERSION 2.3
+#define NP_VERSION 2.302
 
 using namespace std;
 int processID;
