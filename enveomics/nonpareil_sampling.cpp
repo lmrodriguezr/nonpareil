@@ -98,7 +98,7 @@ void *nonpareil_sample_portion_thr(void *samplejob_ref){
    // Transfer results to the external vector
    pthread_mutex_lock( samplejob->mutex );
       double *&result_ref = *samplejob->result;
-      //					     v--> position + first of the thread
+      //					        v--> position + first of the thread
       for(int i=0; i<samplejob->number; i++) result_ref[i + samplejob->from_in_result] = result_cp[i];
    pthread_mutex_unlock( samplejob->mutex );
    

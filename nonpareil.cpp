@@ -19,7 +19,7 @@
 #include "enveomics/nonpareil_sampling.h"
 
 #define LARGEST_PATH 4096
-#define NP_VERSION 2.302
+#define NP_VERSION 2.303
 
 using namespace std;
 int processID;
@@ -150,6 +150,8 @@ int main(int argc, char *argv[]) {
    if(cntfile && (strlen(cntfile)>0)) remove(cntfile);
    if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) remove(outfile);
    srand(rseed+processID);
+   say("9si$", "Hello from worker ", processID);
+   barrier_multinode();
    
    // Parse file
    if(processID==0) say("1s$", "Counting sequences");
@@ -172,6 +174,7 @@ int main(int argc, char *argv[]) {
    barrier_multinode();
 
 restart_vars:
+   say("9sis$", "Worker ", processID, " @start_vars.");
    if(processID==0){
       // Re-wire query portion
       if(qry_portion!=0) hX = (size_t)total_seqs*qry_portion;
@@ -201,6 +204,7 @@ restart_vars:
    
    // Run comparisons
 restart_mates:
+   say("9sis$", "Worker ", processID, " @start_mates.");
    matepar.overlap = ovl;
    matepar.similarity = min_sim;
    matepar.qryportion = qry_portion;
@@ -213,15 +217,11 @@ restart_mates:
 
    // Sampling
 restart_samples:
+   say("9sis$", "Worker ", processID, " @start_samples.");
+   sampling_points = (divide==0) ? ((int)ceil((max-min)/itv)+1) : ((int)ceil( (log(2) - log(total_seqs))/log(divide) )+2);
    sample_t	sample_summary[sampling_points];
    size_t	dummy=0;
    if(processID==0){
-      if(divide==0){
-	 sampling_points=(int)ceil((max-min)/itv)+1;
-      }else{
-	 sampling_points=(int)ceil( (log(2) - log(total_seqs))/log(divide) )+2;
-      }
-      
       sample_i=sample_after_20=0;
       samplepar.np_version = NP_VERSION;
       samplepar.replicates = n;
@@ -262,6 +262,7 @@ restart_samples:
    barrier_multinode();
    // Check results
 restart_checkings:
+   say("9sis$", "Worker ", processID, " @start_checkings.");
    if(processID==0){
       say("1s>", "Evaluating consistency");
       ok = true;
@@ -330,6 +331,7 @@ restart_checkings:
    barrier_multinode();
    
 exit:
+   say("9sis$", "Worker ", processID, " @exit.");
    // Clean temporals
    if(processID==0){
       remove(namFile);
