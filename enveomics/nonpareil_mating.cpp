@@ -24,9 +24,18 @@ extern int processes;
 
 using namespace std;
 
-size_t nonpareil_mate(int *&result,
-		char *file, int threads, unsigned int lines_in_ram,
+size_t nonpareil_mate(int *&result, char *file,
+		int threads, unsigned int lines_in_ram,
 		unsigned int total_seqs, unsigned int largest_seq,
+		matepar_t matepar){
+	// Use `file` for both query and subject sequences
+	return nonpareil_mate(result, file, file, threads, lines_in_ram,
+			total_seqs, largest_seq, largest_seq, matepar);
+}
+size_t nonpareil_mate(int *&result, char *file, char *q_file,
+		int threads, unsigned int lines_in_ram,
+		unsigned int total_seqs, unsigned int largest_seq,
+		unsigned int q_largest_seq,
 		matepar_t matepar){
    // Vars
    int		no_blocks_sbj=0, no_blocks_qry=0,
@@ -40,9 +49,9 @@ size_t nonpareil_mate(int *&result,
    //sampleFile = (char *)malloc(LARGEST_PATH * (sizeof *sampleFile));
    sampleFile = new char[LARGEST_PATH];
    if(processID==0){
-      sprintf(sampleFile, "%s.subsample.%d", file, getpid());
+      sprintf(sampleFile, "%s.subsample.%d", q_file, getpid());
       say("3ss$", "Building query set at ", sampleFile);
-      qry_seqs = sub_sample_seqs(file, sampleFile, matepar.qryportion, (char *)"enveomics-seq");
+      qry_seqs = sub_sample_seqs(q_file, sampleFile, matepar.qryportion, (char *)"enveomics-seq");
       say("4sus$", "Query set built with ", qry_seqs, " sequences");
       if(qry_seqs==0) error("Impossible to create the query set.  Is the -X/-x value too small?");
    }
@@ -77,13 +86,13 @@ size_t nonpareil_mate(int *&result,
    if(processID==0) say("3sisis$", "Mating sequences in ", no_blocks_qry, " by ", no_blocks_sbj, " blocks");
    if(processID==0 && processes>1) say("3sis$", "Silencing log in slave processes (", processes-1, ")");
    for(int i=0; i<no_blocks_qry; i++){
-      // Sequences in block A
-      tmp_ram = (int)(((double)no_seqs_block_qry/1024)*largest_seq*(sizeof **blockA)/1024);
+      // Sequences in block A (qry)
+      tmp_ram = (int)(((double)no_seqs_block_qry/1024)*q_largest_seq*(sizeof **blockA)/1024);
       if(processID==0) say("5sisi$", "Allocating ~", tmp_ram, " Mib in RAM for block qry:", i+1);
-      size_blockA = get_seqs(blockA, file, i*no_seqs_block_qry+1, no_seqs_block_qry, largest_seq, (char *)"enveomics-seq");
+      size_blockA = get_seqs(blockA, sampleFile, i*no_seqs_block_qry+1, no_seqs_block_qry, q_largest_seq, (char *)"enveomics-seq");
       if(size_blockA==0) error("Impossible to get the i-th query block", i);
       
-      // Sequences in block B
+      // Sequences in block B (sbj)
       for(int j=0; j<no_blocks_sbj; j++){
 	 if(j%processes == processID){
 	    tmp_ram = (int)(((double)no_seqs_block_sbj/1024)*largest_seq*(sizeof **blockB)/1024);

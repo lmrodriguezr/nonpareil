@@ -39,6 +39,8 @@ void help(const char *msg){
 	<< "   -s <str> : Path to the (input) file containing the sequences.  This is lowercase S." << endl
 	<< endl
 	<< "COMMON OPTIONS" << endl
+	<< "   -q <str> : Path to the (input) file containing a second dataset to be used as query, for dataset comparisons.  This" << endl
+	<< "              option is currently experimental." << endl
 	<< "   -f <str> : The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'." << endl
 	<< "   -b <str> : Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files" << endl
 	<< "              with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set." << endl
@@ -72,13 +74,14 @@ int main(int argc, char *argv[]) {
    
    // Vars
    char		*file, *format=(char *)"fasta", *alldata, *cntfile, *outfile, *namFile,
-   		*seqFile, *baseout;
+   		*seqFile, *baseout, *qfile, *qNamFile, *qSeqFile;
    double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50, *sample_result,
-   		avg_seq_len, divide=0;
+   		avg_seq_len, divide=0, q_avg_seq_len;
    int		v=7, largest_seq, rseed=time(NULL), n=1024, thr=2, ram=1024, *mates, samples_no,
-   		sample_i, sample_after_20, sampling_points;
-   unsigned int	total_seqs, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
-   bool		n_as_mismatch=false, portion_label=false, revcom=true, ok, autoadjust=false;
+   		sample_i, sample_after_20, sampling_points, q_largest_seq;
+   unsigned int	total_seqs, q_total_seqs, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
+   bool		n_as_mismatch=false, portion_label=false, revcom=true, ok, autoadjust=false,
+   		alt_query=false;
    matepar_t	matepar;
    samplepar_t 	samplepar;
 
@@ -88,7 +91,7 @@ int main(int argc, char *argv[]) {
    
    // GetOpt
    int		optchr;
-   while ((optchr = getopt (argc, argv, "Aa:b:cC:d:f:Fhi:l:L:m:M:n:No:r:R:s:S:t:T:v:Vx:X:")) != EOF)
+   while ((optchr = getopt (argc, argv, "Aa:b:cC:d:f:Fhi:l:L:m:M:n:No:q:r:R:s:S:t:T:v:Vx:X:")) != EOF)
       switch(optchr) {
 	 case 'a': alldata = optarg;		break;
 	 case 'A': autoadjust = true;		break;
@@ -107,6 +110,7 @@ int main(int argc, char *argv[]) {
 	 case 'n': n = atoi(optarg);		break;
 	 case 'N': n_as_mismatch=true;		break;
 	 case 'o': outfile = optarg;		break;
+	 case 'q': qfile = optarg; alt_query = true;	break;
 	 case 'r': rseed=atoi(optarg);		break;
 	 case 'R': ram = atoi(optarg);		break;
          case 's': file = optarg;		break;
@@ -173,12 +177,38 @@ int main(int argc, char *argv[]) {
    avg_seq_len = broadcast_double(avg_seq_len);
    barrier_multinode();
 
+   // Parse Q-File
+   if(processID==0){
+      if(alt_query){
+	 q_total_seqs = build_index(qfile, format, qNamFile, qSeqFile, q_largest_seq, q_avg_seq_len);
+	 if(q_largest_seq<1) error("Your query sequences are empty or an internal error occurred.  Largest sequence is ", q_largest_seq);
+	 say("2sss$", "The file ", qSeqFile, " was just created");
+	 say("4sis$", "Longest query sequence has ", q_largest_seq, " characters");
+	 say("4sfs$", "Average query read length is ", q_avg_seq_len, " bp");
+	 if(q_total_seqs==0) error("The query file you provided do not contain sequences.  Before re-run please delete the file", qSeqFile);
+	 say("1sus$", "Reading query file with ", q_total_seqs, " sequences");
+      }else{
+	 q_total_seqs=0;
+	 qNamFile=(char *)"";
+	 qSeqFile=(char *)"";
+	 q_largest_seq = 0;
+	 q_avg_seq_len = 0.0;
+      }
+   }
+   q_total_seqs = broadcast_int(q_total_seqs);
+   qNamFile = broadcast_char(qNamFile, LARGEST_PATH);
+   qSeqFile = broadcast_char(qSeqFile, LARGEST_PATH);
+   q_largest_seq = broadcast_int(q_largest_seq);
+   q_avg_seq_len = broadcast_double(q_avg_seq_len);
+   barrier_multinode();
+   
+
 restart_vars:
    say("9sis$", "Worker ", processID, " @start_vars.");
    if(processID==0){
       // Re-wire query portion
       if(qry_portion!=0) hX = (size_t)total_seqs*qry_portion;
-      qry_portion = (double)hX/total_seqs;
+      qry_portion = (double)hX/(alt_query ? q_total_seqs : total_seqs);
       
       // Prepare memory arguments
       if(ram > UINT_MAX/1024) error("The memory to allocate is huge, I cannot manage such a big number.  Reduce -R and try again", ram);
@@ -211,8 +241,15 @@ restart_mates:
    matepar.revcom = revcom;
    matepar.n_as_mismatch = n_as_mismatch;
    if(processID==0) say("1sfsis$", "Querying library with ", qry_portion, " times the total size (", hX," seqs)");
-   qry_seqs_no = nonpareil_mate(mates, seqFile, thr, lines_in_ram, total_seqs, largest_seq, matepar);
-   if(processID==0 && cntfile && (strlen(cntfile)>0)) nonpareil_save_mates(mates, qry_seqs_no, cntfile);
+   if(alt_query){
+      qry_seqs_no = nonpareil_mate(mates, seqFile, qSeqFile, thr, lines_in_ram, total_seqs, largest_seq, q_largest_seq, matepar);
+   }else{
+      qry_seqs_no = nonpareil_mate(mates, seqFile, thr, lines_in_ram, total_seqs, largest_seq, matepar);
+   }
+   if(processID==0){
+      //if(alt_query) for(size_t a=0; a<qry_seqs_no; a++) mates[a]++; // <- Accounts for the lack of self-matches
+      if(cntfile && (strlen(cntfile)>0)) nonpareil_save_mates(mates, qry_seqs_no, cntfile);
+   }
    barrier_multinode();
 
    // Sampling

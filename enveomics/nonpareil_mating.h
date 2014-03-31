@@ -62,26 +62,36 @@ typedef struct {
 } matejob_t;
 
 /**
- * size_t nonpareil_mate(int *&result,
- *			char *file, int threads, unsigned int lines_in_ram,
+ * size_t nonpareil_mate(int *&result, char *file[, char *q_file]
+ *			int threads, unsigned int lines_in_ram,
  *			unsigned int total_seqs, unsigned int largest_seq,
+ *			[unsigned int q_largest_seq,]
  *			matepar_t matepar);
  * Description:
  *   Counts all the mates in the dataset by blocks determined by the ammount of RAM allowed to use.
  * Input:
  *   int *&result: Array of integers to be filled with the results of mating.
  *   char *file: File containing the sequences (assumed to be in "enveomics-seq" format).
+ *   char *q_file (optional): File containing the query sequences (assumed to be in "enveomics-seq" format).
+ *		If not passed, `file` is used as query file.
  *   int threads: Number of threads (CPUs) to use.
  *   unsigned int lines_in_ram: Maximum number of sequences to be stored in RAM.
  *   unsigned int total_seqs: Total number of sequences in the file.
  *   unsigned int largest_seq: Length of the largest sequence.
+ *   unsigned int q_largest_seq (optional): Length of the largest query sequence. Required if `q_file` is
+ 		passed.
  *   matepar_t matepar: Parameters for the mating.
  * Output:
  *   size_t: The number of slots in the results array (equal to the number of sampled queries).
  */
-size_t nonpareil_mate(int *&result,
-			char *file, int threads, unsigned int lines_in_ram,
+size_t nonpareil_mate(int *&result, char *file,
+			int threads, unsigned int lines_in_ram,
 			unsigned int total_seqs, unsigned int largest_seq,
+			matepar_t matepar);
+size_t nonpareil_mate(int *&result, char *file, char *q_file,
+			int threads, unsigned int lines_in_ram,
+			unsigned int total_seqs, unsigned int largest_seq,
+			unsigned int q_largest_seq,
 			matepar_t matepar);
 
 /**
