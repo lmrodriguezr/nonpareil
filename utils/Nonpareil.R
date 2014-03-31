@@ -113,13 +113,15 @@ Nonpareil.curve <- function(
 	### Label of the X-axis. If NULL, it's set to sequencing effort and the units (see factor).
 	ylab=NULL,
 	### Label of the Y-axis. If NULL, it's set to Estimated average coverage.
+	col=NA,
+	### The color of the curve. If passed, it overrides `r`, `g`, and `b`.
 	r=NA,
 	### Red component of the curve's color. If NA, it's randomly set. If <=1, it's assumed to be in the range [0,1]; if
 	### >1, it's assumed to be in the range [0,256].
 	g=NA,
-	### Green component of the curve's color. Same as r.
+	### Green component of the curve's color. Same as `r`.
 	b=NA,
-	### Blue component of the curve's color. Same as r.
+	### Blue component of the curve's color. Same as `r`.
 	new=TRUE,
 	### If FALSE, it attempts to use a previous (active) canvas to plot the curve.
 	plot=TRUE,
@@ -258,6 +260,11 @@ Nonpareil.curve <- function(
 			abline(v=10^seq(0,15,by=3), lty=2, col='gray80')
 		}
 
+		if(!is.na(col)){
+			r <- col2rgb(col)['red',1]/256;
+			g <- col2rgb(col)['green',1]/256;
+			b <- col2rgb(col)['blue',1]/256;
+		}
 		if(is.na(r)) r <- sample(200,1);
 		if(is.na(g)) g <- sample(200,1);
 		if(is.na(b)) b <- sample(200,1);

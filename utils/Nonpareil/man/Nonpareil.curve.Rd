@@ -5,11 +5,11 @@
 \usage{Nonpareil.curve(file, overlap = NULL, factor = 1, plotDispersion = NA, 
     returnModelValues = FALSE, returnModelParameters = FALSE, 
     xmax = 1e+13, xmin = 1000, ymax = 1, ymin = 1e-06, xlab = NULL, 
-    ylab = NULL, r = NA, g = NA, b = NA, new = TRUE, plot = TRUE, 
-    libname = NA, modelOnly = FALSE, plotModel = TRUE, curve.lwd = 2, 
-    curve.alpha = 0.4, model.lwd = 1, model.alpha = 1, log = "x", 
-    data.consistency = TRUE, useValue = "mean", star = 95, read.length = NA, 
-    weights.exp = -1.1, ...)}
+    ylab = NULL, col = NA, r = NA, g = NA, b = NA, new = TRUE, 
+    plot = TRUE, libname = NA, modelOnly = FALSE, plotModel = TRUE, 
+    curve.lwd = 2, curve.alpha = 0.4, model.lwd = 1, model.alpha = 1, 
+    log = "x", data.consistency = TRUE, useValue = "mean", star = 95, 
+    read.length = NA, weights.exp = -1.1, ...)}
 \arguments{
   \item{file}{Path to the .npo file, containing the read redundancy.}
   \item{overlap}{Value of the '-L' parameter (in Nonpareil, the default is 50). If not set, it tries to find the value in the
@@ -29,10 +29,11 @@ standard deviation around the mean), 'ci95' (95\% confidence interval), 'ci90' (
   \item{ymin}{Minimum coverage to plot.}
   \item{xlab}{Label of the X-axis. If NULL, it's set to sequencing effort and the units (see factor).}
   \item{ylab}{Label of the Y-axis. If NULL, it's set to Estimated average coverage.}
+  \item{col}{The color of the curve. If passed, it overrides `r`, `g`, and `b`.}
   \item{r}{Red component of the curve's color. If NA, it's randomly set. If <=1, it's assumed to be in the range [0,1]; if
 >1, it's assumed to be in the range [0,256].}
-  \item{g}{Green component of the curve's color. Same as r.}
-  \item{b}{Blue component of the curve's color. Same as r.}
+  \item{g}{Green component of the curve's color. Same as `r`.}
+  \item{b}{Blue component of the curve's color. Same as `r`.}
   \item{new}{If FALSE, it attempts to use a previous (active) canvas to plot the curve.}
   \item{plot}{Determines if the plot should be produced. If FALSE, it still computes the coverage and the model.}
   \item{libname}{Name of the library. If NA, it's determined by the file name. This is useful if you plan to call Nonpareil.legend().}
