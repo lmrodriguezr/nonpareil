@@ -191,8 +191,8 @@ int main(int argc, char *argv[]) {
 	 say("1sus$", "Reading query file with ", q_total_seqs, " sequences");
       }else{
 	 q_total_seqs=0;
-	 qNamFile=(char *)"";
-	 qSeqFile=(char *)"";
+	 //qNamFile=(char *)"";
+	 //qSeqFile=(char *)"";
 	 q_largest_seq = 0;
 	 q_avg_seq_len = 0.0;
       }
