@@ -167,8 +167,9 @@ int main(int argc, char *argv[]) {
       say("2sss$", "The file ", seqFile, " was just created");
       say("4sis$", "Longest sequence has ", largest_seq, " characters");
       say("4sfs$", "Average read length is ", avg_seq_len, " bp");
-      if(total_seqs==0) error("The file you provided do not contain sequences.  Before re-run please delete the file", seqFile);
+      if(total_seqs==0) error("The file you provided does not contain sequences.  Before re-running please delete the file", seqFile);
       say("1sus$", "Reading file with ", total_seqs, " sequences");
+      say("9s$", "Broadcasting");
    }
    total_seqs = broadcast_int(total_seqs);
    namFile = broadcast_char(namFile, LARGEST_PATH);
@@ -179,13 +180,14 @@ int main(int argc, char *argv[]) {
 
    // Parse Q-File
    if(processID==0){
+      say("1s$", "Counting query sequences");
       if(alt_query){
 	 q_total_seqs = build_index(qfile, format, qNamFile, qSeqFile, q_largest_seq, q_avg_seq_len);
 	 if(q_largest_seq<1) error("Your query sequences are empty or an internal error occurred.  Largest sequence is ", q_largest_seq);
 	 say("2sss$", "The file ", qSeqFile, " was just created");
 	 say("4sis$", "Longest query sequence has ", q_largest_seq, " characters");
 	 say("4sfs$", "Average query read length is ", q_avg_seq_len, " bp");
-	 if(q_total_seqs==0) error("The query file you provided do not contain sequences.  Before re-run please delete the file", qSeqFile);
+	 if(q_total_seqs==0) error("The query file you provided does not contain sequences.  Before re-running please delete the file", qSeqFile);
 	 say("1sus$", "Reading query file with ", q_total_seqs, " sequences");
       }else{
 	 q_total_seqs=0;
@@ -194,6 +196,7 @@ int main(int argc, char *argv[]) {
 	 q_largest_seq = 0;
 	 q_avg_seq_len = 0.0;
       }
+      say("9s$", "Broadcasting");
    }
    q_total_seqs = broadcast_int(q_total_seqs);
    qNamFile = broadcast_char(qNamFile, LARGEST_PATH);
