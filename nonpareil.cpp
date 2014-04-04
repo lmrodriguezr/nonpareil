@@ -179,6 +179,8 @@ int main(int argc, char *argv[]) {
    barrier_multinode();
 
    // Parse Q-File
+   qNamFile = (char *)malloc(LARGEST_PATH * (sizeof *qNamFile));
+   qSeqFile = (char *)malloc(LARGEST_PATH * (sizeof *qSeqFile));
    if(processID==0){
       say("1s$", "Counting query sequences");
       if(alt_query){
@@ -191,23 +193,18 @@ int main(int argc, char *argv[]) {
 	 say("1sus$", "Reading query file with ", q_total_seqs, " sequences");
       }else{
 	 q_total_seqs=0;
-	 //qNamFile=(char *)"";
-	 //qSeqFile=(char *)"";
+	 qNamFile=(char *)"";
+	 qSeqFile=(char *)"";
 	 q_largest_seq = 0;
 	 q_avg_seq_len = 0.0;
       }
       say("9s$", "Broadcasting");
    }
    q_total_seqs = broadcast_int(q_total_seqs);
-   say("9sis$", "Worker ", processID, " @qNamFile.");
    qNamFile = broadcast_char(qNamFile, LARGEST_PATH);
-   say("9sis$", "Worker ", processID, " @qSeqFile.");
    qSeqFile = broadcast_char(qSeqFile, LARGEST_PATH);
-   say("9sis$", "Worker ", processID, " @q_largest_seq.");
    q_largest_seq = broadcast_int(q_largest_seq);
-   say("9sis$", "Worker ", processID, " @q_avg_seq_len.");
    q_avg_seq_len = broadcast_double(q_avg_seq_len);
-   say("9sis$", "Worker ", processID, " @barrier.");
    barrier_multinode();
    
 
