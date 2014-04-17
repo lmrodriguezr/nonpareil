@@ -133,12 +133,13 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
    
    if(samplepar.portion==samplepar.portion_min){
       header = new char[LARGEST_LINE];
-      sprintf(header, "# @impl: Nonpareil\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %d\n# @overlap: %.2f\n",
+      sprintf(header, "# @impl: Nonpareil\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %d\n# @overlap: %.2f\n# @divide: %.2f\n",
       		samplepar.np_version,
 		samplepar.max_read_len,
       		samplepar.avg_read_len,
 		samplepar.total_reads,
-		samplepar.seq_overlap*100.0
+		samplepar.seq_overlap*100.0,
+		samplepar.divide
 	);
    }
    

@@ -40,8 +40,11 @@ typedef struct {
  *   int **mates: Reference to the int array containing the matting results.
  *   int mates_size: Number of elements in the array referenced by mates.
  *   int total_reads: Total number of reads in the dataset.
+ *   double avg_read_len: Average read length (in bp).
  *   bool portion_as_label: True if the label column of the summary file must
  *      be filled with the portion, instead of the number of reads.
+ *   double divide: Division factor for "logarithmic" sampling. If linear
+ *      sampling is used instead, it should be zero (0.0).
  */
 typedef struct {
    double	np_version;
@@ -57,6 +60,7 @@ typedef struct {
    int		max_read_len;
    double	avg_read_len;
    bool		portion_as_label;
+   double	divide;
 } samplepar_t;
 
 /**

@@ -277,6 +277,7 @@ restart_samples:
       samplepar.max_read_len = largest_seq;
       samplepar.avg_read_len = avg_seq_len;
       samplepar.portion_as_label = portion_label;
+      samplepar.divide = divide;
    
       say("1s$", "Sub-sampling library");
       double a=min;
