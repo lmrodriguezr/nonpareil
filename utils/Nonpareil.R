@@ -132,6 +132,8 @@ Nonpareil.curve <- function(
 	### If TRUE, the rarefied data is not presented, only the fitted model.
 	plotModel=TRUE,
 	### If FALSE, the model is not plotted (but it's still computed).
+	plotDiversity=FALSE,
+	### If TRUE, the diversity estimate is plotted as a small arrow below the Nonpareil curve.
 	curve.lwd=2,
 	### Line width of the Nonpareil curve.
 	curve.alpha=0.4,
@@ -154,9 +156,10 @@ Nonpareil.curve <- function(
 	### coverage is to be estimated.
 	read.length=NA,
 	### Length of the reads. Use only with Nonpareil < v2.0.
-	weights.exp=-1.1,
-	### Exponent of the weights distribution. If the model fails to converge, sometimes slight modifications in this parameter (e.g.,
-	### to -1.3) may help.
+	weights.exp=NA,
+	### Vector of values to be tested (in order) as exponent of the weights distribution. If the model fails to converge, sometimes
+	### manual modifications in this parameter may help. By default (NA), five different values are tested in the following order:
+	### For linear sampling, -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d option in Nonpareil), 0, 1, -1, 1.3, -1.1.
 	...
 	### Any other parameters accepted by plot().
 	){
@@ -170,6 +173,7 @@ Nonpareil.curve <- function(
 		stop('No previous plot found, please use new=TRUE if this is the first plot.');
 	
 	# Read metadata (.npo header)
+	log_sampling <- 0;
 	meta_data <- gsub('^# @', '', grep("^# @", readLines(file), value=TRUE));
 	keys <- gsub(': .*', '', meta_data);
 	vals <- gsub('.*: ', '', meta_data);
@@ -179,9 +183,11 @@ Nonpareil.curve <- function(
 	if(is.na(read.length)) read.length=101;
 	num_reads = NULL;
 	if('R' %in% keys) num_reads = as.numeric(vals[keys=='R']);
+	if('divide' %in% keys) log_sampling = as.numeric(vals[keys=='divide']);
+	if('logsampling' %in% keys) log_sampling = as.numeric(vals[keys=='logsampling']);
 	
 	# Read input
-	out <- list(kappa=0, C=0, LRstar=0, LR=0, modelR=0)
+	out <- list(kappa=0, C=0, LRstar=0, LR=0, modelR=0, diversity=0);
 	a <- read.table(file, sep="\t", h=F);
 	out$kappa <- a$V2[nrow(a)];
 	if(is.null(num_reads)) num_reads = max(a$V1);
@@ -216,7 +222,8 @@ Nonpareil.curve <- function(
 	# Check data
 	out$C <- max(values);
 	if(data.consistency){
-	   if(a[0.2*nrow(a), 5]==0){
+	   twenty.pc = which.max(a$V1[a$V1<=0.2*max(a$V1)]);
+	   if(a[twenty.pc, 5]==0){
 	      warning('Median of the curve is zero at 20% of the reads, check parameters and re-run (e.g., decrease value of -L in nonpareil).');
 	      return(out);
 	   }
@@ -225,7 +232,7 @@ Nonpareil.curve <- function(
 	      return(out);
 	   }
 	   if(a[2, 2]>=1-1e-5){
-	      warning('Curve too steep, check parameters and re-run (e.g., decrease value of -i in nonpareil).');
+	      warning('Curve too steep, check parameters and re-run (e.g., decrease value of -i in nonpareil or use -d).');
 	      return(out);
 	   }
 	   #if(min(a[a[,2]>0, 2])<0.01){
@@ -302,10 +309,18 @@ Nonpareil.curve <- function(
 	if((length(x)>10) | ! data.consistency){
 	   y <- values[sel];
 	   data <- list(x=x, y=y)
-	   model <- nls(y ~ Nonpareil.f(x, a, b), data=data, weights=(a$V3[sel]^weights.exp), start=list(a=1, b=0.1), lower=c(a=0, b=0), algorithm='port', 
-			control=nls.control(minFactor=1e-25000, tol=1e-15, maxiter=1024, warnOnly=T));
-	   #model <- nls(y ~ Nonpareil.f(x, a, b), data=data, start=list(a=1, b=1), 
-	   #		control=nls.control(minFactor=1e-250000000, tol=1e-150000000, maxiter=1024000));
+	   estModel <- TRUE;
+	   if(is.na(weights.exp[1])){
+	      if(log_sampling==0){ weights.exp <- c(-1.1,-1.2,-0.9,-1.3,-1) }
+	      else{ weights.exp <- c(0, 1, -1, 1.3, -1.1) }
+	   }
+	   weights.i <- 0;
+	   while(estModel){
+	      weights.i <- weights.i+1;
+	      model <- nls(y ~ Nonpareil.f(x, a, b), data=data, weights=(a$V3[sel]^weights.exp[weights.i]), start=list(a=1, b=0.1), lower=c(a=0, b=0), algorithm='port', 
+			   control=nls.control(minFactor=1e-25000, tol=1e-15, maxiter=1024, warnOnly=T));
+	      if(!is.na(weights.exp[weights.i+1]) | summary(model)$convInfo$isConv) estModel <- FALSE;
+	   }
 	   if(summary(model)$convInfo$isConv){
 	      model.lty=2;
 	      if(modelOnly) model.lty=1;
@@ -314,13 +329,19 @@ Nonpareil.curve <- function(
 		 model.y <- predict(model, list(x=model.x));
 		 model.x <- model.x*horiz.diff*factor;
 		 lines(model.x, model.y, col=rgb(r,g,b,model.alpha), lty=model.lty, lwd=model.lwd);
-		 if(returnModelValues) { out$model.x <- model.x ; out$model.y <- model.y; }
-		 if(returnModelParameters) { out$model=model }
 		 if(modelOnly) points(max(a$V1), predict(model, list(x=max(a$V1))), col=rgb(r,g,b), pch=21, bg='white');
 		 #if(modelOnly) points(min(a$V1[a$V1>0]), predict(model, list(x=min(a$V1[a$V1>0]))), col=rgb(r,g,b), pch=8, bg='white');
 	      }
-	      pa <- as.numeric(summary(model)$parameters['a', 1])
-	      pb <- as.numeric(summary(model)$parameters['b', 1])
+	      if(returnModelValues) { out$model.x <- model.x ; out$model.y <- model.y; }
+	      if(returnModelParameters) { out$model=model }
+	      pa <- coef(model)[1];
+	      pb <- coef(model)[2];
+	      if(pa > 1) out$diversity <- (pa-1)/pb;
+	      if(plot & plotDiversity & out$diversity>0)
+	      	arrows(x0=exp(out$diversity),
+			y0=ifelse(log=='y' | log=='xy' | log=='yx', ymin*0.1, ymin-1),
+			y1=ymin,
+			length=0.1, col=rgb(r,g,b,model.alpha));
 	      out$LRstar <- Nonpareil.antif(star/100, pa, pb);
 	      out$modelR <- cor(y, predict(model, list(x=x)));
 	   }else{
@@ -341,6 +362,10 @@ Nonpareil.curve <- function(
 	### LR: Actual sequencing effort of the dataset.
 	### 
 	### modelR: Pearson's R coefficient betweeen the rarefied data and the projected model.
+	###
+	### diversity: Nonpareil-based diversity index. This value's units are the natural logarithm of the units of
+	###    sequencing effort (by default, log-bp), and indicates the inflection point of the fitted model for the
+	###    Nonpareil curve. If the fit doesn't converge, or the model is not estimated, the value is zero (0).
 	### 
 	### model.x (if retturnModelValues=TRUE): Values of sequencing effort in the projected model.
 	### 

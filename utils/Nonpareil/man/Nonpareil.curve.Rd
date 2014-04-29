@@ -7,9 +7,10 @@
     xmax = 1e+13, xmin = 1000, ymax = 1, ymin = 1e-06, xlab = NULL, 
     ylab = NULL, col = NA, r = NA, g = NA, b = NA, new = TRUE, 
     plot = TRUE, libname = NA, modelOnly = FALSE, plotModel = TRUE, 
-    curve.lwd = 2, curve.alpha = 0.4, model.lwd = 1, model.alpha = 1, 
-    log = "x", data.consistency = TRUE, useValue = "mean", star = 95, 
-    read.length = NA, weights.exp = -1.1, ...)}
+    plotDiversity = FALSE, curve.lwd = 2, curve.alpha = 0.4, 
+    model.lwd = 1, model.alpha = 1, log = "x", data.consistency = TRUE, 
+    useValue = "mean", star = 95, read.length = NA, weights.exp = NA, 
+    ...)}
 \arguments{
   \item{file}{Path to the .npo file, containing the read redundancy.}
   \item{overlap}{Value of the '-L' parameter (in Nonpareil, the default is 50). If not set, it tries to find the value in the
@@ -39,6 +40,7 @@ standard deviation around the mean), 'ci95' (95\% confidence interval), 'ci90' (
   \item{libname}{Name of the library. If NA, it's determined by the file name. This is useful if you plan to call Nonpareil.legend().}
   \item{modelOnly}{If TRUE, the rarefied data is not presented, only the fitted model.}
   \item{plotModel}{If FALSE, the model is not plotted (but it's still computed).}
+  \item{plotDiversity}{If TRUE, the diversity estimate is plotted as a small arrow below the Nonpareil curve.}
   \item{curve.lwd}{Line width of the Nonpareil curve.}
   \item{curve.alpha}{Alpha value (from 0 to 1) of the Nonpareil curve.}
   \item{model.lwd}{Line width of the model.}
@@ -52,8 +54,9 @@ confidence interval), 'q1' (quartile 1), 'q3' (quartile 3). Note that the quarti
   \item{star}{Objective coverage (in percentage). By default: 95, which means the sequencing effort required to reach 95\% average
 coverage is to be estimated.}
   \item{read.length}{Length of the reads. Use only with Nonpareil < v2.0.}
-  \item{weights.exp}{Exponent of the weights distribution. If the model fails to converge, sometimes slight modifications in this parameter (e.g.,
-to -1.3) may help.}
+  \item{weights.exp}{Vector of values to be tested (in order) as exponent of the weights distribution. If the model fails to converge, sometimes
+manual modifications in this parameter may help. By default (NA), five different values are tested in the following order:
+For linear sampling, -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d option in Nonpareil), 0, 1, -1, 1.3, -1.1.}
   \item{\dots}{Any other parameters accepted by plot().}
 }
 
@@ -68,6 +71,10 @@ LRstar: Estimated sequencing effort required to reach the objective average cove
 LR: Actual sequencing effort of the dataset.
 
 modelR: Pearson's R coefficient betweeen the rarefied data and the projected model.
+
+diversity: Nonpareil-based diversity index. This value's units are the natural logarithm of the units of
+sequencing effort (by default, log-bp), and indicates the inflection point of the fitted model for the
+Nonpareil curve. If the fit doesn't converge, or the model is not estimated, the value is zero (0).
 
 model.x (if retturnModelValues=TRUE): Values of sequencing effort in the projected model.
 
