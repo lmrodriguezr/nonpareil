@@ -4,7 +4,7 @@
 \description{Generates a single plot (and a single table of estimates) with multiple Nonpareil
 curves, from different .npo files.}
 \usage{Nonpareil.curve.batch(files, overlap, r = NA, g = NA, b = NA, 
-    libnames = NA, read.lengths = NA, ...)}
+    libnames = NA, read.lengths = NA, col = NA, ...)}
 \arguments{
   \item{files}{Vector of characters with the paths to the .npo files.}
   \item{overlap}{Value of the '-L' parameter (in Nonpareil, the default is 50). It can be a number (if all the curves
@@ -17,6 +17,7 @@ of 'Nonpareil.curve()'. Use only with Nonpareil < v2.0.}
 not factors.}
   \item{read.lengths}{A vector of numbers indicating the length of the reads (corresponding to 'read.length' in 'Nonpareil.curve()').
 Use only with Nonpareil < v2.0.}
+  \item{col}{Values of 'col' in 'Nonpareil.curve()'.}
   \item{\dots}{Any other parameter accepted by 'Nonpareil.curve()' is supported.}
 }
 

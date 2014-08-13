@@ -59,6 +59,8 @@ Nonpareil.curve.batch <- function(
 	read.lengths=NA,
 	### A vector of numbers indicating the length of the reads (corresponding to 'read.length' in 'Nonpareil.curve()').
 	### Use only with Nonpareil < v2.0.
+	col=NA,
+	### Values of 'col' in 'Nonpareil.curve()'.
 	...
 	### Any other parameter accepted by 'Nonpareil.curve()' is supported.
 	){
@@ -66,7 +68,7 @@ Nonpareil.curve.batch <- function(
    if(missing(overlap)) overlap=rep(NULL, length(files));
    new=TRUE;
    for(i in 1:length(files)){
-      o = Nonpareil.curve(files[i], overlap, r=r[i], g=g[i], b=b[i],
+      o = Nonpareil.curve(as.character(files[i]), overlap, r=r[i], g=g[i], b=b[i], col=col[i],
       		libname=ifelse(is.na(libnames[1]), NA, as.character(libnames[i])), new=new,
 		read.length=ifelse(is.na(read.lengths[1]), NA, read.lengths[i]), ...);
       if(new){
@@ -312,7 +314,7 @@ Nonpareil.curve <- function(
 	   estModel <- TRUE;
 	   if(is.na(weights.exp[1])){
 	      if(log_sampling==0){ weights.exp <- c(-1.1,-1.2,-0.9,-1.3,-1) }
-	      else{ weights.exp <- c(0, 1, -1, 1.3, -1.1) }
+	      else{ weights.exp <- c(0, 1, -1, 1.3, -1.1, 1.5, -1.5) }
 	   }
 	   weights.i <- 0;
 	   while(estModel){
