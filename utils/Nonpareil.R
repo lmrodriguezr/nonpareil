@@ -161,7 +161,8 @@ Nonpareil.curve <- function(
 	weights.exp=NA,
 	### Vector of values to be tested (in order) as exponent of the weights distribution. If the model fails to converge, sometimes
 	### manual modifications in this parameter may help. By default (NA), five different values are tested in the following order:
-	### For linear sampling, -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d option in Nonpareil), 0, 1, -1, 1.3, -1.1.
+	### For linear sampling, -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d option in Nonpareil), 0, 1, -1, 1.3, -1.1,
+	### 1.5, -1.5.
 	...
 	### Any other parameters accepted by plot().
 	){
