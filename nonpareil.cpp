@@ -1,6 +1,6 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
-// @version 2.3
+// @version 2.4
 // @license artistic license 2.0
 
 /*
@@ -19,7 +19,7 @@
 #include "enveomics/nonpareil_sampling.h"
 
 #define LARGEST_PATH 4096
-#define NP_VERSION 2.304
+#define NP_VERSION 2.400
 
 using namespace std;
 int processID;
@@ -27,8 +27,9 @@ int processes;
 
 void help(const char *msg){
    if(processID==0 && msg!=NULL && strlen(msg) != 0) cerr << endl << msg << endl << endl;
-   if(processID==0) cerr << "AIM"<< endl
-   	<< "   Fast and memory-efficient method to generate Nonpareil curves in large sets of short reads." << endl
+   if(processID==0) cerr << "DESCRIPTION"<< endl
+   	<< "   Nonpareil uses the redundancy of the reads in metagenomic datasets to estimate the average coverage and predict the" << endl
+	<< "   amount of sequences that will be required to achieve 'nearly complete coverage'." << endl
 	<< endl
    	<< "USAGE" << endl
 	<< "   nonpareil -s sequences.fa -b output [options]" << endl
@@ -39,17 +40,19 @@ void help(const char *msg){
 	<< "   -s <str> : Path to the (input) file containing the sequences.  This is lowercase S." << endl
 	<< endl
 	<< "COMMON OPTIONS" << endl
-	<< "   -q <str> : Path to the (input) file containing a second dataset to be used as query, for dataset comparisons.  This" << endl
-	<< "              option is currently experimental." << endl
 	<< "   -f <str> : The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'." << endl
 	<< "   -b <str> : Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files" << endl
 	<< "              with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set." << endl
-	<< "   -i <num> : Interval between sampling portions.  By default: 0.01." << endl
+	<< "   -d <num> : Subsample iteratively applying this factor to the number of reads, resulting in logarithmic subsampling." << endl
+	<< "              Use -d 0 to fall back to linear sampling, controlled by -m, -M, & -i (this was the default before v2.4)." << endl
+	<< "              By default: 0.7." << endl
 	<< "   -n <int> : Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t)," << endl
 	<< "              it is rounded to the next (upper) multiple.  By default: 1024." << endl
 	<< "   -L <num> : Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is" << endl
 	<< "              evaluated for the aligned region only.  By default: 50." << endl
 	<< "   -X <int> : Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads." << endl
+	<< "   -q <str> : Path to the (input) file containing a second dataset to be used as query, for dataset comparisons.  This" << endl
+	<< "              option is currently experimental." << endl
 	<< "   -R <int> : Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding" << endl
 	<< "              non-sequence elements like headers or quality).  This is particularly important when running in multiple" << endl
 	<< "              cores (see -t).  This value is approximated.  By default 1024." << endl
@@ -76,7 +79,7 @@ int main(int argc, char *argv[]) {
    char		*file, *format=(char *)"fasta", *alldata, *cntfile, *outfile, *namFile,
    		*seqFile, *baseout, *qfile, *qNamFile, *qSeqFile;
    double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50, *sample_result,
-   		avg_seq_len, divide=0, q_avg_seq_len;
+   		avg_seq_len, divide=0.7, q_avg_seq_len;
    int		v=7, largest_seq, rseed=time(NULL), n=1024, thr=2, ram=1024, *mates, samples_no,
    		sample_i, sample_after_20, sampling_points, q_largest_seq;
    unsigned int	total_seqs, q_total_seqs, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;

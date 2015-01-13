@@ -89,7 +89,7 @@ supported by R_). Next, you can simply type something like this in the R_ consol
     library(Nonpareil); # Or source('utils/Nonpareil.R');, if you didn't "make install"
     samples <- read.table('samples.txt', sep='\t', h=T);
     attach(samples);
-    np <- Nonpareil.curve.batch(File, 50, r=R, g=G, b=B, libnames=Name, modelOnly=TRUE);
+    np <- Nonpareil.curve.batch(File, r=R, g=G, b=B, libnames=Name, modelOnly=TRUE);
     Nonpareil.legend('bottomright');
     detach(samples);
 

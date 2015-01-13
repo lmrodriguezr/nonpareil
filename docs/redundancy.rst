@@ -22,12 +22,16 @@ Common options
    -f <str>   The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'
    -b <str>   Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files
               with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.
-   -i <num>   Interval between sampling portions.  By default: 0.01.
+   -d <num>   Subsample iteratively applying this factor to the number of reads, resulting in logarithmic subsampling.
+              Use -d 0 to fall back to linear sampling, controlled by -m, -M, & -i (this was the default before v2.4).
+	      By default: 0.7.
    -n <int>   Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t),
               it is rounded to the next (upper) multiple.  By default: 1024.
    -L <num>   Minimum overlapping percentage of the aligned region on the largest sequence. The similarity (see -S) is
               evaluated for the aligned region only.  By default: 50.
    -X <int>   Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads.
+   -q <str>   Path to the (input) file containing a second dataset to be used as query, for dataset comparisons.  This
+	      option is currently experimental.
    -R <int>   Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding
               non-sequence elements like headers or quality).  This is particularly important when running in multiple
               cores (see -t).  This value is approximated.  By default 1024.
@@ -55,9 +59,8 @@ Additional options
 **Sampling**
    -m <num>   Minimum value of sampling portion.  By default: 0.
    -M <num>   Maximum value of sampling portion.  By default: 1.
-   -d <num>   Take this fraction of the total library every sampling point (logarithmic sampling, not linear).  If set
-              to zero, logarithmic sub-sampling is disabled (default). Recommended value: 0.7. EXPERIMENTAL CODE.
-   
+   -i <num>   Interval between sampling portions. By default: 0.01.
+
 **Mating**
    -c         Do not use reverse-complement.  This is useful for single stranded sequences data (like RNA).  This is a
               lowercase C.
