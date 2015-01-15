@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Nonpareil curves &mdash; Nonpareil 2.3r3 documentation</title>
+    <title>Nonpareil curves &mdash; Nonpareil 2.4r0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.3r3',
+        VERSION:     '2.4r0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.3r3 documentation" href="index.html" />
+    <link rel="top" title="Nonpareil 2.4r0 documentation" href="index.html" />
     <link rel="next" title="MPI support" href="mpi.html" />
     <link rel="prev" title="Redundancy" href="redundancy.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="redundancy.html" title="Redundancy"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.3r3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -64,12 +64,13 @@ of Nonpareil). Second, the <tt class="docutils literal"><span class="pre">.npo</
 </pre></div>
 </div>
 <p>And you can get help messages using any of:</p>
-<div class="highlight-python"><pre>?Nonpareil.curve
+<div class="highlight-python"><div class="highlight"><pre>?Nonpareil.curve
 ?Nonpareil.curve.batch
 ?Nonpareil.legend
 ?Nonpareil.f
 ?Nonpareil.antif
-?Nonpareil.coverageFactor</pre>
+?Nonpareil.coverageFactor
+</pre></div>
 </div>
 <p>If you didn&#8217;t install it, you have to load it from the source (although you won&#8217;t have the embedded documentation):</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">source</span><span class="p">(</span><span class="s">&#39;utils/Nonpareil.R&#39;</span><span class="p">);</span> <span class="c"># Change utils/Nonpareil.R for the actual path to the utils folder</span>
@@ -84,10 +85,12 @@ of Nonpareil). Second, the <tt class="docutils literal"><span class="pre">.npo</
 <h2>Nonpareil.curve()<a class="headerlink" href="#nonpareil-curve" title="Permalink to this headline">¶</a></h2>
 <p>This function can generate a Nonpareil curve from a <tt class="docutils literal"><span class="pre">.npo</span></tt> file. See the documentation of this function inside <a class="reference external" href="http://www.r-project.org/">R</a> after
 loading the Nonpareil package:</p>
-<div class="highlight-python"><pre>?Nonpareil.curve</pre>
+<div class="highlight-python"><div class="highlight"><pre>?Nonpareil.curve
+</pre></div>
 </div>
 <p>If you didn&#8217;t install the Nonpareil package, you can see the documentation from the source:</p>
-<div class="highlight-python"><pre>tools::Rd2txt(tools::parse_Rd('utils/nonpareil/man/Nonpareil.curve.Rd'))</pre>
+<div class="highlight-python"><div class="highlight"><pre>tools::Rd2txt(tools::parse_Rd(&#39;utils/nonpareil/man/Nonpareil.curve.Rd&#39;))
+</pre></div>
 </div>
 </div>
 <div class="section" id="nonpareil-legend">
@@ -95,23 +98,27 @@ loading the Nonpareil package:</p>
 <p>This function creates a legend for the Nonpareil curve(s) in the (active) plot. It&#8217;s compatible with single
 or multiple calls of <a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a> (using <tt class="docutils literal"><span class="pre">new=F</span></tt> in all but the first call) and with
 <a class="reference internal" href="#nonpareil-curve-batch">Nonpareil.curve.batch()</a>. See the documentation inside <a class="reference external" href="http://www.r-project.org/">R</a> after loading the Nonpareil package:</p>
-<div class="highlight-python"><pre>?Nonpareil.legend</pre>
+<div class="highlight-python"><div class="highlight"><pre>?Nonpareil.legend
+</pre></div>
 </div>
 <p>Or from the source:</p>
-<div class="highlight-python"><pre>tools::Rd2txt(tools::parse_Rd('utils/nonpareil/man/Nonpareil.legend.Rd'))</pre>
+<div class="highlight-python"><div class="highlight"><pre>tools::Rd2txt(tools::parse_Rd(&#39;utils/nonpareil/man/Nonpareil.legend.Rd&#39;))
+</pre></div>
 </div>
 </div>
 <div class="section" id="nonpareil-curve-batch">
 <h2>Nonpareil.curve.batch()<a class="headerlink" href="#nonpareil-curve-batch" title="Permalink to this headline">¶</a></h2>
 <p>This function can generate a plot with several Nonpareil curves from <tt class="docutils literal"><span class="pre">.npo</span></tt> files. See the documentation of this
 function in <a class="reference external" href="http://www.r-project.org/">R</a> after loading the Nonpareil package:</p>
-<div class="highlight-python"><pre>?Nonpareil.curve.batch</pre>
+<div class="highlight-python"><div class="highlight"><pre>?Nonpareil.curve.batch
+</pre></div>
 </div>
 <p>Or from the source:</p>
-<div class="highlight-python"><pre>tools::Rd2txt(tools::parse_Rd('utils/nonpareil/man/Nonpareil.curve.batch.Rd'))</pre>
+<div class="highlight-python"><div class="highlight"><pre>tools::Rd2txt(tools::parse_Rd(&#39;utils/nonpareil/man/Nonpareil.curve.batch.Rd&#39;))
+</pre></div>
 </div>
 <p><strong>Example</strong>: I find it very convenient to first prepare a table with the samples, something like:</p>
-<div class="highlight-python"><pre># samples.txt
+<div class="highlight-python"><div class="highlight"><pre># samples.txt
 File        Name    R       G       B
 # HMP
 SRS063417.1.L50.npo Posterior fornix        256     200     200
@@ -119,14 +126,15 @@ SRS063287.1.L50.npo Buccal mucosa   256     120     120
 SRS062540.1.L50.npo Tongue dorsum   256     3       3
 SRS016335.1.L50.npo Stool   200     135     76
 SRS015574.1.L50.npo Supragingival plaque    230     100     120
-SRS019087.1.L50.npo Anterior nares  220     220     130</pre>
+SRS019087.1.L50.npo Anterior nares  220     220     130
+</pre></div>
 </div>
 <p>Note that this table is tab-delimited, because I find it easier to read, but you can use anything you like (and is
 supported by <a class="reference external" href="http://www.r-project.org/">R</a>). Next, you can simply type something like this in the <a class="reference external" href="http://www.r-project.org/">R</a> console:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">library</span><span class="p">(</span><span class="n">Nonpareil</span><span class="p">);</span> <span class="c"># Or source(&#39;utils/Nonpareil.R&#39;);, if you didn&#39;t &quot;make install&quot;</span>
 <span class="n">samples</span> <span class="o">&lt;-</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s">&#39;samples.txt&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">T</span><span class="p">);</span>
 <span class="n">attach</span><span class="p">(</span><span class="n">samples</span><span class="p">);</span>
-<span class="n">np</span> <span class="o">&lt;-</span> <span class="n">Nonpareil</span><span class="o">.</span><span class="n">curve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">File</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">libnames</span><span class="o">=</span><span class="n">Name</span><span class="p">,</span> <span class="n">modelOnly</span><span class="o">=</span><span class="n">TRUE</span><span class="p">);</span>
+<span class="n">np</span> <span class="o">&lt;-</span> <span class="n">Nonpareil</span><span class="o">.</span><span class="n">curve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">File</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">libnames</span><span class="o">=</span><span class="n">Name</span><span class="p">,</span> <span class="n">modelOnly</span><span class="o">=</span><span class="n">TRUE</span><span class="p">);</span>
 <span class="n">Nonpareil</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="s">&#39;bottomright&#39;</span><span class="p">);</span>
 <span class="n">detach</span><span class="p">(</span><span class="n">samples</span><span class="p">);</span>
 </pre></div>
@@ -191,12 +199,12 @@ supported by <a class="reference external" href="http://www.r-project.org/">R</a
         <li class="right" >
           <a href="redundancy.html" title="Redundancy"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.3r3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013-2014, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+        &copy; Copyright 2013-2015, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

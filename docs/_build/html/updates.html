@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Updates history &mdash; Nonpareil 2.3r3 documentation</title>
+    <title>Updates history &mdash; Nonpareil 2.4r0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.3r3',
+        VERSION:     '2.4r0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.3r3 documentation" href="index.html" />
+    <link rel="top" title="Nonpareil 2.4r0 documentation" href="index.html" />
     <link rel="next" title="Preprocess the reads" href="preprocess.html" />
     <link rel="prev" title="MPI support" href="mpi.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="mpi.html" title="MPI support"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.3r3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -51,6 +51,21 @@
             
   <div class="section" id="updates-history">
 <h1>Updates history<a class="headerlink" href="#updates-history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-s-new-in-2-4">
+<h2>What&#8217;s new in 2.4<a class="headerlink" href="#what-s-new-in-2-4" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Subsampling now defaults to logarithmic: Previous versions subsampled linearly, since 2.4 the -d
+option defaults to 0.7. Options -m, -M, &amp; -i still exist but they are ignored unless -d is 0.</li>
+<li>Nonpareil diversity: A logarithmic value of diversity is now reported, indicating the horizontal
+position of the Nonpareil curves. This value is the estimated mode of the fitted Gamma CDF, and
+cannot be calculated if model fitting fails.</li>
+<li>Experimental dataset comparisons: The -q option allows the paired comparison of datasets. The
+expectation is that the difference between the diversity of a sample by itself (without using -q)
+and the diversity of the same sample queried with a second sample (with -q) represents the distance
+between them. Note that this method experimental and is not symetric (hence not a real distance).
+Usually, the average of the distances in both ways can be used for clustering of samples.</li>
+</ul>
+</div>
 <div class="section" id="what-s-new-in-2-3">
 <h2>What&#8217;s new in 2.3<a class="headerlink" href="#what-s-new-in-2-3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -76,6 +91,7 @@ for the Nonpareil R package are now self-contained, and were removed from the <a
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Updates history</a><ul>
+<li><a class="reference internal" href="#what-s-new-in-2-4">What&#8217;s new in 2.4</a></li>
 <li><a class="reference internal" href="#what-s-new-in-2-3">What&#8217;s new in 2.3</a></li>
 </ul>
 </li>
@@ -121,12 +137,12 @@ for the Nonpareil R package are now self-contained, and were removed from the <a
         <li class="right" >
           <a href="mpi.html" title="MPI support"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.3r3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013-2014, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+        &copy; Copyright 2013-2015, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

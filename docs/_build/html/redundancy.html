@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Redundancy &mdash; Nonpareil 2.3r3 documentation</title>
+    <title>Redundancy &mdash; Nonpareil 2.4r0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.3r3',
+        VERSION:     '2.4r0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.3r3 documentation" href="index.html" />
+    <link rel="top" title="Nonpareil 2.4r0 documentation" href="index.html" />
     <link rel="next" title="Nonpareil curves" href="curves.html" />
     <link rel="prev" title="Preprocess the reads" href="preprocess.html" /> 
   </head>
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="preprocess.html" title="Preprocess the reads"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.3r3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -55,7 +55,8 @@
 <div class="section" id="for-the-impatient">
 <h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Permalink to this headline">¶</a></h2>
 <p>Even if you&#8217;re in a hurry, taking a look at <a class="reference internal" href="preprocess.html"><em>Preprocess the reads</em></a> is very important. If you already did, you can simply run:</p>
-<div class="highlight-python"><pre>nonpareil -s reads.fa -b output</pre>
+<div class="highlight-python"><div class="highlight"><pre>nonpareil -s reads.fa -b output
+</pre></div>
 </div>
 <p>Where <tt class="docutils literal"><span class="pre">reads.fa</span></tt> is the file containing the trimmed single reads, and <tt class="docutils literal"><span class="pre">output</span></tt> is the prefix
 of the output files to be created.</p>
@@ -89,8 +90,10 @@ of the output files to be created.</p>
 <td>Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files
 with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.</td></tr>
 <tr><td class="option-group">
-<kbd><span class="option">-i <var>&lt;num&gt;</var></span></kbd></td>
-<td>Interval between sampling portions.  By default: 0.01.</td></tr>
+<kbd><span class="option">-d <var>&lt;num&gt;</var></span></kbd></td>
+<td>Subsample iteratively applying this factor to the number of reads, resulting in logarithmic subsampling.
+Use -d 0 to fall back to linear sampling, controlled by -m, -M, &amp; -i (this was the default before v2.4).
+By default: 0.7.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-n <var>&lt;int&gt;</var></span></kbd></td>
 <td>Number of sub-samples to generate per point.  If it is not a multiple of the number of threads (see -t),
@@ -102,6 +105,10 @@ evaluated for the aligned region only.  By default: 50.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-X <var>&lt;int&gt;</var></span></kbd></td>
 <td>Maximum number of reads to use as query.  This is capital X.  By default, 1,000 reads.</td></tr>
+<tr><td class="option-group">
+<kbd><span class="option">-q <var>&lt;str&gt;</var></span></kbd></td>
+<td>Path to the (input) file containing a second dataset to be used as query, for dataset comparisons.  This
+option is currently experimental.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-R <var>&lt;int&gt;</var></span></kbd></td>
 <td>Maximum RAM usage in Mib.  Ideally this value should be larger than the sequences to analyze (discarding
@@ -168,9 +175,8 @@ OUTPUT section.</td></tr>
 <kbd><span class="option">-M <var>&lt;num&gt;</var></span></kbd></td>
 <td>Maximum value of sampling portion.  By default: 1.</td></tr>
 <tr><td class="option-group">
-<kbd><span class="option">-d <var>&lt;num&gt;</var></span></kbd></td>
-<td>Take this fraction of the total library every sampling point (logarithmic sampling, not linear).  If set
-to zero, logarithmic sub-sampling is disabled (default). Recommended value: 0.7. EXPERIMENTAL CODE.</td></tr>
+<kbd><span class="option">-i <var>&lt;num&gt;</var></span></kbd></td>
+<td>Interval between sampling portions. By default: 0.01.</td></tr>
 </tbody>
 </table>
 </dd>
@@ -306,12 +312,12 @@ estimation.</dd>
         <li class="right" >
           <a href="preprocess.html" title="Preprocess the reads"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.3r3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013-2014, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+        &copy; Copyright 2013-2015, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

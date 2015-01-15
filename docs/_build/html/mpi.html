@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>MPI support &mdash; Nonpareil 2.3r3 documentation</title>
+    <title>MPI support &mdash; Nonpareil 2.4r0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.3r3',
+        VERSION:     '2.4r0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.3r3 documentation" href="index.html" />
+    <link rel="top" title="Nonpareil 2.4r0 documentation" href="index.html" />
     <link rel="prev" title="Nonpareil curves" href="curves.html" /> 
   </head>
   <body>
@@ -36,7 +36,7 @@
         <li class="right" >
           <a href="curves.html" title="Nonpareil curves"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.3r3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -55,8 +55,9 @@ it&#8217;s not as widely tested as the regular Nonpareil.</p>
 you have it, you should have at least the C++ compiler (typically <tt class="docutils literal"><span class="pre">mpic++</span></tt>) and the interactive executable (typically <tt class="docutils literal"><span class="pre">mpirun</span></tt>). If
 you have the compiler in a non-standard location (for example, to coexist with mpich), change the value of <tt class="docutils literal"><span class="pre">mpicpp</span></tt> in the <tt class="docutils literal"><span class="pre">globals.mk</span></tt>
 file. Once you are ready, simply run:</p>
-<div class="highlight-python"><pre>cd nonpareil # or wherever you have the nonpareil folder
-make nonpareil-mpi</pre>
+<div class="highlight-python"><div class="highlight"><pre>cd nonpareil # or wherever you have the nonpareil folder
+make nonpareil-mpi
+</pre></div>
 </div>
 <p>That&#8217;s it. Now you should have the <tt class="docutils literal"><span class="pre">nonpareil-mpi</span></tt> binary, that you can place in a location listed in your <tt class="docutils literal"><span class="pre">$PATH</span></tt> if you want.</p>
 </div>
@@ -69,12 +70,14 @@ the resources section below). For example, to request 10 machines with 16 CPUs e
 </li>
 <li><p class="first">Obtain the machine names. Just prepare a raw text file with the list of machines you want to use. If you are using PBS, you can do
 this by running:</p>
-<div class="highlight-python"><pre>cat $PBS_NODEFILE | awk 'NR%16==0' &gt; hosts.txt # Change the '16' by the number of CPUs you are using (the value of ppn).</pre>
+<div class="highlight-python"><div class="highlight"><pre>cat $PBS_NODEFILE | awk &#39;NR%16==0&#39; &gt; hosts.txt # Change the &#39;16&#39; by the number of CPUs you are using (the value of ppn).
+</pre></div>
 </div>
 </li>
 <li><p class="first">Run Nonpareil MPI. All you need is to call <tt class="docutils literal"><span class="pre">nonpareil-mpi</span></tt> with <tt class="docutils literal"><span class="pre">mpirun</span></tt>. For example, if you want to use 10 machines, with 16
 CPUs each, and the list of machines is in <tt class="docutils literal"><span class="pre">hosts.txt</span></tt>, then run:</p>
-<div class="highlight-python"><pre>mpirun -np 10 -machinefile hosts.txt nonpareil-mpi -t 16 -s path/to/your/sequences.fasta -b output ...</pre>
+<div class="highlight-python"><div class="highlight"><pre>mpirun -np 10 -machinefile hosts.txt nonpareil-mpi -t 16 -s path/to/your/sequences.fasta -b output ...
+</pre></div>
 </div>
 <p>Note that the options of <tt class="docutils literal"><span class="pre">nonpareil-mpi</span></tt> are the exact same as for <tt class="docutils literal"><span class="pre">nonpareil</span></tt>. Just remember that the value of <tt class="docutils literal"><span class="pre">-t</span></tt> is the
 number of threads <em>per machine</em>, not the total number of CPUs.</p>
@@ -182,12 +185,12 @@ attain shorter running times by increasing the RAM (<tt class="docutils literal"
         <li class="right" >
           <a href="curves.html" title="Nonpareil curves"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.3r3 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2013-2014, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+        &copy; Copyright 2013-2015, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
