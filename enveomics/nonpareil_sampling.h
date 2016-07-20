@@ -56,9 +56,12 @@ typedef struct {
    int		replicates;
    int		**mates;
    int		mates_size;
-   int		total_reads;
+   unsigned long long int		total_reads;
    int		max_read_len;
+   int    k;
+   int    type;
    double	avg_read_len;
+   double adj_avg_read_len;
    bool		portion_as_label;
    double	divide;
 } samplepar_t;
@@ -128,4 +131,3 @@ void *nonpareil_sample_portion_thr(void *samplejob_ref);
 sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, char *alldata, char *outfile, samplepar_t samplepar);
 
 #endif
-
