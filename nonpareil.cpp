@@ -142,8 +142,8 @@ int main(int argc, char *argv[]) {
    if(qry_portion<0 | qry_portion>1)
    				help("Bad argument for -x option, accepted values are numbers in the range (0, 1]");
    if(divide<0 | divide>=1)	help("Bad argument for -d option, accepted values are numbers in the range (0, 1)");
+   char alldataTmp[LARGEST_PATH], outfileTmp[LARGEST_PATH], cntfileTmp[LARGEST_PATH];
    if(baseout && (strlen(baseout)>0)){
-      char alldataTmp[LARGEST_PATH], outfileTmp[LARGEST_PATH], cntfileTmp[LARGEST_PATH];
       if(!alldata || (strlen(alldata)<=0)){ sprintf(alldataTmp, "%s.npa", baseout); alldata=alldataTmp; }
       if(!cntfile || (strlen(cntfile)<=0)){ sprintf(cntfileTmp, "%s.npc", baseout); cntfile=cntfileTmp; }
       if(!outfile || (strcmp(outfile, "-")==0)){ sprintf(outfileTmp, "%s.npo", baseout); outfile=outfileTmp; }
