@@ -1,6 +1,6 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
-// @version 2.4
+// @version 3.0
 // @license artistic license 2.0
 
 /*
