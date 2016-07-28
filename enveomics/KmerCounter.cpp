@@ -3,6 +3,7 @@
 #include <fstream>
 #include <math.h>
 #include "KmerCounter.h"
+#include "universal.h"
 
 using namespace std;
 
@@ -70,7 +71,7 @@ void KmerCounter::saveCounts(string file) {
   ofstream	fileh;
 
   fileh.open(file, ios::out);
-  //if(!fileh.is_open()) error("Cannot open the file", file);
+  if(!fileh.is_open()) error("Cannot open the file", file);
 
   for(int a=0; a<this->countTable.size(); a++)
      fileh << countTable[a] << endl;

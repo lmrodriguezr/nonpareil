@@ -1,6 +1,7 @@
 #include "References.h"
 #include "Hash.h"
 #include "sequence.h"
+#include "universal.h"
 
 using namespace std;
 
@@ -32,6 +33,8 @@ void References::intializeReferences(FastaReader &fastaReader, bool alt_query) {
 
   while(fastaReader.readNextSeq(temp) != -1) {
     this->refSize++;
+    if(temp.sequence.length() < this->ksize)
+        error("Reads are required to have a minimum length of kmer size");
     kmer = temp.sequence.substr(0,this->ksize);
     flag = getHashCode(kmer, hashcode);
     if(flag == -1) {
@@ -60,6 +63,8 @@ void References::intializeReferences(FastqReader &fastqReader) {
   for(i=0;i<this->refSize;i++) {
     fastqReader.getRandomSeq(temp);
     //Hashcode for forward kmer
+    if(temp.sequence.length() < this->ksize)
+      error("Reads are required to have a minimum length of kmer size");
     kmer = temp.sequence.substr(0,this->ksize);
     flag = getHashCode(kmer,hashcode);
     if(flag == -1) {
@@ -90,6 +95,8 @@ void References::intializeReferences(FastaReader &fastaReader) {
   int i = 0;
   for(i=0;i<this->refSize;i++) {
     fastaReader.getRandomSeq(temp);
+    if(temp.sequence.length() < this->ksize)
+        error("Reads are required to have a minimum length of kmer size");
     kmer = temp.sequence.substr(0,this->ksize);
     flag = getHashCode(kmer, hashcode);
     if(flag == -1) {
