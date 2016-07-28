@@ -24,6 +24,8 @@ void KmerCounter::counting(References &references, FastqReader &metaReader) {
   Hash hasher(references.ksize);
   unsigned long long int hashcode;
   while(metaReader.readNextSeq(temp) != -1) {
+    if(temp.sequence.length() < references.ksize)
+        error("Reads are required to have a minimum length of kmer size");
     hasher.intialize(temp.sequence);
     this->totalSeqs++;
     this->totalLength = this->totalLength + temp.sequence.length();
@@ -39,6 +41,8 @@ void KmerCounter::counting(References &references, FastaReader &metaReader) {
   Hash hasher(references.ksize);
   unsigned long long int hashcode;
   while(metaReader.readNextSeq(temp) != -1) {
+    if(temp.sequence.length() < references.ksize)
+        error("Reads are required to have a minimum length of kmer size");
     hasher.intialize(temp.sequence);
     this->totalSeqs++;
     this->totalLength = this->totalLength + temp.sequence.length();
