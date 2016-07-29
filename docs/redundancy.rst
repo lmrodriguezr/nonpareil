@@ -8,7 +8,11 @@ For the impatient
 
 Even if you're in a hurry, taking a look at :doc:`preprocess` is very important. If you already did, you can simply run::
 
-    nonpareil -s reads.fa -b output
+    nonpareil -s reads.fa -T kmer -f fastq -b output (fastq is recommended for kmer algorithm)
+    nonpareil -s reads.fa -T kmer -f fasta -b output
+    nonpareil -s reads.fa -T alignment -f fasta -b output (fasta is recommended for alignment algorithm)
+    nonpareil -s reads.fa -T alignment -f fastq -b output
+    
 
 Where ``reads.fa`` is the file containing the trimmed single reads, and ``output`` is the prefix
 of the output files to be created.
@@ -16,10 +20,11 @@ of the output files to be created.
 Mandatory options
 -----------------
    -s <str>   Path to the (input) file containing the sequences.  This is lowercase S.
+   -T <str>   nonpareil algorithm. can be 'kmer' or 'alignment'.
+   -f <str>   The format of the sequence. Can be 'fasta' or 'fastq'.
 
 Common options
 --------------
-   -f <str>   The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'
    -b <str>   Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files
               with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set.
    -d <num>   Subsample iteratively applying this factor to the number of reads, resulting in logarithmic subsampling.
