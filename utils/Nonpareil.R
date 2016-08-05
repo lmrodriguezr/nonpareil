@@ -353,20 +353,19 @@ Nonpareil.curve <- function(
   if((length(x)>10) | ! data.consistency){
     y <- values[sel];
     data <- list(x=x, y=y)
-    estModel <- TRUE;
     if(is.na(weights.exp[1])){
       if(log_sampling==0){ weights.exp <- c(-1.1,-1.2,-0.9,-1.3,-1) }
       else{ weights.exp <- c(0, 1, -1, 1.3, -1.1, 1.5, -1.5) }
     }
+    estModel <- TRUE;
     weights.i <- 0;
-    while(estModel){
+    while(estModel & !is.na(weights.exp[weights.i+1])){
       weights.i <- weights.i+1;
-      model <- nls(y ~ Nonpareil.f(x, a, b), data=data,
+      suppressWarnings(model <- nls(y ~ Nonpareil.f(x, a, b), data=data,
         weights=(a$V3[sel]^weights.exp[weights.i]), start=list(a=1, b=0.1),
         lower=c(a=0, b=0), algorithm='port', control=nls.control(
-          minFactor=1e-25000, tol=1e-15, maxiter=1024, warnOnly=T));
-      if(!is.na(weights.exp[weights.i+1]) | summary(model)$convInfo$isConv)
-        estModel <- FALSE;
+          minFactor=1e-25000, tol=1e-15, maxiter=1024, warnOnly=T)));
+      if(summary(model)$convInfo$isConv) estModel <- FALSE;
     }
     if(summary(model)$convInfo$isConv){
       model.lty=2;
