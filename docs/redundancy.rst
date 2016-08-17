@@ -72,6 +72,7 @@ Additional options
    -N         Treat Ns as mismatches.  By default, Ns (unknown nucleotides) match any nucleotide (even another N).
    -S <num>   Similarity threshold to group two reads together.   Reducing this option will increase sensitivity while
               increasing running time.  This is uppercase S.
+   -k <int>   kmer size. You can increase kmer size to increase sensitivity. By default: 24
    -x <num>   Probability of taking a sequence into account as query for the construction of the curve.  Higher values
               reduce accuracy but increase speed.  This is lower case x.  If set, overides -X.
 
