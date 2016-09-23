@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
          ifstream ifs((string(file)));
          FastaReader fastaReader(ifs);
          KmerCounter counter = KmerCounter(references, fastaReader, string(cntfile));
-         mates = new int[hX];
+         mates = new int[counter.getTotalSeqs()];
          counter.getCounts(mates);
          avg_seq_len = counter.getAvgLen();
          total_seqs = counter.getTotalSeqs();
