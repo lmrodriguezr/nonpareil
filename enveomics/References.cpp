@@ -15,13 +15,15 @@ References::References(FastqReader &fastqReader, int refSize, int ksize) {
 References::References(FastaReader &fastaReader, int refSize, int ksize) {
   this->refSize = refSize;
   this->ksize = ksize;
-  this->totalErrKmers = 0.014 * refSize;
+  //this->totalErrKmers = 0.014 * refSize;
+  this->totalErrKmers = 0;
   intializeReferences(fastaReader);
 }
 
 References::References(FastaReader &fastaReader, int ksize, bool alt_query) {
   this->ksize = ksize;
   this->refSize = 0;
+  this->totalErrKmers = 0;
   intializeReferences(fastaReader, alt_query);
 }
 
@@ -49,7 +51,7 @@ void References::intializeReferences(FastaReader &fastaReader, bool alt_query) {
     refKmerMap[hashcode] = 0;
     refRevComKmers.push_back(hashcode);
   }
-  this->totalErrKmers = 0.014 * refSize;
+  //this->totalErrKmers = 0.014 * refSize;
 }
 
 void References::intializeReferences(FastqReader &fastqReader) {

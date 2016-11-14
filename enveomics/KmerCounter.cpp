@@ -59,9 +59,12 @@ void KmerCounter::prepCounts(References &references) {
     count = references.refKmerMap[references.refKmers[i]] + references.refKmerMap[references.refRevComKmers[i]];
     this->countTable.push_back(count);
   }
+
   int j = 0;
   for(int i = 0; i < nearbyint(references.totalErrKmers); i++) {
     while(true){
+      if(countTable.size() <= j)
+          break;
       if(countTable[j] == 1) {
         countTable.erase(countTable.begin()+j);
         break;
