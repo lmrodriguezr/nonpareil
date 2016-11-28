@@ -112,7 +112,7 @@ int main(int argc, char *argv[]) {
 	 case 'F': portion_label = true;	break;
 	 case 'h': help("");			break;
 	 case 'i': itv = atof(optarg);		break;
-   case 'k': k = atoi(optarg);  break;
+	 case 'k': k = atoi(optarg);		break;
 	 case 'l': open_log(optarg);		break;
 	 case 'L': ovl=atof(optarg)/100.0;	break;
 	 case 'm': min = atof(optarg);		break;
@@ -123,10 +123,10 @@ int main(int argc, char *argv[]) {
 	 case 'q': qfile = optarg; alt_query = true;	break;
 	 case 'r': rseed=atoi(optarg);		break;
 	 case 'R': ram = atoi(optarg);		break;
-   case 's': file = optarg;		break;
+	 case 's': file = optarg;		break;
 	 case 'S': min_sim=atof(optarg);	break;
 	 case 't': thr = atoi(optarg);		break;
-	 case 'T': nonpareiltype = optarg; break; // For backwards compatibility
+	 case 'T': nonpareiltype = optarg;	break; // For backwards compatibility
 	 case 'v': v = atoi(optarg);		break;
 	 case 'V': finalize_multinode(); return 0;
 	 case 'x': qry_portion = atof(optarg);	break;
