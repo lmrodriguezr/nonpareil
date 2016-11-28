@@ -2,3 +2,7 @@ enveomics/*.o
 nonpareil
 nonpareil-mpi
 !utils/Nonpareil
+*.npo
+*.npc
+*.npl
+*.npa
