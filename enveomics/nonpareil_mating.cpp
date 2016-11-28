@@ -44,7 +44,7 @@ size_t nonpareil_mate(int *&result, char *file, char *q_file,
 		size_blockA, size_blockB;
    size_t	qry_seqs=0;
    char		**blockA, **blockB, *sampleFile;
-   
+
    // Set subsampling
    //sampleFile = (char *)malloc(LARGEST_PATH * (sizeof *sampleFile));
    sampleFile = new char[LARGEST_PATH];
@@ -57,20 +57,20 @@ size_t nonpareil_mate(int *&result, char *file, char *q_file,
    }
    sampleFile = broadcast_char(sampleFile, LARGEST_PATH);
    qry_seqs = broadcast_int(qry_seqs);
-   
+
    // Blank results
    result = new int[qry_seqs];
    for(size_t a=0; a<qry_seqs; a++) result[a] = 0;
-   
+
    // Design blocks
    if(processID==0){
       say("5sis$", "Designing the blocks scheme for ", total_seqs, " sequences");
-      
+
       no_blocks_qry = (int)ceil((double)qry_seqs*2/(double)lines_in_ram); // <- Maximum half of the available slots
       if(no_blocks_qry==0) no_blocks_qry=1; // <-- Because of float precision
       no_seqs_block_qry = (int)ceil((double)qry_seqs/(double)no_blocks_qry);
       say("6sisi$", "Qry blocks:", no_blocks_qry, ", seqs/block:", no_seqs_block_qry);
-      
+
       no_blocks_sbj = (int)ceil( (double)total_seqs/(double)(lines_in_ram - no_seqs_block_qry) );
       if(no_blocks_sbj==0) no_blocks_sbj=1; // <-- Because of float precision
       no_blocks_sbj = (int)ceil( (double)no_blocks_sbj/(double)processes )*processes;
@@ -81,7 +81,7 @@ size_t nonpareil_mate(int *&result, char *file, char *q_file,
    no_seqs_block_qry = broadcast_int(no_seqs_block_qry);
    no_blocks_sbj = broadcast_int(no_blocks_sbj);
    no_seqs_block_sbj = broadcast_int(no_seqs_block_sbj);
-   
+
    // Mating
    if(processID==0) say("3sisis$", "Mating sequences in ", no_blocks_qry, " by ", no_blocks_sbj, " blocks");
    if(processID==0 && processes>1) say("3sis$", "Silencing log in slave processes (", processes-1, ")");
@@ -91,7 +91,7 @@ size_t nonpareil_mate(int *&result, char *file, char *q_file,
       if(processID==0) say("5sisi$", "Allocating ~", tmp_ram, " Mib in RAM for block qry:", i+1);
       size_blockA = get_seqs(blockA, sampleFile, i*no_seqs_block_qry+1, no_seqs_block_qry, q_largest_seq, (char *)"enveomics-seq");
       if(size_blockA==0) error("Impossible to get the i-th query block", i);
-      
+
       // Sequences in block B (sbj)
       for(int j=0; j<no_blocks_sbj; j++){
 	 if(j%processes == processID){
@@ -99,7 +99,7 @@ size_t nonpareil_mate(int *&result, char *file, char *q_file,
 	    if(processID==0) say("5sisi$", "Allocating ~", tmp_ram, " Mib in RAM for block sbj:", j+1);
 	    size_blockB = get_seqs(blockB, file, j*no_seqs_block_sbj+1, no_seqs_block_sbj, largest_seq, (char *)"enveomics-seq");
 	    if(size_blockB==0) error("Impossible to get the i-th subject block", j);
-	    
+
 	    // Mate
 	    if(processID==0) say("4sisi$", "Computing block ", (i+1)*(j+1), "/", no_blocks_qry*no_blocks_sbj);
 	    nonpareil_count_mates_block(result, result_i, blockA, blockB, size_blockA, size_blockB, threads, matepar);
@@ -112,7 +112,7 @@ size_t nonpareil_mate(int *&result, char *file, char *q_file,
       delete[] blockA;
    }
    barrier_multinode();
-   
+
    // Reduce multi-node results
    if(processes>1){
       // DEBUG
@@ -141,10 +141,10 @@ void nonpareil_count_mates_block(int *&result, int from_in_result,
    pthread_mutex_t	mutex = PTHREAD_MUTEX_INITIALIZER;
    unsigned int		mates_per_thr = (unsigned int)ceil((double)sizeBlockA/threads);
    int			rc;
-   
+
    // Set threads
    threads = (int)ceil((double)sizeBlockA/mates_per_thr);
-   
+
    // Launch jobs
    if(processID==0) say("5sis$", "Launching parallel comparisons to ", threads, " threads");
    for(int thr=0; thr<threads; thr++){
@@ -159,14 +159,14 @@ void nonpareil_count_mates_block(int *&result, int from_in_result,
      matejob[thr].blockB = &blockB;
      matejob[thr].size_blockA = sizeBlockA;
      matejob[thr].size_blockB = sizeBlockB;
-     
+
      if(matejob[thr].number==0)
         error("Unexpectedly, the thread contains zero load", thr);
-     
+
      if((rc=pthread_create(&thread[thr], NULL, &nonpareil_count_mates_thr, (void *)&matejob[thr]  )))
         error("Thread creation failed", (char)rc);
    }
-   
+
    // Gather jobs
    for(int thr=0; thr<threads; thr++){
       pthread_join(thread[thr], NULL);
@@ -180,7 +180,7 @@ void *nonpareil_count_mates_thr(void *matejob_ref){
    matejob_t	*matejob = (matejob_t *)matejob_ref;
    int		*result_cp = new int[matejob->number];
    if(!result_cp) error("Impossible to allocate memory for the results of the new thread", matejob->id);
-   
+
    // Run comparisons
    for(size_t a=0; a<matejob->number; a++) result_cp[a] = 0;
    nonpareil_count_mates(result_cp, *matejob->blockA, *matejob->blockB,
@@ -225,7 +225,7 @@ bool nonpareil_compare_reads(char *seqA, char *seqB, matepar_t matepar){
 bool nonpareil_compare_reads_shortfirst(char *seqA, char *seqB, int lenA, int lenB, matepar_t matepar){
    int		min_len = (int)ceil(matepar.overlap * lenA);
    double	disimilarity = 1.0 - matepar.similarity;
-   
+
    // Compare strands W-W
    for(int i=min_len-lenB; i<=lenA-min_len; i++){
       int	errors = 0,
@@ -233,30 +233,30 @@ bool nonpareil_compare_reads_shortfirst(char *seqA, char *seqB, int lenA, int le
       		len_within = (i<0 ? lenB+i : lenA-i),
 		max_errors = (int)((disimilarity)*(double)len_within),
 		from_seqB = (i<0 ? -1*i : 0);
-      
+
       for(int j=0; j<len_within; j++){
          if((seqA[j+from_seqA]!=seqB[j+from_seqB] || (matepar.n_as_mismatch && (seqA[j+from_seqA]=='N' || seqB[j+from_seqB]=='N'))) && (++errors>max_errors))
 	    goto next_i; // Cannot be 'continue', because it's a nested loop
       }
       return true;
-      
+
       next_i: ; // To avoid problems with the nested loop.
    }
-   
+
    // Compare strands C-W
    if(matepar.revcom){
       char	*rc = new char[lenA+1];
       bool	out;
-      
+
       reverse_complement(rc, seqA);
       matepar.revcom = false;
       out = nonpareil_compare_reads_shortfirst(rc, seqB, lenA, lenB, matepar);
       matepar.revcom = true; // Not really necesary, just in case it's passed as reference or something like that
-      
+
       free(rc);
       return out;
    }
-   
+
    return false;
 }
 
@@ -266,7 +266,7 @@ void nonpareil_save_mates(int *&result, int no_results, char *file){
 
    fileh.open(file, ios::out);
    if(!fileh.is_open()) error("Cannot open the file", file);
-   
+
    for(int a=0; a<no_results; a++)
       fileh << result[a] << endl;
 

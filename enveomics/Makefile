@@ -6,7 +6,7 @@
 include ../globals.mk
 
 mpiflags=-DENVEOMICS_MULTI_NODE
-CPPFLAGS=-c -Wall
+CPPFLAGS=-c -Wall -std=c++11
 
 all: go sequence nonpareil
 
@@ -26,6 +26,10 @@ nonpareil:
 	$(cpp) sequence.cpp $(CPPFLAGS)
 	$(cpp) nonpareil_mating.cpp $(CPPFLAGS)
 	$(cpp) nonpareil_sampling.cpp $(CPPFLAGS)
+	$(cpp) SeqReader.cpp $(CPPFLAGS)
+	$(cpp) References.cpp $(CPPFLAGS)
+	$(cpp) Hash.cpp $(CPPFLAGS)
+	$(cpp) KmerCounter.cpp $(CPPFLAGS)
 
 nonpareil-mpi:
 	$(mpicpp) $(mpiflags) universal.cpp $(CPPFLAGS)
@@ -33,7 +37,6 @@ nonpareil-mpi:
 	$(mpicpp) $(mpiflags) sequence.cpp $(CPPFLAGS)
 	$(mpicpp) $(mpiflags) nonpareil_mating.cpp $(CPPFLAGS)
 	$(mpicpp) $(mpiflags) nonpareil_sampling.cpp $(CPPFLAGS)
-	
+
 clean:
 	rm *.o
-

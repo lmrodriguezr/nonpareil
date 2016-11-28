@@ -25,6 +25,7 @@ typedef struct {
    double	qryportion;
    bool		revcom;
    bool		n_as_mismatch;
+   int k;
 } matepar_t;
 
 /**
@@ -189,4 +190,3 @@ bool nonpareil_compare_reads_shortfirst(char *seqA, char *seqB, int lenA, int le
 void nonpareil_save_mates(int *&result, int no_results, char *file);
 
 #endif
-

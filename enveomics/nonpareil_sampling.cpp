@@ -33,17 +33,17 @@ int nonpareil_sample_portion(double *&result, int threads, samplepar_t samplepar
    pthread_t		thread[threads];
    pthread_mutex_t	mutex = PTHREAD_MUTEX_INITIALIZER;
    int			rc, samples_per_thr, launched_replicates=0;
-   
+
    // Blank result
    result = new double[samplepar.replicates];
    for(int a=0; a<samplepar.replicates; a++) result[a] = 0.0;
-   
+
    // Set sample
    //if(processID==0)
    say("4sfs^", "Sampling at ", samplepar.portion*100, "%");
    samples_per_thr = (int)ceil((double)samplepar.replicates/(double)threads);
    threads = (int)ceil((double)samplepar.replicates/samples_per_thr);
-   
+
    // Launch samplings
    for(int thr=0; thr<threads; thr++){
       samplejob[thr].id = thr;
@@ -73,7 +73,7 @@ void *nonpareil_sample_portion_thr(void *samplejob_ref){
    samplejob_t	*samplejob = (samplejob_t *)samplejob_ref;
    int		*&mates_ref = *samplejob->samplepar.mates, n;
    double	*result_cp = new double[samplejob->number], p, p_gt_0;
-   
+
    // Sample
    for(int i=0; i<samplejob->number; i++){
       int	found=0, sample_size=0;
@@ -84,7 +84,7 @@ void *nonpareil_sample_portion_thr(void *samplejob_ref){
 	    sample_size++;
 	    // Does the sample contain at least one mate?
 	    // if((double)rand()/(double)RAND_MAX < 1.0-pow(1-samplejob->samplepar.portion, mates_ref[j]-1)) found++;
-	    n=(int)floor(samplejob->samplepar.total_reads*samplejob->samplepar.portion)-1; // -1 because we exclude the query read from the sample
+	    n=(int)floor((samplejob->samplepar.total_reads)*samplejob->samplepar.portion)-1; // -1 because we exclude the query read from the sample
 	    if(n<0) n=0;
 	    p=(double)(mates_ref[j]-1.0)/(samplejob->samplepar.total_reads-1.0); // Again, -1 in both terms because of the query read
 	    p_gt_0 = 1.0 - pow(1.0-p, n);
@@ -101,7 +101,7 @@ void *nonpareil_sample_portion_thr(void *samplejob_ref){
       //					        v--> position + first of the thread
       for(int i=0; i<samplejob->number; i++) result_ref[i + samplejob->from_in_result] = result_cp[i];
    pthread_mutex_unlock( samplejob->mutex );
-   
+
    return (void *)0;
 }
 
@@ -130,19 +130,31 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
    }else if(strlen(outfile)>0){
       reportSummary=2;
    }
-   
+
    if(samplepar.portion==samplepar.portion_min){
       header = new char[LARGEST_LINE];
-      sprintf(header, "# @impl: Nonpareil\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %d\n# @overlap: %.2f\n# @divide: %.2f\n",
-      		samplepar.np_version,
-		samplepar.max_read_len,
-      		samplepar.avg_read_len,
-		samplepar.total_reads,
-		samplepar.seq_overlap*100.0,
-		samplepar.divide
-	);
+      if(samplepar.type == 1) {
+      sprintf(header, "# @impl: Nonpareil\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+                samplepar.k,
+                samplepar.np_version,
+                samplepar.max_read_len,
+      		      samplepar.avg_read_len,
+		            samplepar.total_reads,
+		            samplepar.seq_overlap*100.0,
+		            samplepar.divide);
+      }
+      else if(samplepar.type == 2) {
+        sprintf(header, "# @ksize: %d\n# @impl: Nonpareil\n# @version: %.2f\n# @L: %.3f\n# @AL: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+                  samplepar.k,
+                  samplepar.np_version,
+        		      samplepar.avg_read_len,
+                  samplepar.adj_avg_read_len,
+  		            samplepar.total_reads,
+  		            samplepar.seq_overlap*100.0,
+  		            samplepar.divide);
+      }
    }
-   
+
    if(sample_number>0){
       // Average & SD
       s.avg = s.sd = x2 = 0.0;
@@ -156,7 +168,7 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
       s.avg /= (double)sample_number;
       x2    /= (double)sample_number;
       s.sd   = sqrt(x2-pow(s.avg, 2.0));
-      
+
       // Quartiles
       vector<double>::iterator	firstDatum = dataPoints.begin();
       vector<double>::iterator	lastDatum = dataPoints.end();
@@ -176,7 +188,7 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
       s.q2  = 0;
       s.q3  = 0;
    }
-   
+
    // Report summary
    if(reportSummary==0) return s;
    label = new char[LARGEST_LABEL];
@@ -192,4 +204,3 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
 
    return s;
 }
-

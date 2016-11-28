@@ -25,13 +25,13 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
    bool		isFastQ=false;
 
    avg_seq = 0.0;
-   
+
    // Format
    if(strcmp(format, "fasta")==0) {start = '>';}
    else if(strcmp(format, "fastq")==0) {start = '@'; isFastQ=true;}
    else if(strcmp(format, "enveomics-seq")==0){start = '>';}
    else {error("Unsupported format", format);}
-   
+
    // Count
    fileh.open(file, ios::in);
    if(!fileh.is_open()) error("Impossible to open the file", file);
@@ -49,7 +49,7 @@ size_t count_seqs(char *file, const char *format, int &largest_line, double &avg
       nline++;
    }
    fileh.close();
-   
+
    largest_line = maxlen;
    avg_seq = ( ( avg_seq/N )*lastn ) + ((double)totlen/N);
    return N;
@@ -96,7 +96,7 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    if(strcmp(format, "fasta")==0) {start = '>';}
    else if(strcmp(format, "fastq")==0) {start = '@'; isFastQ=true;}
    else {error("Unsupported format", format);}
-   
+
    // Files
    seqFile = new char[strlen(sourceFile)+20];
    sprintf(seqFile, "%s.enve-seq.%d", sourceFile, getpid());
@@ -185,17 +185,17 @@ size_t sub_sample_seqs(char *sourceFile, char *destFile, double portion, char *f
    char		start;
    size_t	n=0;
    string	entry;
-   
+
    if(strcmp(format, "fasta")==0) {start = '>';}
    else if(strcmp(format, "enveomics-seq")==0) {start = '>';}
    else if(strcmp(format, "fastq")==0) {start = '@';}
    else {error("Unsupported format", format);}
-   
+
    filein.open(sourceFile, ios::in);
    if(!filein.is_open()) error("Impossible to open the input file", sourceFile);
    fileout.open(destFile, ios::out);
    if(!fileout.is_open()) error("Impossible to open the output file", destFile);
-   
+
    while(filein.good()){
       string line;
       getline(filein, line);
@@ -212,7 +212,7 @@ size_t sub_sample_seqs(char *sourceFile, char *destFile, double portion, char *f
 
    fileout.close();
    filein.close();
-   
+
    return n;
 }
 
@@ -231,11 +231,11 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
    if(strcmp(format, "fasta")==0) {start = '>';}
    else if(strcmp(format, "enveomics-seq")==0) {start = '>';}
    else {error("Unsupported format", format);}
-   
+
    // Open file
    filein.open(file, ios::in);
    if(!filein.is_open()) error("Impossible to open the input file", file);
-   
+
    // Memory allocation
    seqs = new char*[number];
    if(!seqs) error("Impossible to allocate memory for that many sequences", number);
@@ -243,7 +243,7 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
       seqs[a] = new char[largest_seq+1];
       if(!seqs[a]) error("Impossible to allocate memory for another sequence", (unsigned int)a);
    }
-   
+
    // Read the file
    while(filein.good()){
       string line;
@@ -264,7 +264,7 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
          //entry.append((char *)"\n");
       }
    }
-   
+
    // Finalize
    filein.close();
    return n;
@@ -284,6 +284,19 @@ int reverse_complement(char *&out, char *in){
 			      'N';
    out[len]=(char)NULL;
    return len;
+}
+
+int reverse_complement(string &out, string in){
+  int len = in.length();
+  out = "";
+  for(int i = len-1; i >= 0; i--) {
+    out.push_back(in[i]=='A'?'T':
+     in[i]=='C'?'G':
+     in[i]=='G'?'C':
+     in[i]=='T'?'A':
+          'N');
+  }
+  return len;
 }
 
 #ifdef ENVEOMICS_NUC_T
@@ -334,4 +347,3 @@ int seqtoa(char *&charseq, nucseq_t nucseq){
 }
 
 #endif
-

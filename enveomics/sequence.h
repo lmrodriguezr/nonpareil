@@ -77,6 +77,7 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
 int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq);
 
 int reverse_complement(char *&out, char *in);
+int reverse_complement(string &out, string in);
 
 
 #ifdef ENVEOMICS_NUC_T_DEFINE
@@ -95,4 +96,3 @@ int reverse_complement(nucseq_t &out, nucseq_t in);
 #endif
 
 #endif
-

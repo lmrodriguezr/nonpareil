@@ -1,13 +1,13 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
-// @version 2.4
+// @version 3.0
 // @license artistic license 2.0
 
 /*
   ROADMAP
 
   o To validate "logarithmic sampling".
-  
+
 */
 
 #include <math.h>
@@ -17,9 +17,12 @@
 #include "enveomics/sequence.h"
 #include "enveomics/nonpareil_mating.h"
 #include "enveomics/nonpareil_sampling.h"
+#include "enveomics/References.h"
+#include "enveomics/KmerCounter.h"
+#include <string>
 
 #define LARGEST_PATH 4096
-#define NP_VERSION 2.400
+#define NP_VERSION 3.000
 
 using namespace std;
 int processID;
@@ -32,7 +35,8 @@ void help(const char *msg){
 	<< "   amount of sequences that will be required to achieve 'nearly complete coverage'." << endl
 	<< endl
    	<< "USAGE" << endl
-	<< "   nonpareil -s sequences.fa -b output [options]" << endl
+  << "   nonpareil -s sequences.fa -T alignment -b output [options]" << endl
+	<< "   nonpareil -s sequences.fa -T kmer -f fastq -b output [options]" << endl
 	<< "   nonpareil -h" << endl
 	<< "   nonpareil -V" << endl
 	<< endl
@@ -62,10 +66,11 @@ void help(const char *msg){
 	<< "   -v <int> : Verbosity level, for debugging purposes.  By default 7.  This is lowercase V." << endl
 	<< "   -V       : Show version information and exit.  This is uppercase V." << endl
 	<< "   -h       : Display this message and exit." << endl
+  << "   -k <int> : kmer length. By default: 24" << endl
+  << "   -T <str> : Nonpareil algorithm kmer or alignment accepted"
 	<< endl
 	<< "See all supported arguments and additional documentation at http://nonpareil.readthedocs.org or execute man nonpareil." << endl
-	<< endl
-	;
+	<< endl;
    finalize_multinode();
    if(processID==0){ exit(1); }else{ exit(0); }
 }
@@ -74,15 +79,16 @@ int main(int argc, char *argv[]) {
    init_multinode(argc, argv, processID, processes);
    if(processID==0) cout << "Nonpareil v" << NP_VERSION << endl;
    if(argc<=1) help("");
-   
+
    // Vars
-   char		*file, *format=(char *)"fasta", *alldata, *cntfile, *outfile, *namFile,
+   char		*file, *format=(char *)"fasta", *nonpareiltype, *alldata, *cntfile, *outfile, *namFile,
    		*seqFile, *baseout, *qfile, *qNamFile, *qSeqFile;
    double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50, *sample_result,
-   		avg_seq_len, divide=0.7, q_avg_seq_len;
-   int		v=7, largest_seq, rseed=time(NULL), n=1024, thr=2, ram=1024, *mates, samples_no,
+   		avg_seq_len, adj_avg_seq_len, divide=0.7, q_avg_seq_len;
+   int		v=7, largest_seq, rseed=time(NULL), n=1024, k=24, thr=2, ram=1024, *mates, samples_no,
    		sample_i, sample_after_20, sampling_points, q_largest_seq;
-   unsigned int	total_seqs, q_total_seqs, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
+   unsigned int	q_total_seqs, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
+   unsigned long long int total_seqs;
    bool		n_as_mismatch=false, portion_label=false, revcom=true, ok, autoadjust=false,
    		alt_query=false;
    matepar_t	matepar;
@@ -91,10 +97,11 @@ int main(int argc, char *argv[]) {
    alldata = (char *)"";
    cntfile = (char *)"";
    outfile = (char *)"-";
-   
+
+
    // GetOpt
    int		optchr;
-   while ((optchr = getopt (argc, argv, "Aa:b:cC:d:f:Fhi:l:L:m:M:n:No:q:r:R:s:S:t:T:v:Vx:X:")) != EOF)
+   while ((optchr = getopt (argc, argv, "Aa:b:cC:d:f:Fhi:k:l:L:m:M:n:No:q:r:R:s:S:t:T:v:Vx:X:")) != EOF)
       switch(optchr) {
 	 case 'a': alldata = optarg;		break;
 	 case 'A': autoadjust = true;		break;
@@ -106,6 +113,7 @@ int main(int argc, char *argv[]) {
 	 case 'F': portion_label = true;	break;
 	 case 'h': help("");			break;
 	 case 'i': itv = atof(optarg);		break;
+   case 'k': k = atoi(optarg);  break;
 	 case 'l': open_log(optarg);		break;
 	 case 'L': ovl=atof(optarg)/100.0;	break;
 	 case 'm': min = atof(optarg);		break;
@@ -116,17 +124,20 @@ int main(int argc, char *argv[]) {
 	 case 'q': qfile = optarg; alt_query = true;	break;
 	 case 'r': rseed=atoi(optarg);		break;
 	 case 'R': ram = atoi(optarg);		break;
-         case 's': file = optarg;		break;
+   case 's': file = optarg;		break;
 	 case 'S': min_sim=atof(optarg);	break;
 	 case 't': thr = atoi(optarg);		break;
-	 case 'T': ;				break; // For backwards compatibility
+	 case 'T': nonpareiltype = optarg; break; // For backwards compatibility
 	 case 'v': v = atoi(optarg);		break;
 	 case 'V': finalize_multinode(); return 0;
 	 case 'x': qry_portion = atof(optarg);	break;
 	 case 'X': hX = atoi(optarg);		break;
-      }
+     }
    // Initialize
    set_verbosity(v);
+   if(strlen(nonpareiltype)==0) help("");
+   if(strcmp(nonpareiltype,"kmer")!=0 && strcmp(nonpareiltype,"alignment")!=0)
+        help("Bad argument for -t option, accepted values are kmer or alignment");
    if(strlen(file)==0) help("");
    if(strcmp(format, "fasta")!=0 & strcmp(format, "fastq")!=0)
    				help("Unsupported value for -f option");
@@ -153,13 +164,78 @@ int main(int argc, char *argv[]) {
 	 open_log(logfile);
       }
    }
+
    if(alldata && (strlen(alldata)>0)) remove(alldata);
    if(cntfile && (strlen(cntfile)>0)) remove(cntfile);
    if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) remove(outfile);
+
+   if(strcmp(nonpareiltype,"kmer")==0) {
+     if(alt_query) {
+       if(strcmp(format,"fasta")==0) {
+         cout << "testing" << endl;
+         ifstream qifs((string(qfile)));
+         say("1ss$","reading query", file);
+         FastaReader qfastaReader(qifs);
+         References references = References(qfastaReader, k, alt_query);
+         say("1s$","Started counting");
+         ifstream ifs((string(file)));
+         FastaReader fastaReader(ifs);
+         KmerCounter counter = KmerCounter(references, fastaReader, string(cntfile));
+         mates = new int[counter.getTotalSeqs()];
+         counter.getCounts(mates);
+         avg_seq_len = counter.getAvgLen();
+         total_seqs = counter.getTotalSeqs();
+         qry_seqs_no = counter.getTotalQSeqs();
+         adj_avg_seq_len = avg_seq_len - k + 1;
+         say("1sus$", "Read file with ", total_seqs, " sequences");
+         say("1sfs$", "Average read length is ", avg_seq_len, "bp");
+         goto restart_samples;
+       }
+     }
+     else {
+       if(strcmp(format,"fastq")==0) {
+         ifstream ifs((string(file)));
+         say("1ss$","reading ", file);
+         FastqReader fastqReader(ifs);
+         say("1sus$","Picking ", hX, " random sequences");
+         References references = References(fastqReader, hX, k);
+         say("1s$","Started counting");
+         KmerCounter counter = KmerCounter(references, fastqReader, string(cntfile));
+         mates = new int[hX];
+         counter.getCounts(mates);
+         avg_seq_len = counter.getAvgLen();
+         total_seqs = counter.getTotalSeqs();
+         qry_seqs_no = counter.getTotalQSeqs();
+         adj_avg_seq_len = avg_seq_len - k + 1;
+         say("1sus$", "Read file with ", total_seqs, " sequences");
+         say("1sfs$", "Average read length is ", avg_seq_len, "bp");
+         goto restart_samples;
+       }
+       else if(strcmp(format,"fasta")==0) {
+         ifstream ifs((string(file)));
+         say("1ss$","reading ", file);
+         FastaReader fastaReader(ifs);
+         say("1sus$","Picking ", hX, " random sequences");
+         References references = References(fastaReader, hX, k);
+         say("1s$","Started counting");
+         KmerCounter counter = KmerCounter(references, fastaReader, string(cntfile));
+         mates = new int[hX];
+         counter.getCounts(mates);
+         avg_seq_len = counter.getAvgLen();
+         total_seqs = counter.getTotalSeqs();
+         qry_seqs_no = counter.getTotalQSeqs();
+         adj_avg_seq_len = avg_seq_len - k + 1;
+         say("1sus$", "Read file with ", total_seqs, " sequences");
+         say("1sfs$", "Average read length is ", avg_seq_len, "bp");
+         goto restart_samples;
+       }
+     }
+   }
+
    srand(rseed+processID);
    say("9si$", "Hello from worker ", processID);
    barrier_multinode();
-   
+
    // Parse file
    if(processID==0) say("1s$", "Counting sequences");
    namFile = (char *)malloc(LARGEST_PATH * (sizeof *namFile));
@@ -209,7 +285,7 @@ int main(int argc, char *argv[]) {
    q_largest_seq = broadcast_int(q_largest_seq);
    q_avg_seq_len = broadcast_double(q_avg_seq_len);
    barrier_multinode();
-   
+
 
 restart_vars:
    say("9sis$", "Worker ", processID, " @start_vars.");
@@ -217,7 +293,7 @@ restart_vars:
       // Re-wire query portion
       if(qry_portion!=0) hX = (size_t)total_seqs*qry_portion;
       qry_portion = (double)hX/(alt_query ? q_total_seqs : total_seqs);
-      
+
       // Prepare memory arguments
       if(ram > UINT_MAX/1024) error("The memory to allocate is huge, I cannot manage such a big number.  Reduce -R and try again", ram);
       ram_Kb = ram*1024;
@@ -239,7 +315,7 @@ restart_vars:
    required_ram_Kb = broadcast_int(required_ram_Kb);
    lines_in_ram = broadcast_int(lines_in_ram);
    barrier_multinode();
-   
+
    // Run comparisons
 restart_mates:
    say("9sis$", "Worker ", processID, " @start_mates.");
@@ -248,6 +324,7 @@ restart_mates:
    matepar.qryportion = qry_portion;
    matepar.revcom = revcom;
    matepar.n_as_mismatch = n_as_mismatch;
+   matepar.k = k;
    if(processID==0) say("1sfsis$", "Querying library with ", qry_portion, " times the total size (", hX," seqs)");
    if(alt_query){
       qry_seqs_no = nonpareil_mate(mates, seqFile, qSeqFile, thr, lines_in_ram, total_seqs, largest_seq, q_largest_seq, matepar);
@@ -255,7 +332,7 @@ restart_mates:
       qry_seqs_no = nonpareil_mate(mates, seqFile, thr, lines_in_ram, total_seqs, largest_seq, matepar);
    }
    if(processID==0){
-      //if(alt_query) for(size_t a=0; a<qry_seqs_no; a++) mates[a]++; // <- Accounts for the lack of self-matches
+      if(alt_query) for(size_t a=0; a<qry_seqs_no; a++) mates[a]++; // <- Accounts for the lack of self-matches
       if(cntfile && (strlen(cntfile)>0)) nonpareil_save_mates(mates, qry_seqs_no, cntfile);
    }
    barrier_multinode();
@@ -266,7 +343,8 @@ restart_samples:
    sampling_points = (divide==0) ? ((int)ceil((max-min)/itv)+1) : ((int)ceil( (log(2) - log(total_seqs))/log(divide) )+2);
    sample_t	sample_summary[sampling_points];
    size_t	dummy=0;
-   if(processID==0){
+   if(processID==0) {
+     if(strcmp(nonpareiltype,"kmer")!=0) {
       sample_i=sample_after_20=0;
       samplepar.np_version = NP_VERSION;
       samplepar.replicates = n;
@@ -281,11 +359,31 @@ restart_samples:
       samplepar.avg_read_len = avg_seq_len;
       samplepar.portion_as_label = portion_label;
       samplepar.divide = divide;
-   
+      samplepar.type = 1;
+    }
+    else {
+      sample_i=sample_after_20=0;
+      samplepar.np_version = NP_VERSION;
+      samplepar.replicates = n;
+      samplepar.mates = &mates;
+      samplepar.mates_size = qry_seqs_no;
+      samplepar.portion_min = min;
+      samplepar.portion_max = max;
+      samplepar.portion_itv = itv;
+      samplepar.seq_overlap = ovl;
+      samplepar.total_reads = total_seqs;
+      samplepar.max_read_len = largest_seq;
+      samplepar.avg_read_len = avg_seq_len;
+      samplepar.portion_as_label = portion_label;
+      samplepar.divide = divide;
+      samplepar.k = k;
+      samplepar.adj_avg_read_len = adj_avg_seq_len;
+      samplepar.type = 2; //kmer
+    }
+
       say("1s$", "Sub-sampling library");
       double a=min;
-      
-      //for(double a=min; a<=max; a+=itv){
+
       while(sample_i < sampling_points){
 	 //if(sampling_points<=sample_i)
 	   //error("Unexpected number of sampling points.  This can be due to a precision problem, try decreasing the -i parameter");
@@ -295,7 +393,7 @@ restart_samples:
 	    samplepar.portion = sample_i==0 ? 0 : pow(divide, sampling_points-sample_i-1);
 	 }
 	 samplepar.replicates = n;
-	 
+
 	 samples_no = nonpareil_sample_portion(sample_result, thr, samplepar);
 	 //if(processID==0){
 	    sample_summary[sample_i++] = nonpareil_sample_summary(sample_result, samples_no, alldata, outfile, samplepar);
@@ -375,7 +473,7 @@ restart_checkings:
    }
    dummy = broadcast_int(dummy);
    barrier_multinode();
-   
+
 exit:
    say("9sis$", "Worker ", processID, " @exit.");
    // Clean temporals
@@ -388,4 +486,3 @@ exit:
    finalize_multinode();
    return 0;
 }
-

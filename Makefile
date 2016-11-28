@@ -12,8 +12,12 @@ regex=$(enveomics)regex.o
 go=$(enveomics)go.o $(regex) $(sqlite)
 sequence=$(enveomics)sequence.o
 multinode=$(enveomics)multinode.o
+seqreader=$(enveomics)SeqReader.o
+references=$(enveomics)References.o
+hash=$(enveomics)Hash.o
+kmercounter=$(enveomics)KmerCounter.o
 pthread=-lpthread
-np_objs=$(universal) $(multinode) $(sequence) $(enveomics)nonpareil_mating.o $(enveomics)nonpareil_sampling.o
+np_objs=$(universal) $(multinode) $(sequence) $(seqreader) $(reader) $(kmercounter) $(references) $(hash) $(enveomics)nonpareil_mating.o $(enveomics)nonpareil_sampling.o
 
 
 all:	nonpareil
@@ -32,10 +36,10 @@ nonpareil:
 nuc_sampler:
 	cd $(enveomics) && $(MAKE) sequence
 	$(cpp) nuc_sampler.cpp $(universal) $(sequence) $(pthread) -o utils/nuc_sampler
-	
+
 clean:
 	cd $(enveomics) && $(MAKE) clean
-
+	rm nonpareil
 install:
 	if [ ! -d $(bindir) ] ; then mkdir -p $(bindir) ; fi
 	if [ ! -d $(mandir) ] ; then mkdir -p $(mandir) ; fi
@@ -43,4 +47,3 @@ install:
 	if [ -e nonpareil-mpi ] ; then install -m 0755 nonpareil-mpi $(bindir)/ ; fi
 	cp docs/_build/man/nonpareil.1 $(mandir)/nonpareil.1
 	$(R) CMD INSTALL utils/Nonpareil
-
