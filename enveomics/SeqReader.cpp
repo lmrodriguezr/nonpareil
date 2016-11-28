@@ -150,7 +150,7 @@ size_t FastaReader:: readNextSeq(Sequence &out) {
     // not -1, since the function's return type is size_t
 
   if(!getline(this->ifs,sequence).good()) {
-    error("This file provide does not have proper fasta format");
+    error("The file provided does not have proper fasta format");
   }
 
   buildFastaSeq(header, sequence, out);
