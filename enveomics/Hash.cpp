@@ -32,7 +32,7 @@ size_t getHashCode(string s, unsigned long long int &hashcode) {
   int flag = 1;
   hashcode = 0;
 
-  for(int i = 0; i < s.length(); i++) {
+  for(size_t i = 0; i < s.length(); i++) {
     hashcode = hashcode << 2;
     hashcode |= lookupTable[(unsigned char)s[i]][0];
     hashcode &= lookupTable[(unsigned char)s[i]][1];

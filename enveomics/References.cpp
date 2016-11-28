@@ -33,7 +33,7 @@ void References::intializeReferences(FastaReader &fastaReader, bool alt_query) {
   int flag;
   unsigned long long int hashcode;
 
-  while(fastaReader.readNextSeq(temp) != -1) {
+  while(fastaReader.readNextSeq(temp) != (size_t)(-1)) {
     this->refSize++;
     if(temp.sequence.length() < this->ksize)
         error("Reads are required to have a minimum length of kmer size");
@@ -60,7 +60,7 @@ void References::intializeReferences(FastqReader &fastqReader) {
   int flag;
   double kerr;
   unsigned long long int hashcode;
-  int i = 0;
+  size_t i = 0;
   // deal with shorter reads then kmer length
   for(i=0;i<this->refSize;i++) {
     fastqReader.getRandomSeq(temp);
@@ -82,7 +82,7 @@ void References::intializeReferences(FastqReader &fastqReader) {
     refKmerMap[hashcode] = 0;
     refRevComKmers.push_back(hashcode);
     kerr = 1.0;
-    for(int j = 0; j < ksize; j++) {
+    for(size_t j = 0; j < ksize; j++) {
       kerr = kerr * (1.0 - temp.baseProb[0]);
     }
     this->totalErrKmers = this->totalErrKmers + (1-kerr);
@@ -94,7 +94,7 @@ void References::intializeReferences(FastaReader &fastaReader) {
   string kmer, revkmer;
   int flag;
   unsigned long long int hashcode;
-  int i = 0;
+  size_t i = 0;
   for(i=0;i<this->refSize;i++) {
     fastaReader.getRandomSeq(temp);
     if(temp.sequence.length() < this->ksize)

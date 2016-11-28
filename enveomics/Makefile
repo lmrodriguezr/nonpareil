@@ -5,38 +5,35 @@
 
 include ../globals.mk
 
-mpiflags=-DENVEOMICS_MULTI_NODE
-CPPFLAGS=-c -Wall -std=c++11
-
 all: go sequence nonpareil
 
 go:
-	$(cpp) universal.cpp $(CPPFLAGS)
-	$(cpp) sqlite.cpp $(CPPFLAGS)
-	$(cpp) regex.cpp $(CPPFLAGS)
-	$(cpp) go.cpp $(CPPFLAGS)
+	$(cpp) universal.cpp -c $(CPPFLAGS)
+	$(cpp) sqlite.cpp -c $(CPPFLAGS)
+	$(cpp) regex.cpp -c $(CPPFLAGS)
+	$(cpp) go.cpp -c $(CPPFLAGS)
 
 sequence:
-	$(cpp) universal.cpp $(CPPFLAGS)
-	$(cpp) sequence.cpp $(CPPFLAGS)
+	$(cpp) universal.cpp -c $(CPPFLAGS)
+	$(cpp) sequence.cpp -c $(CPPFLAGS)
 
 nonpareil:
-	$(cpp) universal.cpp $(CPPFLAGS)
-	$(cpp) multinode.cpp $(CPPFLAGS)
-	$(cpp) sequence.cpp $(CPPFLAGS)
-	$(cpp) nonpareil_mating.cpp $(CPPFLAGS)
-	$(cpp) nonpareil_sampling.cpp $(CPPFLAGS)
-	$(cpp) SeqReader.cpp $(CPPFLAGS)
-	$(cpp) References.cpp $(CPPFLAGS)
-	$(cpp) Hash.cpp $(CPPFLAGS)
-	$(cpp) KmerCounter.cpp $(CPPFLAGS)
+	$(cpp) universal.cpp -c $(CPPFLAGS)
+	$(cpp) multinode.cpp -c $(CPPFLAGS)
+	$(cpp) sequence.cpp -c $(CPPFLAGS)
+	$(cpp) nonpareil_mating.cpp -c $(CPPFLAGS)
+	$(cpp) nonpareil_sampling.cpp -c $(CPPFLAGS)
+	$(cpp) SeqReader.cpp -c $(CPPFLAGS)
+	$(cpp) References.cpp -c $(CPPFLAGS)
+	$(cpp) Hash.cpp -c $(CPPFLAGS)
+	$(cpp) KmerCounter.cpp -c $(CPPFLAGS)
 
 nonpareil-mpi:
-	$(mpicpp) $(mpiflags) universal.cpp $(CPPFLAGS)
-	$(mpicpp) $(mpiflags) multinode.cpp $(CPPFLAGS)
-	$(mpicpp) $(mpiflags) sequence.cpp $(CPPFLAGS)
-	$(mpicpp) $(mpiflags) nonpareil_mating.cpp $(CPPFLAGS)
-	$(mpicpp) $(mpiflags) nonpareil_sampling.cpp $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) universal.cpp -c $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) multinode.cpp -c $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) sequence.cpp -c $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) nonpareil_mating.cpp -c $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) nonpareil_sampling.cpp -c $(CPPFLAGS)
 
 clean:
 	rm *.o

@@ -35,7 +35,7 @@ void help(const char *msg){
 	<< "   amount of sequences that will be required to achieve 'nearly complete coverage'." << endl
 	<< endl
    	<< "USAGE" << endl
-  << "   nonpareil -s sequences.fa -T alignment -b output [options]" << endl
+	<< "   nonpareil -s sequences.fa -T alignment -b output [options]" << endl
 	<< "   nonpareil -s sequences.fa -T kmer -f fastq -b output [options]" << endl
 	<< "   nonpareil -h" << endl
 	<< "   nonpareil -V" << endl
@@ -66,9 +66,8 @@ void help(const char *msg){
 	<< "   -v <int> : Verbosity level, for debugging purposes.  By default 7.  This is lowercase V." << endl
 	<< "   -V       : Show version information and exit.  This is uppercase V." << endl
 	<< "   -h       : Display this message and exit." << endl
-  << "   -k <int> : kmer length. By default: 24" << endl
-  << "   -T <str> : Nonpareil algorithm kmer or alignment accepted"
-	<< endl
+	<< "   -k <int> : kmer length. By default: 24." << endl
+	<< "   -T <str> : Nonpareil algorithm kmer or alignment accepted." << endl
 	<< "See all supported arguments and additional documentation at http://nonpareil.readthedocs.org or execute man nonpareil." << endl
 	<< endl;
    finalize_multinode();
@@ -81,14 +80,14 @@ int main(int argc, char *argv[]) {
    if(argc<=1) help("");
 
    // Vars
-   char		*file, *format=(char *)"fasta", *nonpareiltype, *alldata, *cntfile, *outfile, *namFile,
+   char		*file, *format=(char *)"fasta", *nonpareiltype=(char *)"alignment", *alldata, *cntfile, *outfile, *namFile,
    		*seqFile, *baseout, *qfile, *qNamFile, *qSeqFile;
    double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50, *sample_result,
-   		avg_seq_len, adj_avg_seq_len, divide=0.7, q_avg_seq_len;
-   int		v=7, largest_seq, rseed=time(NULL), n=1024, k=24, thr=2, ram=1024, *mates, samples_no,
-   		sample_i, sample_after_20, sampling_points, q_largest_seq;
-   unsigned int	q_total_seqs, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
-   unsigned long long int total_seqs;
+   		avg_seq_len=0.0, adj_avg_seq_len, divide=0.7, q_avg_seq_len=0.0;
+   int		v=7, largest_seq=0, rseed=time(NULL), n=1024, k=24, thr=2, ram=1024, *mates, samples_no,
+   		sample_i, sample_after_20, sampling_points, q_largest_seq=0;
+   unsigned int	q_total_seqs=0, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
+   unsigned long long int total_seqs=0;
    bool		n_as_mismatch=false, portion_label=false, revcom=true, ok, autoadjust=false,
    		alt_query=false;
    matepar_t	matepar;
@@ -139,20 +138,21 @@ int main(int argc, char *argv[]) {
    if(strcmp(nonpareiltype,"kmer")!=0 && strcmp(nonpareiltype,"alignment")!=0)
         help("Bad argument for -t option, accepted values are kmer or alignment");
    if(strlen(file)==0) help("");
-   if(strcmp(format, "fasta")!=0 & strcmp(format, "fastq")!=0)
+   if((strcmp(format, "fasta")!=0) & (strcmp(format, "fastq")!=0))
    				help("Unsupported value for -f option");
-   if(min<0 | min>1)		help("Bad argument for -m option, accepted values are numbers in the range [0, 1]");
-   if(max<0 | max>1)		help("Bad argument for -M option, accepted values are numbers in the range [0, 1]");
-   if(itv<=0 | itv>1)		help("Bad argument for -i option, accepted values are numbers in the range (0, 1]");
-   if(ovl<=0.0 | ovl>1.0)	help("Bad argument for -L option, accepted values are numbers in the range (0, 100]");
+   if((min<0) | (min>1))	help("Bad argument for -m option, accepted values are numbers in the range [0, 1]");
+   if((max<0) | (max>1))	help("Bad argument for -M option, accepted values are numbers in the range [0, 1]");
+   if((itv<=0) | (itv>1))	help("Bad argument for -i option, accepted values are numbers in the range (0, 1]");
+   if((ovl<=0.0) | (ovl>1.0))	help("Bad argument for -L option, accepted values are numbers in the range (0, 100]");
    if(thr<=0)			help("Bad argumement for -t option, accepted values are positive non-zero integers");
    if(n<=0)			help("Bad argument for -n option, accepted values are positive non-zero integers");
    if(ram<=0)			help("Bad argument for -R option, accepted values are positive non-zero integers");
-   if(min_sim<=0 | min_sim>1)	help("Bad argument for -S option, accepted values are numbers in the range (0, 1]");
    if(thr<=0)			help("Bad argument for -t option, accepted values are positive non-zero integers");
-   if(qry_portion<0 | qry_portion>1)
+   if((min_sim<=0) | (min_sim>1))
+   				help("Bad argument for -S option, accepted values are numbers in the range (0, 1]");
+   if((qry_portion<0) | (qry_portion>1))
    				help("Bad argument for -x option, accepted values are numbers in the range (0, 1]");
-   if(divide<0 | divide>=1)	help("Bad argument for -d option, accepted values are numbers in the range (0, 1)");
+   if((divide<0) | (divide>=1))	help("Bad argument for -d option, accepted values are numbers in the range (0, 1)");
    char alldataTmp[LARGEST_PATH], outfileTmp[LARGEST_PATH], cntfileTmp[LARGEST_PATH];
    if(baseout && (strlen(baseout)>0)){
       if(!alldata || (strlen(alldata)<=0)){ sprintf(alldataTmp, "%s.npa", baseout); alldata=alldataTmp; }
@@ -295,7 +295,7 @@ restart_vars:
       qry_portion = (double)hX/(alt_query ? q_total_seqs : total_seqs);
 
       // Prepare memory arguments
-      if(ram > UINT_MAX/1024) error("The memory to allocate is huge, I cannot manage such a big number.  Reduce -R and try again", ram);
+      if((size_t)ram > UINT_MAX/1024) error("The memory to allocate is huge, I cannot manage such a big number.  Reduce -R and try again", ram);
       ram_Kb = ram*1024;
       required_ram_Kb = 2*(int)hX*sizeof(int)*thr/1024 + 2048; //<- 2Mb to store other things (usually <1Mb)
       if(ram_Kb < required_ram_Kb)
@@ -382,11 +382,7 @@ restart_samples:
     }
 
       say("1s$", "Sub-sampling library");
-      double a=min;
-
       while(sample_i < sampling_points){
-	 //if(sampling_points<=sample_i)
-	   //error("Unexpected number of sampling points.  This can be due to a precision problem, try decreasing the -i parameter");
 	 if(divide==0){
 	    samplepar.portion = min + itv*sample_i;
 	 }else{
@@ -404,6 +400,8 @@ restart_samples:
    }
    dummy = broadcast_int(dummy);
    barrier_multinode();
+   goto restart_checkings;
+
    // Check results
 restart_checkings:
    say("9sis$", "Worker ", processID, " @start_checkings.");
@@ -473,6 +471,7 @@ restart_checkings:
    }
    dummy = broadcast_int(dummy);
    barrier_multinode();
+   goto exit;
 
 exit:
    say("9sis$", "Worker ", processID, " @exit.");

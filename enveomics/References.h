@@ -11,7 +11,7 @@ class References {
 
 public:
   double totalErrKmers;
-  int refSize, ksize;
+  size_t refSize, ksize;
   vector<unsigned long long int> refKmers;
   vector<unsigned long long int> refRevComKmers;
   unordered_map<unsigned long long int, int> refKmerMap;

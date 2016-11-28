@@ -71,7 +71,7 @@ Sequence::Sequence() {
 void buildFastqSeq(string header, string sequence, string qual, Sequence &out) {
   vector<double> baseProb;
 
-  for(int i = 0; i < qual.length(); i++) {
+  for(size_t i = 0; i < qual.length(); i++) {
     baseProb.push_back(PhredQual[int(qual[i]) - 33]);
   }
   Sequence seq = Sequence(header, sequence, qual, baseProb);
@@ -112,7 +112,9 @@ size_t FastqReader::readNextSeq(Sequence &out) {
   string qual;
 
   if(getline(this->ifs,header).eof())
-   return -1;
+    return -1;
+    // Be careful: this actually returns the largest unsigned integer,
+    // not -1, since the function's return type is size_t
 
   char c;
   if(getline(this->ifs,sequence).good()) {
@@ -144,6 +146,8 @@ size_t FastaReader:: readNextSeq(Sequence &out) {
 
   if(getline(this->ifs,header).eof())
     return -1;
+    // Be careful: this actually returns the largest unsigned integer,
+    // not -1, since the function's return type is size_t
 
   if(!getline(this->ifs,sequence).good()) {
     error("This file provide does not have proper fasta format");

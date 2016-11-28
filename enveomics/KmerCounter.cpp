@@ -23,14 +23,14 @@ void KmerCounter::counting(References &references, FastqReader &metaReader) {
   Sequence temp;
   Hash hasher(references.ksize);
   unsigned long long int hashcode;
-  while(metaReader.readNextSeq(temp) != -1) {
+  while(metaReader.readNextSeq(temp) != (size_t)(-1)) {
     if(temp.sequence.length() < references.ksize)
         error("Reads are required to have a minimum length of kmer size");
     hasher.intialize(temp.sequence);
     this->totalSeqs++;
     this->totalLength = this->totalLength + temp.sequence.length();
     hashcode = 0;
-    while(hasher.nextHash(hashcode) != -1) {
+    while(hasher.nextHash(hashcode) != (size_t)(-1)) {
       references.update(hashcode);
     }
   }
@@ -40,14 +40,14 @@ void KmerCounter::counting(References &references, FastaReader &metaReader) {
   Sequence temp;
   Hash hasher(references.ksize);
   unsigned long long int hashcode;
-  while(metaReader.readNextSeq(temp) != -1) {
+  while(metaReader.readNextSeq(temp) != (size_t)(-1)) {
     if(temp.sequence.length() < references.ksize)
         error("Reads are required to have a minimum length of kmer size");
     hasher.intialize(temp.sequence);
     this->totalSeqs++;
     this->totalLength = this->totalLength + temp.sequence.length();
     hashcode = 0;
-    while(hasher.nextHash(hashcode) != -1) {
+    while(hasher.nextHash(hashcode) != (size_t)(-1)) {
       references.update(hashcode);
     }
   }
@@ -55,13 +55,13 @@ void KmerCounter::counting(References &references, FastaReader &metaReader) {
 
 void KmerCounter::prepCounts(References &references) {
   int count = 0;
-  for(int i = 0; i < references.refKmers.size(); i++) {
+  for(size_t i = 0; i < references.refKmers.size(); i++) {
     count = references.refKmerMap[references.refKmers[i]] + references.refKmerMap[references.refRevComKmers[i]];
     this->countTable.push_back(count);
   }
 
-  int j = 0;
-  for(int i = 0; i < nearbyint(references.totalErrKmers); i++) {
+  size_t j = 0;
+  for(size_t i = 0; i < nearbyint(references.totalErrKmers); i++) {
     while(true){
       if(countTable.size() <= j)
           break;
@@ -80,7 +80,7 @@ void KmerCounter::saveCounts(string file) {
   fileh.open(file, ios::out);
   if(!fileh.is_open()) error("Cannot open the file", file);
 
-  for(int a=0; a<this->countTable.size(); a++)
+  for(size_t a=0; a<this->countTable.size(); a++)
      fileh << countTable[a] << endl;
 }
 
@@ -101,7 +101,7 @@ double KmerCounter::getAvgLen() {
 void KmerCounter::getCounts(int *&result) {
   //result = new int[this->countTable.size()];
 
-  for(int i = 0; i < countTable.size(); i++) {
+  for(size_t i = 0; i < countTable.size(); i++) {
     result[i] = countTable[i];
   }
 }

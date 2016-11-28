@@ -27,15 +27,15 @@ enveomics:
 
 nonpareil-mpi:
 	cd $(enveomics) && $(MAKE) $@
-	$(mpicpp) nonpareil.cpp $(np_objs) $(pthread) -o $@
+	$(mpicpp) nonpareil.cpp $(np_objs) $(pthread) $(mpiflags) $(CPPFLAGS) -o $@
 
 nonpareil:
 	cd $(enveomics) && $(MAKE) $@
-	$(cpp) nonpareil.cpp $(np_objs) $(pthread) -o $@
+	$(cpp) nonpareil.cpp $(np_objs) $(pthread) $(CPPFLAGS) -o $@
 
 nuc_sampler:
 	cd $(enveomics) && $(MAKE) sequence
-	$(cpp) nuc_sampler.cpp $(universal) $(sequence) $(pthread) -o utils/nuc_sampler
+	$(cpp) nuc_sampler.cpp $(universal) $(sequence) $(pthread) $(CPPFLAGS) -o utils/nuc_sampler
 
 clean:
 	cd $(enveomics) && $(MAKE) clean
