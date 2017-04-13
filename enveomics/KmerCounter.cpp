@@ -23,6 +23,7 @@ void KmerCounter::counting(References &references, FastqReader &metaReader) {
   Sequence temp;
   Hash hasher(references.ksize);
   unsigned long long int hashcode;
+  int counter = 0;
   while(metaReader.readNextSeq(temp) != (size_t)(-1)) {
     if(temp.sequence.length() < references.ksize)
         error("Reads are required to have a minimum length of kmer size");
@@ -40,6 +41,7 @@ void KmerCounter::counting(References &references, FastaReader &metaReader) {
   Sequence temp;
   Hash hasher(references.ksize);
   unsigned long long int hashcode;
+  int counter = 0;
   while(metaReader.readNextSeq(temp) != (size_t)(-1)) {
     if(temp.sequence.length() < references.ksize)
         error("Reads are required to have a minimum length of kmer size");
