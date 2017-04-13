@@ -143,20 +143,14 @@ size_t FastaReader:: readNextSeq(Sequence &out) {
 
   string header;
   string sequence;
-  string temp;  
-          
+
   if(getline(this->ifs,header).eof())
     return -1;
     // Be careful: this actually returns the largest unsigned integer,
     // not -1, since the function's return type is size_t
-  while(true) {
-    if (getline(this->ifs,temp).eof()) {
-        sequence = sequence + temp;
-        break;
-    }
-    if(temp[0] == '>')
-      break;
-    sequence = sequence + temp;
+
+  if(!getline(this->ifs,sequence).good()) {
+    error("The file provided does not have proper fasta format");
   }
 
   buildFastaSeq(header, sequence, out);
@@ -191,7 +185,6 @@ size_t FastqReader::getRandomSeq(Sequence &out) {
     getline(this->ifs,header);
     if(this->randomHeaders.count(header) == 1)
       continue;
-    
     getline(this->ifs,sequence);
 
     this->ifs.get(c);
@@ -234,13 +227,7 @@ size_t FastaReader::getRandomSeq(Sequence &out) {
     getline(this->ifs, header);
     if(this->randomHeaders.count(header) == 1)
       continue;
-    
-    while(true) {
-        getline(this->ifs,temp);
-        if(temp[0] == '>')
-            break;
-        sequence = sequence + temp;
-    } 
+    getline(this->ifs,sequence);
     break;
   }
 
