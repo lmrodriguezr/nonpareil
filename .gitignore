@@ -1,6 +1,7 @@
 enveomics/*.o
 nonpareil
 nonpareil-mpi
+utils/nuc_sampler
 !utils/Nonpareil
 *.npo
 *.npc
