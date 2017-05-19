@@ -41,6 +41,7 @@ void KmerCounter::counting(References &references, FastaReader &metaReader) {
   Hash hasher(references.ksize);
   unsigned long long int hashcode;
   while(metaReader.readNextSeq(temp) != (size_t)(-1)) {
+    cout << temp.sequence << temp.sequence.length() << endl;
     if(temp.sequence.length() < references.ksize)
         error("Reads are required to have a minimum length of kmer size");
     hasher.intialize(temp.sequence);

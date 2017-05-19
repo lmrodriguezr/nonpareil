@@ -80,13 +80,13 @@ int main(int argc, char *argv[]) {
    if(argc<=1) help("");
 
    // Vars
-   char		*file, *format=(char *)"fasta", *nonpareiltype=(char *)"alignment", *alldata, *cntfile, *outfile, *namFile,
+   char		*file, *format=(char *)"fasta", *nonpareiltype=(char *)"", *alldata, *cntfile, *outfile, *namFile,
    		*seqFile, *baseout, *qfile, *qNamFile, *qSeqFile;
    double	min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50, *sample_result,
    		avg_seq_len=0.0, adj_avg_seq_len, divide=0.7, q_avg_seq_len=0.0;
    int		v=7, largest_seq=0, rseed=time(NULL), n=1024, k=24, thr=2, ram=1024, *mates, samples_no,
    		sample_i, sample_after_20, sampling_points, q_largest_seq=0;
-   unsigned int	q_total_seqs=0, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb;
+   unsigned int	q_total_seqs=0, lines_in_ram, hX=1000, qry_seqs_no, ram_Kb, required_ram_Kb, temphX = 0;
    unsigned long long int total_seqs=0;
    bool		n_as_mismatch=false, portion_label=false, revcom=true, ok, autoadjust=false,
    		alt_query=false;
@@ -130,13 +130,23 @@ int main(int argc, char *argv[]) {
 	 case 'v': v = atoi(optarg);		break;
 	 case 'V': finalize_multinode(); return 0;
 	 case 'x': qry_portion = atof(optarg);	break;
-	 case 'X': hX = atoi(optarg);		break;
+	 case 'X': temphX = atoi(optarg);		break;
      }
    // Initialize
+   if(strcmp(nonpareiltype,"kmer")){
+       hX = 10000;
+   }
+   else if(strcmp(nonpareiltype,"alignment")){
+       hX = 1000;
+   }
+   if (temphX != 0){
+       hX = temphX;
+   }
+
    set_verbosity(v);
    if(strlen(nonpareiltype)==0) help("");
    if(strcmp(nonpareiltype,"kmer")!=0 && strcmp(nonpareiltype,"alignment")!=0)
-        help("Bad argument for -t option, accepted values are kmer or alignment");
+        help("Bad argument for -T option, accepted values are kmer or alignment");
    if(strlen(file)==0) help("");
    if((strcmp(format, "fasta")!=0) & (strcmp(format, "fastq")!=0))
    				help("Unsupported value for -f option");
@@ -165,6 +175,32 @@ int main(int argc, char *argv[]) {
       }
    }
 
+   //file checking
+   int count = 0;
+   int limit = 10 * hX; //metagenome should have 10 times more than the number of query sequences
+   Sequence test_temp;
+   if(strcmp(format,"fasta")==0){
+       ifstream testifs((string(file)));
+       FastaReader testfastaReader(testifs);
+       while(testfastaReader.readNextSeq(test_temp) != (size_t)(-1)) {
+           count++;
+           if (count > limit)
+               break;
+       }
+       if (count < limit)
+           help("Sequence file should have at least 10 times the number of query sequences");
+   }
+   else if(strcmp(format,"fastq")==0){
+        ifstream testifs((string(file)));
+        FastqReader testfastqReader(testifs);
+        while(testfastqReader.readNextSeq(test_temp) != (size_t)(-1)) {
+            count++;
+            if (count > limit)
+                break;
+        }
+        if (count < limit)
+            help("Sequence file should have at least 10 times the number of query sequences");
+   }
    if(alldata && (strlen(alldata)>0)) remove(alldata);
    if(cntfile && (strlen(cntfile)>0)) remove(cntfile);
    if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) remove(outfile);

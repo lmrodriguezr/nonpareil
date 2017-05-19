@@ -143,20 +143,28 @@ size_t FastaReader:: readNextSeq(Sequence &out) {
 
   string header;
   string sequence;
-  string temp;  
-          
+  string temp;
+  char c;
   if(getline(this->ifs,header).eof())
     return -1;
     // Be careful: this actually returns the largest unsigned integer,
     // not -1, since the function's return type is size_t
   while(true) {
-    if (getline(this->ifs,temp).eof()) {
+    if (getline(this->ifs,temp).good()) {
         sequence = sequence + temp;
-        break;
+        if (!this->ifs.get(c).good()){
+            ifs.seekg(-1,std::ios::cur);
+            break;
+        }
+        if(c == '>'){
+            ifs.seekg(-1,std::ios::cur);
+            break;
+        }
+        ifs.seekg(-1,std::ios::cur);
     }
-    if(temp[0] == '>')
-      break;
-    sequence = sequence + temp;
+    else {
+        return -1;
+    }
   }
 
   buildFastaSeq(header, sequence, out);
