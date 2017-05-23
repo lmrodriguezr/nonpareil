@@ -265,9 +265,9 @@ Nonpareil.curve <- function(
   # Check data
   out$C <- max(values);
   if(data.consistency){
-    twenty.pc = which.max(a$V1[a$V1<=0.2*max(a$V1)]);
+    twenty.pc = which.max(a$V1[a$V1<=0.5*max(a$V1)]);
     if(a[twenty.pc, 5]==0){
-      warning(paste("Median of the curve is zero at 20% of the reads, check",
+      warning(paste("Median of the curve is zero at 50% of the reads, check",
         "parameters and re-run (e.g., decrease value of -L in nonpareil)."));
       return(out);
     }
