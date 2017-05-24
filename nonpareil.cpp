@@ -132,11 +132,11 @@ int main(int argc, char *argv[]) {
 	 case 'x': qry_portion = atof(optarg);	break;
 	 case 'X': temphX = atoi(optarg);		break;
      }
-   // Initialize
-   if(strcmp(nonpareiltype,"kmer")){
+   // Set number of reads to use as query
+   if(strcmp(nonpareiltype,"kmer")==0){
        hX = 10000;
    }
-   else if(strcmp(nonpareiltype,"alignment")){
+   else if(strcmp(nonpareiltype,"alignment")==0){
        hX = 1000;
    }
    if (temphX != 0){
