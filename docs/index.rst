@@ -28,16 +28,6 @@ coverage".
       mpi
       updates
 
-.. only:: man
-   
-   .. toctree::
-      :maxdepth: 2
-
-      preprocess
-      redundancy
-      curves
-      mpi
-
 
 .. Indices and tables
  ==================
