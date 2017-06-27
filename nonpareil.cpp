@@ -42,9 +42,10 @@ void help(const char *msg){
 	<< endl
    	<< "MANDATORY ARGUMENTS" << endl
 	<< "   -s <str> : Path to the (input) file containing the sequences.  This is lowercase S." << endl
+    << "   -T <str> : Nonpareil algorithm 'kmer' or 'alignment' accepted" << endl
+    << "   -f <str> : The format of the sequence. Can be 'fasta' or fastq' " << endl
 	<< endl
 	<< "COMMON OPTIONS" << endl
-	<< "   -f <str> : The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'." << endl
 	<< "   -b <str> : Path to the prefix for all the output files.  Replaces the options: -a, -C, -l, and -o; generating files" << endl
 	<< "              with the suffixes .npa, npc, .npl, and .npo, respectively, unless explicitly set." << endl
 	<< "   -d <num> : Subsample iteratively applying this factor to the number of reads, resulting in logarithmic subsampling." << endl
@@ -148,6 +149,7 @@ int main(int argc, char *argv[]) {
    if(strcmp(nonpareiltype,"kmer")!=0 && strcmp(nonpareiltype,"alignment")!=0)
         help("Bad argument for -T option, accepted values are kmer or alignment");
    if(strlen(file)==0) help("");
+   if(strlen(format)==0) help("Bad argument for -f option, accepted values are fasta or fastq");
    if((strcmp(format, "fasta")!=0) & (strcmp(format, "fastq")!=0))
    				help("Unsupported value for -f option");
    if((min<0) | (min>1))	help("Bad argument for -m option, accepted values are numbers in the range [0, 1]");
