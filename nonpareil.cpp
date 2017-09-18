@@ -45,8 +45,6 @@ void help(const char *msg){
     <<"  -f <str> : The format of the sequence. Can be 'fasta' or fastq'"<<endl
     <<"  -X <int> : Maximum number of reads to use as query." <<endl
     <<"             By default: 1000 for alignment, 10000 for kmer" <<endl
-    <<"  -d <num> : Subsample iteratively applying this factor" <<endl
-    <<"             Use -d 0 for linear sampling. By default: 0.7" <<endl
     <<"  -k <int> : kmer length. By default: 24" <<endl
     <<"  -n <int> : Number of sub-samples to generate per point." <<endl
     <<"             If it is not a multiple of the number of threads" << endl
@@ -56,9 +54,6 @@ void help(const char *msg){
     <<"             on the largest sequence. The similarity (see -S) is" <<endl
     <<"             evaluated for the aligned region only." <<endl
     <<"             By default: 50" <<endl
-    <<"  -q <str> : Path to the (input) file containing a second dataset"<<endl
-    <<"             to be used as query, for dataset comparisons. This" <<endl
-    <<"             option is currently experimental" <<endl
     <<"  -R <int> : Maximum RAM usage in Mib. Ideally this value should" <<endl
     <<"             be larger than the sequences to analyze (discarding" <<endl
     <<"             non-sequence elements like headers or quality). This" <<endl
