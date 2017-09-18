@@ -1,34 +1,36 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Install Nonpareil &mdash; Nonpareil 2.4r0 documentation</title>
+    <title>Install Nonpareil &#8212; Nonpareil 3.0r0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.4r0',
+        VERSION:     '3.0r0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.4r0 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Preprocess the reads" href="preprocess.html" />
-    <link rel="prev" title="Updates history" href="updates.html" /> 
+    <link rel="prev" title="Nonpareil" href="index.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -38,23 +40,25 @@
           <a href="preprocess.html" title="Preprocess the reads"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="updates.html" title="Updates history"
+          <a href="index.html" title="Nonpareil"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.0r0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="install-nonpareil">
 <h1>Install Nonpareil<a class="headerlink" href="#install-nonpareil" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="system-requirements">
 <h2>System requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
-<p><strong>Nonpareil binary</strong>: Nonpareil requires a C++ compiler. It has been tested on 64-bit machines with GCC versions ≥4.2.1, running Mac OSX and Red Hat Linux.</p>
-<p><strong>Nonpareil MPI</strong>: If you want to compile Nonpareil with MPI support, you will need <a class="reference external" href="http://www.open-mpi.org/">OpenMPI</a> (v &gt; 1.4.3 tested). Other implementations of MPI could work, but
+<p><strong>Nonpareil binary</strong>: Nonpareil requires a C++ compiler. It has been tested on
+64-bit machines with GCC versions &gt;=4.2.1, running Mac OSX and Red Hat Linux.</p>
+<p><strong>Nonpareil MPI</strong>: If you want to compile Nonpareil with MPI support, you will
+need <a class="reference external" href="http://www.open-mpi.org/">OpenMPI</a> (v &gt; 1.4.3 tested). Other implementations of MPI could work, but
 are yet untested.</p>
 <p><strong>Nonpareil utilities</strong>: Requires <a class="reference external" href="http://www.r-project.org/">R</a>. No additional libraries are necessary.</p>
 </div>
@@ -63,45 +67,49 @@ are yet untested.</p>
 <ol class="arabic">
 <li><p class="first"><strong>Get the source</strong></p>
 <p>Clone the repository from <a class="reference external" href="https://github.com/lmrodriguezr/nonpareil">GitHub</a>:</p>
-<div class="highlight-python"><div class="highlight"><pre>git clone git://github.com/lmrodriguezr/nonpareil.git
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">git</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">lmrodriguezr</span><span class="o">/</span><span class="n">nonpareil</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
-<p>If you don&#8217;t have <a class="reference external" href="http://git-scm.com/">git</a>, you can also download the <a class="reference external" href="https://github.com/lmrodriguezr/nonpareil/tarball/master">TAR-Ball</a> and unpack it with:</p>
-<div class="highlight-python"><div class="highlight"><pre>tar zxvf nonpareil.tar.gz
+<p>If you don’t have <a class="reference external" href="http://git-scm.com/">git</a>, you can also download the <a class="reference external" href="https://github.com/lmrodriguezr/nonpareil/tarball/master">TAR-Ball</a> and unpack it
+with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">tar</span> <span class="n">zxvf</span> <span class="n">nonpareil</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first"><strong>Compile</strong></p>
 <p>Change directory into the newly created folder, and compile Nonpareil:</p>
-<div class="highlight-python"><div class="highlight"><pre>cd nonpareil
-make
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">nonpareil</span>
+<span class="n">make</span>
 </pre></div>
 </div>
-<p>If you want to compile Nonpareil MPI (see also <a class="reference internal" href="mpi.html"><em>MPI support</em></a>), just run:</p>
-<div class="highlight-python"><div class="highlight"><pre>make nonpareil-mpi
+<p>If you want to compile Nonpareil MPI (see also <a class="reference internal" href="mpi.html"><span class="doc">MPI support</span></a>), just run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">nonpareil</span><span class="o">-</span><span class="n">mpi</span>
 </pre></div>
 </div>
-<p>In either case, you can specify the C++ compiler to be used setting the <tt class="docutils literal"><span class="pre">cpp</span></tt> or <tt class="docutils literal"><span class="pre">mpicpp</span></tt> variables, respectively. For example:</p>
-<div class="highlight-python"><div class="highlight"><pre>make cpp=/usr/local/bin/g++ nonpareil # This compiles nonpareil with /usr/local/bin/g++
-make mpicpp=/usr/local/bin/mpic++ nonpareil-mpi # This compiles nonpareil-mpi with /usr/local/bin/mpic++
+<p>In either case, you can specify the C++ compiler to be used setting the
+<code class="docutils literal"><span class="pre">cpp</span></code> or <code class="docutils literal"><span class="pre">mpicpp</span></code> variables, respectively. For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">cpp</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">g</span><span class="o">++</span> <span class="n">nonpareil</span> <span class="c1"># This compiles nonpareil with /usr/local/bin/g++</span>
+<span class="n">make</span> <span class="n">mpicpp</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">mpic</span><span class="o">++</span> <span class="n">nonpareil</span><span class="o">-</span><span class="n">mpi</span> <span class="c1"># This compiles nonpareil-mpi with /usr/local/bin/mpic++</span>
 </pre></div>
 </div>
 </li>
 <li><p class="first"><strong>Install</strong></p>
 <p>If you want to make Nonpareil available system-wide, just run:</p>
-<div class="highlight-python"><div class="highlight"><pre>sudo make install
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">make</span> <span class="n">install</span>
 </pre></div>
 </div>
-<p>If you don&#8217;t have superuser privileges and/or want to install Nonpareil in a location other than <tt class="docutils literal"><span class="pre">/usr/local</span></tt>, simply set the prefix, for
-example:</p>
-<div class="highlight-python"><div class="highlight"><pre>make prefix=$HOME/apps install
+<p>If you don’t have superuser privileges and/or want to install Nonpareil in a
+location other than <code class="docutils literal"><span class="pre">/usr/local</span></code>, simply set the prefix, for example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>make prefix=$HOME/apps install
 </pre></div>
 </div>
-<p>You can also change the location of <tt class="docutils literal"><span class="pre">R</span></tt>, if it&#8217;s not in the <tt class="docutils literal"><span class="pre">$PATH</span></tt> or you want to use a non-standard installation:</p>
-<div class="highlight-python"><div class="highlight"><pre>make prefix=$HOME R=~/bin/R install
+<p>You can also change the location of <code class="docutils literal"><span class="pre">R</span></code>, if it’s not in the <code class="docutils literal"><span class="pre">$PATH</span></code> or
+you want to use a non-standard installation:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>make prefix=$HOME R=~/bin/R install
 </pre></div>
 </div>
-<p>Other variables you can set explicitly for the <tt class="docutils literal"><span class="pre">install</span></tt> target are <tt class="docutils literal"><span class="pre">bindir</span></tt> (binaries directory) and <tt class="docutils literal"><span class="pre">mandir</span></tt> (documentation directory).</p>
+<p>Other variables you can set explicitly for the <code class="docutils literal"><span class="pre">install</span></code> target are
+<code class="docutils literal"><span class="pre">bindir</span></code> (binaries directory) and <code class="docutils literal"><span class="pre">mandir</span></code> (documentation directory).</p>
 </li>
 </ol>
 </div>
@@ -111,7 +119,7 @@ example:</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
@@ -123,34 +131,33 @@ example:</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="updates.html"
-                        title="previous chapter">Updates history</a></p>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Nonpareil</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="preprocess.html"
                         title="next chapter">Preprocess the reads</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/installation.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -160,14 +167,14 @@ example:</p>
           <a href="preprocess.html" title="Preprocess the reads"
              >next</a> |</li>
         <li class="right" >
-          <a href="updates.html" title="Updates history"
+          <a href="index.html" title="Nonpareil"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.0r0 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013-2015, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013-2017, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

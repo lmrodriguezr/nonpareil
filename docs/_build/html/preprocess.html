@@ -1,34 +1,36 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Preprocess the reads &mdash; Nonpareil 2.4r0 documentation</title>
+    <title>Preprocess the reads &#8212; Nonpareil 3.0r0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.4r0',
+        VERSION:     '3.0r0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.4r0 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Redundancy" href="redundancy.html" />
-    <link rel="prev" title="MPI support" href="mpi.html" /> 
+    <link rel="prev" title="Install Nonpareil" href="installation.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -38,33 +40,35 @@
           <a href="redundancy.html" title="Redundancy"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="mpi.html" title="MPI support"
+          <a href="installation.html" title="Install Nonpareil"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.0r0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="preprocess-the-reads">
 <h1>Preprocess the reads<a class="headerlink" href="#preprocess-the-reads" title="Permalink to this headline">¶</a></h1>
-<p>Nonpareil expects that the sequencing error is always well below 5%, so we suggest using an expected error cutoff of 1%
-(<em>i.e.</em>, Q&gt;20, or 1 error in 100 nucleotides). We recommend to perform this task using <a class="reference external" href="http://solexaqa.sourceforge.net/">SolexaQA</a>.</p>
-<p>Ideally, the reads should be in FastA format (althought Nonpareil can read FastQ). To transform FastQ into FastA, you
-can simply use:</p>
-<div class="highlight-python"><div class="highlight"><pre># Input: reads.fastq
-# Output: reads.fasta
-cat reads.fastq | paste - - - - | awk &#39;BEGIN{FS=&quot;\t&quot;}{print &quot;&gt;&quot;substr($1,2)&quot;\n&quot;$2}&#39; &gt; reads.fasta
+<p>Nonpareil expects that the sequencing error is always well below 5%, so we
+suggest using an expected error cutoff of 1% (<em>i.e.</em>, Q&gt;20, or 1 error in 100
+nucleotides). We recommend to perform this task using <a class="reference external" href="http://solexaqa.sourceforge.net/">SolexaQA</a>.</p>
+<p>Ideally, the reads should be in FastA format (althought Nonpareil can read
+FastQ). To transform FastQ into FastA, you can simply use:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Input: reads.fastq</span>
+<span class="c1"># Output: reads.fasta</span>
+<span class="n">cat</span> <span class="n">reads</span><span class="o">.</span><span class="n">fastq</span> <span class="o">|</span> <span class="n">paste</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">-</span> <span class="o">|</span> <span class="n">awk</span> <span class="s1">&#39;BEGIN{FS=&quot;</span><span class="se">\t</span><span class="s1">&quot;}{print &quot;&gt;&quot;substr($1,2)&quot;</span><span class="se">\n</span><span class="s1">&quot;$2}&#39;</span> <span class="o">&gt;</span> <span class="n">reads</span><span class="o">.</span><span class="n">fasta</span>
 </pre></div>
 </div>
-<p>Also, if you have paired-end reads, you should use only one sister read per pair in Nonpareil. If you have them interposed
-in the same file, you can separate them using <a class="reference external" href="https://github.com/lmrodriguezr/enveomics/blob/master/Scripts/FastA.split.pl">FastA.split.pl</a>:</p>
-<div class="highlight-python"><div class="highlight"><pre># Input: reads.fasta
-# Output: reads.1.fa and reads.2.fa
-FastA.split.pl reads.fasta reads 2
+<p>Also, if you have paired-end reads, you should use only one sister read per pair
+in Nonpareil. If you have them interposed in the same file, you can separate
+them using <a class="reference external" href="https://github.com/lmrodriguezr/enveomics/blob/master/Scripts/FastA.split.pl">FastA.split.pl</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># Input: reads.fasta</span>
+<span class="c1"># Output: reads.1.fa and reads.2.fa</span>
+<span class="n">FastA</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">pl</span> <span class="n">reads</span><span class="o">.</span><span class="n">fasta</span> <span class="n">reads</span> <span class="mi">2</span>
 </pre></div>
 </div>
 </div>
@@ -73,37 +77,36 @@ FastA.split.pl reads.fasta reads 2
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="mpi.html"
-                        title="previous chapter">MPI support</a></p>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Install Nonpareil</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="redundancy.html"
                         title="next chapter">Redundancy</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/preprocess.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/preprocess.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -113,14 +116,14 @@ FastA.split.pl reads.fasta reads 2
           <a href="redundancy.html" title="Redundancy"
              >next</a> |</li>
         <li class="right" >
-          <a href="mpi.html" title="MPI support"
+          <a href="installation.html" title="Install Nonpareil"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.0r0 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013-2015, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013-2017, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>

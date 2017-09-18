@@ -1,58 +1,63 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Updates history &mdash; Nonpareil 2.4r0 documentation</title>
+    <title>Updates history &#8212; Nonpareil 3.0r0 documentation</title>
     
-    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.4r0',
+        VERSION:     '3.0r0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Nonpareil 2.4r0 documentation" href="index.html" />
-    <link rel="next" title="Preprocess the reads" href="preprocess.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="MPI support" href="mpi.html" /> 
   </head>
   <body>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="preprocess.html" title="Preprocess the reads"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
           <a href="mpi.html" title="MPI support"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.0r0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="updates-history">
 <h1>Updates history<a class="headerlink" href="#updates-history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-s-new-in-3-0">
+<h2>What’s new in 3.0<a class="headerlink" href="#what-s-new-in-3-0" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>New k-mer kernel: A much faster kernel is now provided as an alternative to the alignment-based
+kernel in previous versions.</li>
+</ul>
+</div>
 <div class="section" id="what-s-new-in-2-4">
-<h2>What&#8217;s new in 2.4<a class="headerlink" href="#what-s-new-in-2-4" title="Permalink to this headline">¶</a></h2>
+<h2>What’s new in 2.4<a class="headerlink" href="#what-s-new-in-2-4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Subsampling now defaults to logarithmic: Previous versions subsampled linearly, since 2.4 the -d
 option defaults to 0.7. Options -m, -M, &amp; -i still exist but they are ignored unless -d is 0.</li>
@@ -67,15 +72,15 @@ Usually, the average of the distances in both ways can be used for clustering of
 </ul>
 </div>
 <div class="section" id="what-s-new-in-2-3">
-<h2>What&#8217;s new in 2.3<a class="headerlink" href="#what-s-new-in-2-3" title="Permalink to this headline">¶</a></h2>
+<h2>What’s new in 2.3<a class="headerlink" href="#what-s-new-in-2-3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Updates history.</li>
 <li>Nonpareil R package: No changes in the functions were introduced, but they are now available
-as an R package complete with documentation. See <a class="reference internal" href="curves.html"><em>Nonpareil curves</em></a>.</li>
-<li>Make&#8217;s <tt class="docutils literal"><span class="pre">install</span></tt> target: This includes the installation of binaries, the manual page, and the
+as an R package complete with documentation. See <a class="reference internal" href="curves.html"><span class="doc">Nonpareil curves</span></a>.</li>
+<li>Make’s <code class="docutils literal"><span class="pre">install</span></code> target: This includes the installation of binaries, the manual page, and the
 new Nonpareil R package.</li>
-<li>Simplified help: Only mandatory and commonly used arguments are now displayed with <tt class="docutils literal"><span class="pre">nonpareil</span> <span class="pre">-h</span></tt>.
-Complete documentation is maintained both in the manual page (<tt class="docutils literal"><span class="pre">man</span> <span class="pre">nonpareil</span></tt>) and the
+<li>Simplified help: Only mandatory and commonly used arguments are now displayed with <code class="docutils literal"><span class="pre">nonpareil</span> <span class="pre">-h</span></code>.
+Complete documentation is maintained both in the manual page (<code class="docutils literal"><span class="pre">man</span> <span class="pre">nonpareil</span></code>) and the
 <a class="reference external" href="http://nonpareil.readthedocs.org/">online documentation</a>. In order to maintain a centralized documentation, the complete help messages
 for the Nonpareil R package are now self-contained, and were removed from the <a class="reference external" href="http://nonpareil.readthedocs.org/">online documentation</a>.</li>
 </ul>
@@ -86,13 +91,14 @@ for the Nonpareil R package are now self-contained, and were removed from the <a
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Updates history</a><ul>
-<li><a class="reference internal" href="#what-s-new-in-2-4">What&#8217;s new in 2.4</a></li>
-<li><a class="reference internal" href="#what-s-new-in-2-3">What&#8217;s new in 2.3</a></li>
+<li><a class="reference internal" href="#what-s-new-in-3-0">What’s new in 3.0</a></li>
+<li><a class="reference internal" href="#what-s-new-in-2-4">What’s new in 2.4</a></li>
+<li><a class="reference internal" href="#what-s-new-in-2-3">What’s new in 2.3</a></li>
 </ul>
 </li>
 </ul>
@@ -100,49 +106,42 @@ for the Nonpareil R package are now self-contained, and were removed from the <a
   <h4>Previous topic</h4>
   <p class="topless"><a href="mpi.html"
                         title="previous chapter">MPI support</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="preprocess.html"
-                        title="next chapter">Preprocess the reads</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/updates.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/updates.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="preprocess.html" title="Preprocess the reads"
-             >next</a> |</li>
-        <li class="right" >
           <a href="mpi.html" title="MPI support"
              >previous</a> |</li>
-        <li><a href="index.html">Nonpareil 2.4r0 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.0r0 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2013-2015, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2013-2017, Luis M Rodriguez-R.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
     </div>
   </body>
 </html>
