@@ -227,7 +227,8 @@ int main(int argc, char *argv[]) {
   if(strcmp(nonpareiltype,"kmer")==0) {
     if(alt_query) {
       if(strcmp(format,"fasta")==0) {
-        cout << "testing" << endl;
+        say("1ss$","WARNING: The kmer kernel implements an error correction ",
+          "function only compatible with FastQ");
         ifstream qifs((string(qfile)));
         say("1ss$","reading query", file);
         FastaReader qfastaReader(qifs);
@@ -267,6 +268,8 @@ int main(int argc, char *argv[]) {
         say("1sfs$", "Average read length is ", avg_seq_len, "bp");
         goto restart_samples;
       }else if(strcmp(format,"fasta")==0) {
+        say("1ss$","WARNING: The kmer kernel implements an error correction ",
+          "function only compatible with FastQ");
         ifstream ifs((string(file)));
         say("1ss$","reading ", file);
         FastaReader fastaReader(ifs);
