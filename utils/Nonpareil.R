@@ -208,8 +208,8 @@ Nonpareil.curve <- function(
   if(type=="kmer"){
     if(is.null(ksize) & "ksize" %in% keys)
       ksize = as.numeric(vals[keys=="ksize"]);
-    if(is.na(read.length) & "AL" %in% keys)
-      read.length = as.numeric(vals[keys=="AL"]);
+    if(is.na(read.length) & "L" %in% keys)
+      read.length = as.numeric(vals[keys=="L"]);
     overlap <- 0;
   }else{
     if(is.null(overlap) & "overlap" %in% keys)
