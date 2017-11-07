@@ -254,7 +254,7 @@ Nonpareil.curve <- function(
   a$V1 = exp(log(a$V1)*0.61 + 10);
   a$V1 = a$V1 * read.length / 101;
   horiz.diff = LR / max(a$V1);
-  a$V1 = a$V1 * horiz.diff;##
+  #a$V1 = a$V1 * horiz.diff;##
   horiz.diff = 1;
   if(is.na(libname)) {
     libname <- basename(file);
