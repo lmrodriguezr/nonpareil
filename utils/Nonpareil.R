@@ -208,8 +208,8 @@ Nonpareil.curve <- function(
   if(type=="kmer"){
     if(is.null(ksize) & "ksize" %in% keys)
       ksize = as.numeric(vals[keys=="ksize"]);
-    if(is.na(read.length) & "L" %in% keys)
-      read.length = as.numeric(vals[keys=="L"]);
+    if(is.na(read.length) & "AL" %in% keys)
+      read.length = as.numeric(vals[keys=="AL"]);
     overlap <- 0;
   }else{
     if(is.null(overlap) & "overlap" %in% keys)
@@ -452,7 +452,7 @@ Nonpareil.coverageFactor <- function(
     overlap
     ### Value of overlap (-L).
     ){
-  if(overlap==0) overlap <- 50 # for type kmer
+  if(overlap==0) return(1) # for type kmer
   return(1-exp(2.23E-2*overlap-3.5698))
 
   ### A numeric scalar.
