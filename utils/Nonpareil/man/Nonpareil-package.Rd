@@ -9,7 +9,7 @@ files produced by Nonpareil (http://enve-omics.ce.gatech.edu/nonpareil).}
 \tabular{ll}{Package: \tab Nonpareil\cr
 Title: \tab Ancilliary R code for Nonpareil\cr
 Type: \tab Package\cr
-Version: \tab 2014.01.23\cr
+Version: \tab 3.2\cr
 Author: \tab Luis M. Rodriguez-R <lmrodriguezr@gmail.com>\cr
 Maintainer: \tab Luis M. Rodriguez-R <lmrodriguezr@gmail.com>\cr
 Authors@R: \tab c(person("Luis M.","Rodriguez-R",role=c("aut","cre"),
