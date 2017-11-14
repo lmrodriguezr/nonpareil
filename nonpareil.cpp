@@ -176,7 +176,8 @@ int main(int argc, char *argv[]) {
     help("Bad argument for -x option, accepted range: (0, 1]");
   if((divide<0) | (divide>=1))
     help("Bad argument for -d option, accepted range: (0, 1)");
-
+  if((k < 1) | (k > 32))
+    help("Bad argument for -k option, accepted range: [1, 32]");
   char alldataTmp[LARGEST_PATH], outfileTmp[LARGEST_PATH],
     cntfileTmp[LARGEST_PATH];
   if(baseout && (strlen(baseout)>0)){
@@ -192,6 +193,8 @@ int main(int argc, char *argv[]) {
       open_log(logfile);
     }
   }
+
+
 
   //file checking
   if(strcmp(nonpareiltype,"kmer")==0){
