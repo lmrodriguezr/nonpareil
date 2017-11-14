@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Install Nonpareil &#8212; Nonpareil 3.1r0 documentation</title>
+    <title>Install Nonpareil &#8212; Nonpareil 3.2r0 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.1r0',
+        VERSION:     '3.2r0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="index.html" title="Nonpareil"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.1r0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.2r0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -53,8 +53,60 @@
             
   <div class="section" id="install-nonpareil">
 <h1>Install Nonpareil<a class="headerlink" href="#install-nonpareil" title="Permalink to this headline">¶</a></h1>
+<p>Nonpareil can be installed using <a class="reference external" href="https://bioconda.github.io/recipes/nonpareil/README.html">conda</a>,
+as a <a class="reference external" href="https://quay.io/repository/biocontainers/nonpareil">Biocontainer</a>,
+with <a class="reference external" href="https://galaxyproject.org/">Galaxy</a>, or via the source code</p>
+<div class="section" id="conda-installation">
+<h2>Conda installation<a class="headerlink" href="#conda-installation" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Install <a class="reference external" href="https://conda.io/miniconda.html">Miniconda</a></p>
+</li>
+<li><p class="first">Configure the channels to access <a class="reference external" href="https://bioconda.github.io">Bioconda</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">defaults</span>
+<span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+<span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">bioconda</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">Install Nonpareil:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">nonpareil</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="id1">
+<h2>Biocontainer<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic">
+<li><p class="first">Install <a class="reference external" href="https://docs.docker.com/engine/installation/">Docker</a></p>
+</li>
+<li><p class="first">Pull the container:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ docker pull quay.io/biocontainers/nonpareil
+</pre></div>
+</div>
+</li>
+<li><p class="first">Launch the container:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ docker run -i -t quay.io/biocontainers/nonpareil /bin/bash
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="id2">
+<h2>Galaxy<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>You can install Nonpareil on your own Galaxy instance:</p>
+<ol class="arabic simple">
+<li>Go the Galaxy admin space</li>
+<li>Search on the main <a class="reference external" href="https://toolshed.g2.bx.psu.edu/">Toolshed</a> for the nonpareil repository available under the “Metagenomics” sections</li>
+<li>Install it</li>
+</ol>
+<blockquote>
+<div>It will automatically install Nonpareil via the conda installation</div></blockquote>
+</div>
+<div class="section" id="source-code-installation">
+<h2>Source code installation<a class="headerlink" href="#source-code-installation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="system-requirements">
-<h2>System requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h2>
+<h3>System requirements<a class="headerlink" href="#system-requirements" title="Permalink to this headline">¶</a></h3>
 <p><strong>Nonpareil binary</strong>: Nonpareil requires a C++ compiler. It has been tested on
 64-bit machines with GCC versions &gt;=4.2.1, running Mac OSX and Red Hat Linux.</p>
 <p><strong>Nonpareil MPI</strong>: If you want to compile Nonpareil with MPI support, you will
@@ -63,7 +115,7 @@ are yet untested.</p>
 <p><strong>Nonpareil utilities</strong>: Requires <a class="reference external" href="http://www.r-project.org/">R</a>. No additional libraries are necessary.</p>
 </div>
 <div class="section" id="compilation">
-<h2>Compilation<a class="headerlink" href="#compilation" title="Permalink to this headline">¶</a></h2>
+<h3>Compilation<a class="headerlink" href="#compilation" title="Permalink to this headline">¶</a></h3>
 <ol class="arabic">
 <li><p class="first"><strong>Get the source</strong></p>
 <p>Clone the repository from <a class="reference external" href="https://github.com/lmrodriguezr/nonpareil">GitHub</a>:</p>
@@ -114,6 +166,7 @@ you want to use a non-standard installation:</p>
 </ol>
 </div>
 </div>
+</div>
 
 
           </div>
@@ -124,8 +177,14 @@ you want to use a non-standard installation:</p>
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Install Nonpareil</a><ul>
+<li><a class="reference internal" href="#conda-installation">Conda installation</a></li>
+<li><a class="reference internal" href="#id1">Biocontainer</a></li>
+<li><a class="reference internal" href="#id2">Galaxy</a></li>
+<li><a class="reference internal" href="#source-code-installation">Source code installation</a><ul>
 <li><a class="reference internal" href="#system-requirements">System requirements</a></li>
 <li><a class="reference internal" href="#compilation">Compilation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -169,7 +228,7 @@ you want to use a non-standard installation:</p>
         <li class="right" >
           <a href="index.html" title="Nonpareil"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.1r0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.2r0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
