@@ -1,7 +1,9 @@
 Install Nonpareil
 ====================
 
-Nonpareil can be installed using `conda <https://bioconda.github.io/recipes/nonpareil/README.html>`_, as a `Biocontainer <https://quay.io/repository/biocontainers/nonpareil>`_ with `Galaxy <https://galaxyproject.org/>`_ or via the source code
+Nonpareil can be installed using `conda <https://bioconda.github.io/recipes/nonpareil/README.html>`_,
+as a `Biocontainer <https://quay.io/repository/biocontainers/nonpareil>`_,
+with `Galaxy <https://galaxyproject.org/>`_, or via the source code
 
 Conda installation
 ------------------
@@ -9,13 +11,13 @@ Conda installation
 1. Install `Miniconda <https://conda.io/miniconda.html>`_
 2. Configure the channels to access `Bioconda <https://bioconda.github.io>`_::
 
-    $ conda config --add channels defaults
-    $ conda config --add channels conda-forge
-    $ conda config --add channels bioconda
+    conda config --add channels defaults
+    conda config --add channels conda-forge
+    conda config --add channels bioconda
 
 3. Install Nonpareil::
 
-    $ conda install nonpareil
+    conda install nonpareil
 
 Biocontainer
 ------------
