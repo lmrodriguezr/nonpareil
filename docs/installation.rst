@@ -1,8 +1,40 @@
 Install Nonpareil
 ====================
 
+Nonpareil can be installed using `conda <https://bioconda.github.io/recipes/nonpareil/README.html>`_, as a `Biocontainer <https://quay.io/repository/biocontainers/nonpareil>`_ or via the source code
+
+Conda installation
+------------------
+
+1. Install `Miniconda <https://conda.io/miniconda.html>`_
+2. Configure the channels to access `Bioconda <https://bioconda.github.io>`_::
+
+    $ conda config --add channels defaults
+    $ conda config --add channels conda-forge
+    $ conda config --add channels bioconda
+
+3. Install Nonpareil::
+
+    $ conda install nonpareil
+
+Biocontainer
+------------
+
+1. Install `Docker <https://docs.docker.com/engine/installation/>`_
+2. Pull the container::
+
+    $ docker pull quay.io/biocontainers/nonpareil
+
+3. Launch the container::
+
+    $ docker run -i -t quay.io/biocontainers/nonpareil /bin/bash
+
+
+Source code installation
+------------------------
+
 System requirements
--------------------
+*******************
 
 **Nonpareil binary**: Nonpareil requires a C++ compiler. It has been tested on
 64-bit machines with GCC versions >=4.2.1, running Mac OSX and Red Hat Linux.
@@ -14,7 +46,7 @@ are yet untested.
 **Nonpareil utilities**: Requires R_. No additional libraries are necessary.
 
 Compilation
------------
+***********
 
 1. **Get the source**
 
@@ -35,12 +67,12 @@ Compilation
       make
 
    If you want to compile Nonpareil MPI (see also :doc:`mpi`), just run::
-      
+
       make nonpareil-mpi
 
    In either case, you can specify the C++ compiler to be used setting the
    ``cpp`` or ``mpicpp`` variables, respectively. For example::
-      
+
       make cpp=/usr/local/bin/g++ nonpareil # This compiles nonpareil with /usr/local/bin/g++
       make mpicpp=/usr/local/bin/mpic++ nonpareil-mpi # This compiles nonpareil-mpi with /usr/local/bin/mpic++
 
@@ -52,7 +84,7 @@ Compilation
 
    If you don't have superuser privileges and/or want to install Nonpareil in a
    location other than ``/usr/local``, simply set the prefix, for example::
-      
+
       make prefix=$HOME/apps install
 
    You can also change the location of ``R``, if it's not in the ``$PATH`` or
