@@ -1,7 +1,7 @@
 Install Nonpareil
 ====================
 
-Nonpareil can be installed using `conda <https://bioconda.github.io/recipes/nonpareil/README.html>`_, as a `Biocontainer <https://quay.io/repository/biocontainers/nonpareil>`_ or via the source code
+Nonpareil can be installed using `conda <https://bioconda.github.io/recipes/nonpareil/README.html>`_, as a `Biocontainer <https://quay.io/repository/biocontainers/nonpareil>`_ with `Galaxy <https://galaxyproject.org/>`_ or via the source code
 
 Conda installation
 ------------------
@@ -29,6 +29,16 @@ Biocontainer
 
     $ docker run -i -t quay.io/biocontainers/nonpareil /bin/bash
 
+Galaxy
+------
+
+You can install Nonpareil on your own Galaxy instance:
+
+1. Go the Galaxy admin space
+2. Search on the main `Toolshed <https://toolshed.g2.bx.psu.edu/>`_ for the nonpareil repository available under the "Metagenomics" sections
+3. Install it
+
+  It will automatically install Nonpareil via the conda installation
 
 Source code installation
 ------------------------
