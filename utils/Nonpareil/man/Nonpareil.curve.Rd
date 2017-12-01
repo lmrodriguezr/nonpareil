@@ -28,9 +28,14 @@ option in Nonpareil), 0, 1, -1, 1.3, -1.1, 1.5, -1.5.}
 
 \value{Returns invisibly a `Nonpareil.Curve` object}
 
-\author{Luis M. Rodriguez-R <lmrodriguezr@gmail.com>}
+\author{Luis M. Rodriguez-R [aut, cre]}
 
 
 
 
-
+\examples{
+# Generate a Nonpareil plot
+\dontrun{ np <- Nonpareil.curve("redundancy.npo")  }
+# Show the estimated values
+\dontrun{ print(np)  }
+}

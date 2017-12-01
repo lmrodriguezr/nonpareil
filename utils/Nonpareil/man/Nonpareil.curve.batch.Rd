@@ -18,9 +18,14 @@ the filename. Values are recycled}
 
 \value{Returns invisibly a `Nonpareil.Set` object}
 
-\author{Luis M. Rodriguez-R <lmrodriguezr@gmail.com>}
+\author{Luis M. Rodriguez-R [aut, cre]}
 
 
 
 
-
+\examples{
+# Generate a Nonpareil plot with multiple curves
+\dontrun{ nps <- Nonpareil.set(c("ds1.npo", "ds2.npo", "ds3.npo"))  }
+# Show the estimated values
+\dontrun{ print(nps)  }
+}

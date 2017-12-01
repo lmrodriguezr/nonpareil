@@ -52,7 +52,7 @@ setClass("Nonpareil.Set",
   ), package='Nonpareil'
   );
 
-# S4 Methods
+# S3 Methods
 setMethod("$", "Nonpareil.Curve", function(x, name) attr(x, name))
 setMethod("$<-", "Nonpareil.Curve",
       function(x, name, value) { attr(x, name) <- value ; x })
@@ -179,13 +179,13 @@ plot.Nonpareil.Curve <- function(
   if(plot.dispersion!=FALSE){
     if(plot.dispersion == "sd"){
       err.y <- c(x$y.cov+x$y.sd, rev(x$y.cov-x$y.sd))
-    }else if(plotDispersion == "ci95"){
+    }else if(plot.dispersion == "ci95"){
       err.y <- c(x$y.cov+x$y.sd*1.9, rev(x$y.cov-x$y.sd*1.9))
-    }else if(plotDispersion == "ci90"){
+    }else if(plot.dispersion == "ci90"){
       err.y <- c(x$y.cov+x$y.sd*1.64, rev(x$y.cov-x$y.sd*1.64))
-    }else if(plotDispersion == "ci50"){
+    }else if(plot.dispersion == "ci50"){
       err.y <- c(x$y.cov+x$y.sd*.67, rev(x$y.cov-x$y.sd*.67))
-    }else if(plotDispersion == "iq"){
+    }else if(plot.dispersion == "iq"){
       err.y <- c(x$y.p25, rev(x$y.p75))
     }
     polygon(c(x$x.adj, rev(x$x.adj)), border=NA,
@@ -222,31 +222,37 @@ plot.Nonpareil.Curve <- function(
 }
 summary.Nonpareil.Set <- function(
       ### Returns a summary of the Nonpareil.Set results
-      x
+      object,
       ### `Nonpareil.Set` object
+      ...
+      ### Additional parameters ignored
       ){
-  if(!inherits(x, "Nonpareil.Set"))
-    stop("'x' must inherit from class `Nonpareil.Set`")
-  y <- rbind(sapply(x$np.curves, "summary"))
-  colnames(y) <- sapply(x$np.curves, function(n) n$label)
+  if(!inherits(object, "Nonpareil.Set"))
+    stop("'object' must inherit from class `Nonpareil.Set`")
+  y <- rbind(sapply(object$np.curves, "summary"))
+  colnames(y) <- sapply(object$np.curves, function(n) n$label)
   y
 }
 summary.Nonpareil.Curve <- function(
       ### Returns a summary of the Nonpareil.Curve results
-      x
+      object,
       ### `Nonpareil.Curve` object
+      ...
+      ### Additional parameters ignored
       ){
-  if(!inherits(x, "Nonpareil.Curve"))
-    stop("'x' must inherit from class `Nonpareil.Curve`")
+  if(!inherits(object, "Nonpareil.Curve"))
+    stop("'object' must inherit from class `Nonpareil.Curve`")
   n <- c("kappa","C","LR","modelR","LRstar","diversity")
-  y <- sapply(n, function(v) attr(x,v))
+  y <- sapply(n, function(v) attr(object,v))
   names(y) <- n
   y
 }
 print.Nonpareil.Set <- function(
       ### Prints and returns invisibly a summary of the `Nonpareil.Set` results
-      x
+      x,
       ### `Nonpareil.Set` object
+      ...
+      ### Additional parameters ignored
       ){
   if(!inherits(x, "Nonpareil.Set"))
     stop("'x' must inherit from class `Nonpareil.Set`")
@@ -262,8 +268,10 @@ print.Nonpareil.Set <- function(
 print.Nonpareil.Curve <- function(
       ### Prints and returns invisibly a summary of the `Nonpareil.Curve`
       ### results
-      x
+      x,
       ### `Nonpareil.Set` object
+      ...
+      ### Additional parameters ignored
       ){
   if(!inherits(x, "Nonpareil.Curve"))
     stop("'x' must inherit from class `Nonpareil.Curve`")
@@ -279,16 +287,18 @@ print.Nonpareil.Curve <- function(
 }
 predict.Nonpareil.Curve <- function(
       ### Predict the coverage for a given sequencing effort
-      x,
+      object,
       ### `Nonpareil.Curve` object
-      lr=x$LR
+      lr=object$LR,
       ### Sequencing effort for the prediction (in bp)
+      ...
+      ### Additional parameters ignored
       ){
-  if(!inherits(x, "Nonpareil.Curve"))
-    stop("'x' must inherit from class `Nonpareil.Curve`")
-  if(!x$has.model)
-    stop("'x' must be a Nonpareil Curve with a fitted model")
-  predict(x$model, list(x=lr))
+  if(!inherits(object, "Nonpareil.Curve"))
+    stop("'object' must inherit from class `Nonpareil.Curve`")
+  if(!object$has.model)
+    stop("'object' must be a Nonpareil Curve with a fitted model")
+  predict(object$model, list(x=lr))
 }
 
 # Ancillary functions
@@ -474,7 +484,7 @@ Nonpareil.legend <- function(
   if(inherits(np, "Nonpareil.Set")) np <- np$np.curves
   if(!inherits(np, "list"))
     stop("'np' must inherit from `list` or class `Nonpareil.Set`")
-  if(is.null(x)) x <- 0.75*Nonpareil.LastXmax;
+
   labels <- sapply(np, function(x) x$label)
   cols <- sapply(np, Nonpareil.col)
   legend(x=x, y=y, legend=labels, fill=cols, ...);
@@ -507,7 +517,7 @@ Nonpareil.antif <- function(
 }
 
 # Main functions
-Nonpareil.curve <- function(
+Nonpareil.curve <- structure(function(
       ### Generates a Nonpareil curve from an .npo file
       file,
       ### Path to the .npo file, containing the read redundancy
@@ -573,8 +583,13 @@ Nonpareil.curve <- function(
   # Return
   invisible(np)
   ### Returns invisibly a `Nonpareil.Curve` object
-}
-Nonpareil.set <- function(
+}, ex=function(){
+  # Generate a Nonpareil plot
+  np <- Nonpareil.curve("redundancy.npo") ###<<< dontrun
+  # Show the estimated values
+  print(np) ###<<< dontrun
+})
+Nonpareil.set <- structure(function(
       ### Generates a collection of Nonpareil curves (a `Nonpareil.Set` object)
       ### and (optionally) plots all of them in a single canvas
       files,
@@ -615,5 +630,10 @@ Nonpareil.set <- function(
   # Return
   invisible(y)
   ### Returns invisibly a `Nonpareil.Set` object
-}
+}, ex=function(){
+  # Generate a Nonpareil plot with multiple curves
+  nps <- Nonpareil.set(c("ds1.npo", "ds2.npo", "ds3.npo")) ###<<< dontrun
+  # Show the estimated values
+  print(nps) ###<<< dontrun
+})
 Nonpareil.curve.batch <- Nonpareil.set

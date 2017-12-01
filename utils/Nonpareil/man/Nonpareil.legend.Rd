@@ -13,7 +13,7 @@
 
 
 
-\author{Luis M. Rodriguez-R <lmrodriguezr@gmail.com>}
+\author{Luis M. Rodriguez-R [aut, cre]}
 
 
 

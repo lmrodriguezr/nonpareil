@@ -1,5 +1,32 @@
+import(methods)
+
+importFrom("grDevices", "col2rgb", "rgb")
+importFrom("graphics", "abline", "arrows", "legend", "lines", "plot",
+      "points", "polygon")
+importFrom("stats", "coef", "cor", "nls", "nls.control", "pgamma",
+      "predict", "qgamma")
+importFrom("utils", "read.table", "tail")
+
+
+S3method(plot, Nonpareil.Set)
+S3method(plot, Nonpareil.Curve)
+S3method(summary, Nonpareil.Set)
+S3method(summary, Nonpareil.Curve)
+S3method(print, Nonpareil.Set)
+S3method(print, Nonpareil.Curve)
+S3method(predict, Nonpareil.Curve)
+
 export(Nonpareil.f,
-  Nonpareil.read_metadata, Nonpareil.read_data, Nonpareil.fit_model,
-  Nonpareil.coverage_factor, Nonpareil.col, Nonpareil.legend,
-  Nonpareil.f, Nonpareil.antif,
-  Nonpareil.curve, Nonpareil.set, Nonpareil.curve.batch)
+      # Ancillary
+      Nonpareil.read_metadata, Nonpareil.read_data, Nonpareil.fit_model,
+      Nonpareil.coverage_factor, Nonpareil.col, Nonpareil.legend,
+      # Model
+      Nonpareil.f, Nonpareil.antif,
+      # S4
+      plot.Nonpareil.Set, plot.Nonpareil.Curve,
+      summary.Nonpareil.Set, summary.Nonpareil.Curve,
+      print.Nonpareil.Set, print.Nonpareil.Curve,
+      predict.Nonpareil.Curve,
+      # Main
+      Nonpareil.curve, Nonpareil.set, Nonpareil.curve.batch)
+
