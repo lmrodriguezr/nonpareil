@@ -291,7 +291,6 @@ predict.Nonpareil.Curve <- function(
   predict(x$model, list(x=lr))
 }
 
-<<<<<<< HEAD
 # Ancillary functions
 Nonpareil.read_metadata <- function(
       ### Read the metadata headers
@@ -316,133 +315,6 @@ Nonpareil.read_metadata <- function(
     x$overlap <- 50
     x$ksize   <- as.numeric(vals[keys=="ksize"])
     x$AL      <- as.numeric(vals[keys=="AL"])
-=======
-Nonpareil.curve <- function(
-    ### Generates a Nonpareil curve from a .npo file.
-    file,
-    ### Path to the .npo file, containing the read redundancy.
-    ksize=NULL,
-    ### K-mer size (if -T kmer). By default this value is extracted
-    ### from the .npo file headers.
-    overlap=NULL,
-    ### Value of the '-L' parameter (in Nonpareil, the default is 50). If not
-    ### set, it tries to find the value in the .npo file (supported in Nonpareil
-    ### >= 2.0), or fails with an error message. Use only with Nonpareil < v2.0.
-    factor=1,
-    ### Multiplier of the sequencing effort. This can be used to express the
-    ### sequencing effort in units other than base pairs (bp). For example, to
-    ### express sequencing effort as Gbp, use factor=1e-9. This can also affect
-    ### the fit of the model, and it's considered EXPERIMENTAL.
-    plotDispersion=NA,
-    ### Indicates if (and how) dispersion of the replicates should be plotted.
-    ### It requires modelOnly=FALSE to take effect. It can be NA, in which case
-    ### no dispersion is plotted, or any of the following strings: 'sd' (one
-    ### standard deviation around the mean), 'ci95' (95% confidence interval),
-    ### 'ci90' (90% confidence interval), 'ci50' (50% confidence interval), 'iq'
-    ### (inter-quartile range).
-    returnModelValues=FALSE,
-    ### If TRUE, returns the coordinates of the model as model.x and model.y.
-    returnModelParameters=FALSE,
-    ### If TRUE, returns the model itself as model.
-    xmax=10e12,
-    ### Maximum sequencing effort to plot.
-    xmin=1e3,
-    ### Minimum sequencing effort to plot
-    ymax=1,
-    ### Maximum coverage to plot.
-    ymin=1e-6,
-    ### Minimum coverage to plot.
-    xlab=NULL,
-    ### Label of the X-axis. If NULL, it's set to sequencing effort and the
-    ### units (see factor).
-    ylab=NULL,
-    ### Label of the Y-axis. If NULL, it's set to Estimated average coverage.
-    col=NA,
-    ### The color of the curve. If passed, it overrides `r`, `g`, and `b`.
-    r=NA,
-    ### Red component of the curve's color. If NA, it's randomly set. If <=1,
-    ### it's assumed to be in the range [0,1]; if >1, it's assumed to be in the
-    ### range [0,256].
-    g=NA,
-    ### Green component of the curve's color. Same as `r`.
-    b=NA,
-    ### Blue component of the curve's color. Same as `r`.
-    new=TRUE,
-    ### If FALSE, it attempts to use a previous (active) canvas to plot the
-    ### curve.
-    plot=TRUE,
-    ### Determines if the plot should be produced. If FALSE, it still computes
-    ### the coverage and the model.
-    libname=NA,
-    ### Name of the library. If NA, it's determined by the file name. This is
-    ### useful if you plan to call Nonpareil.legend().
-    modelOnly=FALSE,
-    ### If TRUE, the rarefied data is not presented, only the fitted model.
-    plotModel=TRUE,
-    ### If FALSE, the model is not plotted (but it's still computed).
-    plotDiversity=FALSE,
-    ### If TRUE, the diversity estimate is plotted as a small arrow below the
-    ### Nonpareil curve.
-    curve.lwd=2,
-    ### Line width of the Nonpareil curve.
-    curve.alpha=0.4,
-    ### Alpha value (from 0 to 1) of the Nonpareil curve.
-    model.lwd=1,
-    ### Line width of the model.
-    model.alpha=1,
-    ### Alpha value (from 0 to 1) of the model.
-    log='x',
-    ### Axis to plot in logarithmic scale. It can be 'x' (sequencing effort,
-    ### default), 'y' (coverage), 'xy' (both logarithmic), or '' (both linear).
-    data.consistency=TRUE,
-    ### If TRUE, it checks the consistency of the data before plotting.
-    useValue='mean',
-    ### Controls how the replicates are to be summarized at each point of
-    ### sequencing effort. It can be any of: 'mean' (average of the replicates),
-    ### 'median' (median), 'ub' (upper boundary of the 95% confidence interval),
-    ### 'lb' (lower boundary of the 95% confidence interval), 'q1' (quartile 1),
-    ### 'q3' (quartile 3). Note that the quartile 2 is also 'median'.
-    star=95,
-    ### Objective coverage (in percentage). By default: 95, which means the
-    ### sequencing effort required to reach 95% average coverage is to be
-    ### estimated.
-    read.length=NA,
-    ### Length of the reads. Use only with Nonpareil < v2.0.
-    weights.exp=NA,
-    ### Vector of values to be tested (in order) as exponent of the weights
-    ### distribution. If the model fails to converge, sometimes manual
-    ### modifications in this parameter may help. By default (NA), five
-    ### different values are tested in the following order: For linear sampling,
-    ### -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d option in
-    ### Nonpareil), 0, 1, -1, 1.3, -1.1, 1.5, -1.5.
-    correction.factor=TRUE,
-    ### Should the overlap-dependent correction factor be applied? If FALSE,
-    ### redundancy is assumed to equal coverage.
-    ...
-    ### Any other parameters accepted by plot().
-    ){
-  # Create environment
-  Nonpareil.__init_globals(!new);
-
-  # Examine consistency
-  if(is.null(file)) stop("The file argument is mandatory");
-  if(!new && (is.null(Nonpareil.LastFactor) || is.null(Nonpareil.LastXmax)))
-    stop("No previous plot found, use new=TRUE if this is the first plot.");
-
-  # Read metadata (.npo header)
-  log_sampling <- 0;
-  meta_data <- gsub('^# @', "", grep("^# @", readLines(file), value=TRUE));
-  keys <- gsub(': .*', "", meta_data);
-  vals <- gsub('.*: ', "", meta_data);
-  type <- "alignment";
-  if("ksize" %in% keys) type <- "kmer";
-  if(type=="kmer"){
-    if(is.null(ksize) & "ksize" %in% keys)
-      ksize = as.numeric(vals[keys=="ksize"]);
-    if(is.na(read.length) & "AL" %in% keys)
-      read.length = as.numeric(vals[keys=="AL"]);
-    overlap <- 0;
->>>>>>> origin/master
   }else{
     x$overlap <- as.numeric(vals[keys=="overlap"])
     x$AL      <- x$L
@@ -630,14 +502,9 @@ Nonpareil.antif <- function(
     b
     ### Parameter beta of the gamma CDF.
     ){
-<<<<<<< HEAD
   return(exp(qgamma(y,a,b))-1)
   ### Estimated sequencing effort.
 }
-=======
-  if(overlap==0) return(1) # for type kmer
-  return(1-exp(2.23E-2*overlap-3.5698))
->>>>>>> origin/master
 
 # Main functions
 Nonpareil.curve <- function(
