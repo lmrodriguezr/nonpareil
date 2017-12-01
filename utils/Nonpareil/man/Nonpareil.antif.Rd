@@ -1,7 +1,7 @@
 \name{Nonpareil.antif}
 \alias{Nonpareil.antif}
 \title{Nonpareil antif}
-\description{Complement function of Nonpareil.f.}
+\description{Complement function of `Nonpareil.f`}
 \usage{Nonpareil.antif(y, a, b)}
 \arguments{
   \item{y}{Values of abundance-weighted average coverage}

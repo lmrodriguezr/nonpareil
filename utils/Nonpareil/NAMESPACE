@@ -1,1 +1,5 @@
-export(Nonpareil.f, Nonpareil.antif, Nonpareil.curve.batch, Nonpareil.curve, Nonpareil.legend, Nonpareil.coverageFactor)
+export(Nonpareil.f,
+  Nonpareil.read_metadata, Nonpareil.read_data, Nonpareil.fit_model,
+  Nonpareil.coverage_factor, Nonpareil.col, Nonpareil.legend,
+  Nonpareil.f, Nonpareil.antif,
+  Nonpareil.curve, Nonpareil.set, Nonpareil.curve.batch)
