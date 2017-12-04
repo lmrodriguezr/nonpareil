@@ -20,6 +20,7 @@ export(Nonpareil.f,
       # Ancillary
       Nonpareil.read_metadata, Nonpareil.read_data, Nonpareil.fit_model,
       Nonpareil.coverage_factor, Nonpareil.col, Nonpareil.legend,
+      Nonpareil.add.curve,
       # Model
       Nonpareil.f, Nonpareil.antif,
       # S4

@@ -361,9 +361,11 @@ Nonpareil.read_data <- function(
   x$x.adj <- exp(
     max(log(x$x.obs)) + (x$C^0.27)*(log(x$x.obs) - max(log(x$x.obs)))
   )
-  x$x.adj <- exp(log(x$x.adj)*0.61 + 10)
-  x$x.adj <- x$x.adj * x$AL / 101
-  #x$x.adj <- x$x.adj * x$AL * x$R / max(x$x.adj)
+  # Obsolete corrections {
+  #   x$x.adj <- exp(log(x$x.adj)*0.61 + 10)
+  #   x$x.adj <- x$x.adj * x$AL / 101
+  # }
+  x$x.adj <- x$x.adj * x$AL * x$R / max(x$x.adj)
 
   # Check consistency
   x$consistent <- TRUE
@@ -489,6 +491,22 @@ Nonpareil.legend <- function(
   cols <- sapply(np, Nonpareil.col)
   legend(x=x, y=y, legend=labels, fill=cols, ...);
 }
+Nonpareil.add.curve <- function(
+      ### Adds a `Nonpareil.Curve` to a `Nonpareil.Set`
+      nps,
+      ### `Nonpareil.Set` object
+      np
+      ### `Nonpareil.Curve` object
+      ){
+  if(!inherits(nps, "Nonpareil.Set"))
+    stop("'nps' must inherit from class `Nonpareil.Set`")
+  if(!inherits(np, "Nonpareil.Curve"))
+    stop("'np' must inherit from class `Nonpareil.Curve`")
+
+  nps$np.curves[[ length(nps$np.curves)+1 ]] <- np
+  return(nps)
+}
+setMethod("+", "Nonpareil.Set", function(e1,e2) Nonpareil.add.curve(e1,e2))
 
 # Model Functions
 Nonpareil.f <- function(
