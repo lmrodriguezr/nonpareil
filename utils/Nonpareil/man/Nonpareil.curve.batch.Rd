@@ -25,7 +25,24 @@ the filename. Values are recycled}
 
 \examples{
 # Generate a Nonpareil plot with multiple curves
-\dontrun{ nps <- Nonpareil.set(c("ds1.npo", "ds2.npo", "ds3.npo"))  }
+files <- system.file("extdata",
+      c("HumanGut.npo","LakeLanier.npo","IowaSoil.npo"), package="Nonpareil")
+col <- c("orange","darkcyan","firebrick4")
+nps <- Nonpareil.set(files, col=col,
+      plot.opts=list(plot.observed=FALSE, model.lwd=2))
+
 # Show the estimated values
-\dontrun{ print(nps)  }
+print(nps)
+
+# Show current coverage (as \%)
+summary(nps)[,"C"]*100
+
+# Extract Nd diversity index
+summary(nps)[,"diversity"]
+
+# Extract sequencing effort for nearly complete coverage (in Gbp)
+summary(nps)[,"LRstar"]/1e9
+
+# Predict coverage for a sequencing effort of 10Gbp
+sapply(nps$np.curves, predict, 10e9)
 }

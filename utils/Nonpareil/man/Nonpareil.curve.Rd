@@ -37,7 +37,15 @@ option in Nonpareil), 0, 1, -1, 1.3, -1.1, 1.5, -1.5.}
 
 \examples{
 # Generate a Nonpareil plot
-\dontrun{ np <- Nonpareil.curve("redundancy.npo")  }
+file <- system.file("extdata", "LakeLanier.npo", package="Nonpareil")
+np <- Nonpareil.curve(file)
+
 # Show the estimated values
-\dontrun{ print(np)  }
+print(np)
+
+# Predict coverage for 20Gbp
+predict(np, 20e9)
+
+# Obtain the Nd diversity index
+np$diversity
 }

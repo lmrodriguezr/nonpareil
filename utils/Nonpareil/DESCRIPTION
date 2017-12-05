@@ -1,5 +1,5 @@
 Package: Nonpareil
-Title: Coverage Estimation and Projections for 'Nonpareil'
+Title: Metagenome Coverage Estimation and Projections for 'Nonpareil'
 Type: Package
 Version: 3.3
 Authors@R: c(person("Luis M.","Rodriguez-R",role=c("aut","cre"),

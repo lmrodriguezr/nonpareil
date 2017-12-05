@@ -231,7 +231,7 @@ summary.Nonpareil.Set <- function(
     stop("'object' must inherit from class `Nonpareil.Set`")
   y <- rbind(sapply(object$np.curves, "summary"))
   colnames(y) <- sapply(object$np.curves, function(n) n$label)
-  y
+  t(y)
 }
 summary.Nonpareil.Curve <- function(
       ### Returns a summary of the Nonpareil.Curve results
@@ -607,9 +607,17 @@ Nonpareil.curve <- structure(function(
   ### Returns invisibly a `Nonpareil.Curve` object
 }, ex=function(){
   # Generate a Nonpareil plot
-  np <- Nonpareil.curve("redundancy.npo") ###<<< dontrun
+  file <- system.file("extdata", "LakeLanier.npo", package="Nonpareil")
+  np <- Nonpareil.curve(file)
+
   # Show the estimated values
-  print(np) ###<<< dontrun
+  print(np)
+
+  # Predict coverage for 20Gbp
+  predict(np, 20e9)
+
+  # Obtain the Nd diversity index
+  np$diversity
 })
 Nonpareil.set <- structure(function(
       ### Generates a collection of Nonpareil curves (a `Nonpareil.Set` object)
@@ -654,8 +662,25 @@ Nonpareil.set <- structure(function(
   ### Returns invisibly a `Nonpareil.Set` object
 }, ex=function(){
   # Generate a Nonpareil plot with multiple curves
-  nps <- Nonpareil.set(c("ds1.npo", "ds2.npo", "ds3.npo")) ###<<< dontrun
+  files <- system.file("extdata",
+        c("HumanGut.npo","LakeLanier.npo","IowaSoil.npo"), package="Nonpareil")
+  col <- c("orange","darkcyan","firebrick4")
+  nps <- Nonpareil.set(files, col=col,
+        plot.opts=list(plot.observed=FALSE, model.lwd=2))
+
   # Show the estimated values
-  print(nps) ###<<< dontrun
+  print(nps)
+
+  # Show current coverage (as %)
+  summary(nps)[,"C"]*100
+
+  # Extract Nd diversity index
+  summary(nps)[,"diversity"]
+
+  # Extract sequencing effort for nearly complete coverage (in Gbp)
+  summary(nps)[,"LRstar"]/1e9
+
+  # Predict coverage for a sequencing effort of 10Gbp
+  sapply(nps$np.curves, predict, 10e9)
 })
 Nonpareil.curve.batch <- Nonpareil.set
