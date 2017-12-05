@@ -412,7 +412,7 @@ Nonpareil.fit_model <- function(
   data <- list(x=np$x.adj[ sel ], y=np$y.cov[ sel ])
   if(is.na(weights.exp[1])){
     if(np$log.sample==0){ weights.exp <- c(-1.1,-1.2,-0.9,-1.3,-1) }
-    else{ weights.exp <- c(0, 1, -1, 1.3, -1.1, 1.5, -1.5) }
+    else{ weights.exp <- c(0,1,-1,1.3,-1.1,1.5,-1.5,3,-3) }
   }
 
   # Find the first weight with proper fit
@@ -427,7 +427,9 @@ Nonpareil.fit_model <- function(
              control=nls.control(
                    minFactor=1e-25000, tol=1e-15, maxiter=1024, warnOnly=TRUE))
     )
-    if(summary(model)$convInfo$isConv){
+    tryCatch({ is.conv <- summary(model)$convInfo$isConv },
+          error=function(e){ is.conv <- FALSE })
+    if(is.conv){
       np$model <- model
       np$has.model <- TRUE
     }
@@ -563,6 +565,8 @@ Nonpareil.curve <- structure(function(
       ### different values are tested in the following order: For linear
       ### sampling, -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d
       ### option in Nonpareil), 0, 1, -1, 1.3, -1.1, 1.5, -1.5.
+      skip.model=FALSE,
+      ### If set, skips the model estimation altogether.
       ...
       ### Any additional parameters passed to `plot.Nonpareil.Curve`
       ){
@@ -577,7 +581,7 @@ Nonpareil.curve <- structure(function(
     col <- rgb(sample(200,1),sample(200,1),sample(200,1),maxColorValue=255)
   }
   np <- new("Nonpareil.Curve", file=as.character(file), label=label, col=col,
-        star=star, has.model=FALSE, call=match.call())
+        star=star, has.model=FALSE, call=match.call(), diversity=0)
 
   # Read metadata (.npo headers)
   np <- Nonpareil.read_metadata(np)
@@ -590,7 +594,7 @@ Nonpareil.curve <- structure(function(
   }
 
   # Fit model
-  np <- Nonpareil.fit_model(np, weights.exp)
+  if(!skip.model) np <- Nonpareil.fit_model(np, weights.exp)
 
   # Plot
   if(plot) plot(np, ...)

@@ -3,7 +3,8 @@
 \title{Nonpareil curve}
 \description{Generates a Nonpareil curve from an .npo file}
 \usage{Nonpareil.curve(file, plot = TRUE, label = NA, col = NA, enforce.consistency = TRUE, 
-    star = 95, correction.factor = TRUE, weights.exp = NA, ...)}
+    star = 95, correction.factor = TRUE, weights.exp = NA, skip.model = FALSE, 
+    ...)}
 \arguments{
   \item{file}{Path to the .npo file, containing the read redundancy}
   \item{plot}{Determines if the plot should be produced. If FALSE, it still computes
@@ -23,6 +24,7 @@ modifications in this parameter may help. By default (NA), five
 different values are tested in the following order: For linear
 sampling, -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d
 option in Nonpareil), 0, 1, -1, 1.3, -1.1, 1.5, -1.5.}
+  \item{skip.model}{If set, skips the model estimation altogether.}
   \item{\dots}{Any additional parameters passed to `plot.Nonpareil.Curve`}
 }
 
