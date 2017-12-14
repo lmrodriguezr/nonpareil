@@ -83,7 +83,7 @@ void References::intializeReferences(FastqReader &fastqReader) {
     refRevComKmers.push_back(hashcode);
     kerr = 1.0;
     for(size_t j = 0; j < ksize; j++) {
-      kerr = kerr * (1.0 - temp.baseProb[0]);
+      kerr = kerr * (1.0 - temp.baseProb[j]);
     }
     this->totalErrKmers = this->totalErrKmers + (1-kerr);
   }
