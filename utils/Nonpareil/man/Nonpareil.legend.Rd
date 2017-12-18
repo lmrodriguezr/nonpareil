@@ -11,7 +11,7 @@
   \item{\dots}{Any other parameters supported by legend().}
 }
 
-
+\value{Returns invisibly a list, same as `legend`}
 
 \author{Luis M. Rodriguez-R [aut, cre]}
 

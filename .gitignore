@@ -1,11 +1,7 @@
 enveomics/*.o
-nonpareil
-nonpareil-mpi
-utils/nuc_sampler
-!utils/Nonpareil
-Nonpareil_*.tar.gz
-Nonpareil.Rcheck*
-*.npo
-*.npc
-*.npl
-*.npa
+/nonpareil
+/nonpareil-mpi
+/utils/nuc_sampler
+/Nonpareil_*.tar.gz
+/Nonpareil.Rcheck*
+/*.np?

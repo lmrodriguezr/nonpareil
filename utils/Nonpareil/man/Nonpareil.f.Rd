@@ -4,7 +4,7 @@
 \description{Function of the projected model}
 \usage{Nonpareil.f(x, a, b)}
 \arguments{
-  \item{x}{Values of sequencing effort (typically in bp)}
+  \item{x}{Values of sequencing effort (in bp)}
   \item{a}{Parameter alpha of the Gamma CDF}
   \item{b}{Parameter beta of the Gamma CDF}
 }

@@ -1,7 +1,8 @@
 # Classes
 setClass("Nonpareil.Curve",
   ### A single Nonpareil curve. This object can be produced by `Nonpareil.curve`
-  ### and supports S4 methods `plot`, `summary`, `print`, and `predict`
+  ### and supports S4 methods `plot`, `summary`, `print`, and `predict`.
+  ### For additional details, see help for `summary.Nonpareil.Curve`
   representation(
   # Dataset info
   file='character',      ##<< Input .npo file
@@ -101,7 +102,7 @@ plot.Nonpareil.Set <- function(
 
   # Return
   invisible(x)
-  ### Returns invisibly a `Nonpareil.Set` object (same as `x` input)
+  ### Returns invisibly a `Nonpareil.Set` object (same as `x` input).
 }
 plot.Nonpareil.Curve <- function(
       ### Plot a `Nonpareil.Curve` object
@@ -212,13 +213,15 @@ plot.Nonpareil.Curve <- function(
   if(x$has.model & plot.diversity & x$diversity>0){
     arrows(x0=exp(x$diversity), length=arrow.head,
           y1=ifelse(log=='y' | log=='xy' | log=='yx',
-            ylim[1]*(ylim[2]/ylim[1])**arrow.length, ylim[1] + diff(ylim)*arrow.length),
+            ylim[1]*(ylim[2]/ylim[1])**arrow.length,
+            ylim[1] + diff(ylim)*arrow.length),
           y0=ylim[1], col=Nonpareil.col(x, model.alpha));
   }
 
   # Return
   invisible(x)
-  ### Retuns invisibly a `Nonpareil.Curve` object (same as `x` input)
+  ### Retuns invisibly a `Nonpareil.Curve` object (same as `x` input). For
+  ### additional details see help for `summary.Nonpareil.Curve`
 }
 summary.Nonpareil.Set <- function(
       ### Returns a summary of the Nonpareil.Set results
@@ -232,6 +235,8 @@ summary.Nonpareil.Set <- function(
   y <- rbind(sapply(object$np.curves, "summary"))
   colnames(y) <- sapply(object$np.curves, function(n) n$label)
   t(y)
+  ### Returns a matrix with different values for each dataset. For additional
+  ### details on the values returned, see help for `summary.Nonpareil.Curve`
 }
 summary.Nonpareil.Curve <- function(
       ### Returns a summary of the Nonpareil.Curve results
@@ -245,7 +250,28 @@ summary.Nonpareil.Curve <- function(
   n <- c("kappa","C","LR","modelR","LRstar","diversity")
   y <- sapply(n, function(v) attr(object,v))
   names(y) <- n
+  # Return
   y
+  ### Returns a matrix with the following values for the dataset:
+  ### 
+  ### kappa: "Redundancy" value of the entire dataset.
+  ### 
+  ### C: Average coverage of the entire dataset.
+  ### 
+  ### LRstar: Estimated sequencing effort required to reach the objective
+  ###   average coverage (star, 95% by default).
+  ### 
+  ### LR: Actual sequencing effort of the dataset.
+  ### 
+  ### modelR: Pearson's R coefficient betweeen the rarefied data and the
+  ###   projected model.
+  ### 
+  ### diversity: Nonpareil sequence-diversity index (Nd). This value's units are
+  ###   the natural logarithm of the units of sequencing effort (log-bp), and
+  ###   indicates the inflection point of the fitted model for the Nonpareil
+  ###   curve. If the fit doesn't converge, or the model is not estimated, the
+  ###   value is zero (0).
+  ### 
 }
 print.Nonpareil.Set <- function(
       ### Prints and returns invisibly a summary of the `Nonpareil.Set` results
@@ -263,7 +289,10 @@ print.Nonpareil.Set <- function(
   cat("-------------------------------------------------------\n")
   cat("call:",as.character(x$call),"\n")
   cat("-------------------------------------------------------\n")
+  # Return
   invisible(y)
+  ### Returns the summary invisibly. See help for `summary.Nonpareil.Curve` and
+  ### `summary.Nonpareil.Set` for additional information
 }
 print.Nonpareil.Curve <- function(
       ### Prints and returns invisibly a summary of the `Nonpareil.Curve`
@@ -283,7 +312,10 @@ print.Nonpareil.Curve <- function(
   cat("-------------------------------------------------------\n")
   cat("call:",as.character(x$call),"\n")
   cat("-------------------------------------------------------\n")
+  # Return
   invisible(y)
+  ### Returns the summary invisibly. See help for `summary.Nonpareil.Curve` for
+  ### additional information.
 }
 predict.Nonpareil.Curve <- function(
       ### Predict the coverage for a given sequencing effort
@@ -298,7 +330,9 @@ predict.Nonpareil.Curve <- function(
     stop("'object' must inherit from class `Nonpareil.Curve`")
   if(!object$has.model)
     stop("'object' must be a Nonpareil Curve with a fitted model")
+  # Return
   predict(object$model, list(x=lr))
+  ### Returns the expected coverage at the given sequencing effort.
 }
 
 # Ancillary functions
@@ -491,7 +525,9 @@ Nonpareil.legend <- function(
 
   labels <- sapply(np, function(x) x$label)
   cols <- sapply(np, Nonpareil.col)
+  # Return
   legend(x=x, y=y, legend=labels, fill=cols, ...);
+  ### Returns invisibly a list, same as `legend`
 }
 Nonpareil.add.curve <- function(
       ### Adds a `Nonpareil.Curve` to a `Nonpareil.Set`
@@ -506,7 +542,9 @@ Nonpareil.add.curve <- function(
     stop("'np' must inherit from class `Nonpareil.Curve`")
 
   nps$np.curves[[ length(nps$np.curves)+1 ]] <- np
+  # Return
   return(nps)
+  ### Returns the `Nonpareil.Set` including the added `Nonpareil.Curve`
 }
 setMethod("+", "Nonpareil.Set", function(e1,e2) Nonpareil.add.curve(e1,e2))
 
@@ -514,7 +552,7 @@ setMethod("+", "Nonpareil.Set", function(e1,e2) Nonpareil.add.curve(e1,e2))
 Nonpareil.f <- function(
       ### Function of the projected model
       x,
-      ### Values of sequencing effort (typically in bp)
+      ### Values of sequencing effort (in bp)
       a,
       ### Parameter alpha of the Gamma CDF
       b
