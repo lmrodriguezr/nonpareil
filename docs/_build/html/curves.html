@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Nonpareil curves &#8212; Nonpareil 3.2r0 documentation</title>
+    <title>Nonpareil curves &#8212; Nonpareil 3.3.1rc1 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.2r0',
+        VERSION:     '3.3.1rc1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="redundancy.html" title="Redundancy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.2r0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc1 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -63,23 +63,22 @@ file (or <code class="docutils literal"><span class="pre">-o</span></code> value
 <a class="reference internal" href="redundancy.html"><span class="doc">Redundancy</span></a>.</p>
 <div class="section" id="for-the-impatient">
 <h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Permalink to this headline">¶</a></h2>
-<p>First, load the package. If you did <cite>make install</cite> (<a class="reference internal" href="installation.html"><span class="doc">Install Nonpareil</span></a>), you
-can simply open <a class="reference external" href="http://www.r-project.org/">R</a> and execute:</p>
+<p>First, load the package. If you don’t have it installed yet, you can open <a class="reference external" href="http://www.r-project.org/">R</a> and
+execute:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s1">&#39;Nonpareil&#39;</span><span class="p">);</span>
+<span class="n">library</span><span class="p">(</span><span class="n">Nonpareil</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If you did <cite>make install</cite> (<a class="reference internal" href="installation.html"><span class="doc">Install Nonpareil</span></a>), you can simply open <a class="reference external" href="http://www.r-project.org/">R</a> and
+execute:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">Nonpareil</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>And you can get help messages using any of:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>?Nonpareil.curve
-?Nonpareil.curve.batch
+?Nonpareil.set
 ?Nonpareil.legend
-?Nonpareil.f
-?Nonpareil.antif
-?Nonpareil.coverageFactor
-</pre></div>
-</div>
-<p>If you didn’t install it, you have to load it from the source (although you
-won’t have the embedded documentation):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">source</span><span class="p">(</span><span class="s1">&#39;utils/Nonpareil.R&#39;</span><span class="p">);</span> <span class="c1"># Change utils/Nonpareil.R for the actual path to the utils folder</span>
+?Nonpareil.predict
 </pre></div>
 </div>
 <p>Now, you can simply execute:</p>
@@ -94,46 +93,22 @@ documentation of this function inside <a class="reference external" href="http:/
 <div class="highlight-default"><div class="highlight"><pre><span></span>?Nonpareil.curve
 </pre></div>
 </div>
-<p>If you didn’t install the Nonpareil package, you can see the documentation from
-the source:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">tools</span><span class="p">::</span><span class="n">Rd2txt</span><span class="p">(</span><span class="n">tools</span><span class="p">::</span><span class="n">parse_Rd</span><span class="p">(</span><span class="s1">&#39;utils/nonpareil/man/Nonpareil.curve.Rd&#39;</span><span class="p">))</span>
-</pre></div>
 </div>
-</div>
-<div class="section" id="nonpareil-legend">
-<h2>Nonpareil.legend()<a class="headerlink" href="#nonpareil-legend" title="Permalink to this headline">¶</a></h2>
-<p>This function creates a legend for the Nonpareil curve(s) in the (active) plot.
-It’s compatible with single or multiple calls of <a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a> (using
-<code class="docutils literal"><span class="pre">new=F</span></code> in all but the first call) and with <a class="reference internal" href="#nonpareil-curve-batch">Nonpareil.curve.batch()</a>. See
-the documentation inside <a class="reference external" href="http://www.r-project.org/">R</a> after loading the Nonpareil package:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>?Nonpareil.legend
-</pre></div>
-</div>
-<p>Or from the source:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">tools</span><span class="p">::</span><span class="n">Rd2txt</span><span class="p">(</span><span class="n">tools</span><span class="p">::</span><span class="n">parse_Rd</span><span class="p">(</span><span class="s1">&#39;utils/nonpareil/man/Nonpareil.legend.Rd&#39;</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="nonpareil-curve-batch">
-<h2>Nonpareil.curve.batch()<a class="headerlink" href="#nonpareil-curve-batch" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nonpareil-set">
+<h2>Nonpareil.set()<a class="headerlink" href="#nonpareil-set" title="Permalink to this headline">¶</a></h2>
 <p>This function can generate a plot with several Nonpareil curves from <code class="docutils literal"><span class="pre">.npo</span></code>
 files. See the documentation of this function in <a class="reference external" href="http://www.r-project.org/">R</a> after loading the Nonpareil
 package:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>?Nonpareil.curve.batch
-</pre></div>
-</div>
-<p>Or from the source:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">tools</span><span class="p">::</span><span class="n">Rd2txt</span><span class="p">(</span><span class="n">tools</span><span class="p">::</span><span class="n">parse_Rd</span><span class="p">(</span><span class="s1">&#39;utils/nonpareil/man/Nonpareil.curve.batch.Rd&#39;</span><span class="p">))</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span>?Nonpareil.set
 </pre></div>
 </div>
 <p><strong>Example</strong>: I find it very convenient to first prepare a table with the
 samples, something like:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># samples.txt</span>
 <span class="n">File</span>        <span class="n">Name</span>    <span class="n">R</span>       <span class="n">G</span>       <span class="n">B</span>
-<span class="c1"># HMP</span>
-<span class="n">SRS063417</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Posterior</span> <span class="n">fornix</span>        <span class="mi">256</span>     <span class="mi">200</span>     <span class="mi">200</span>
-<span class="n">SRS063287</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Buccal</span> <span class="n">mucosa</span>   <span class="mi">256</span>     <span class="mi">120</span>     <span class="mi">120</span>
-<span class="n">SRS062540</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Tongue</span> <span class="n">dorsum</span>   <span class="mi">256</span>     <span class="mi">3</span>       <span class="mi">3</span>
+<span class="n">SRS063417</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Posterior</span> <span class="n">fornix</span>        <span class="mi">255</span>     <span class="mi">200</span>     <span class="mi">200</span>
+<span class="n">SRS063287</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Buccal</span> <span class="n">mucosa</span>   <span class="mi">255</span>     <span class="mi">120</span>     <span class="mi">120</span>
+<span class="n">SRS062540</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Tongue</span> <span class="n">dorsum</span>   <span class="mi">255</span>     <span class="mi">3</span>       <span class="mi">3</span>
 <span class="n">SRS016335</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Stool</span>   <span class="mi">200</span>     <span class="mi">135</span>     <span class="mi">76</span>
 <span class="n">SRS015574</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Supragingival</span> <span class="n">plaque</span>    <span class="mi">230</span>     <span class="mi">100</span>     <span class="mi">120</span>
 <span class="n">SRS019087</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Anterior</span> <span class="n">nares</span>  <span class="mi">220</span>     <span class="mi">220</span>     <span class="mi">130</span>
@@ -142,12 +117,18 @@ samples, something like:</p>
 <p>Note that this table is tab-delimited, because I find it easier to read, but you
 can use anything you like (and is supported by <a class="reference external" href="http://www.r-project.org/">R</a>). Next, you can simply type
 something like this in the <a class="reference external" href="http://www.r-project.org/">R</a> console:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">Nonpareil</span><span class="p">);</span> <span class="c1"># Or source(&#39;utils/Nonpareil.R&#39;);, if you didn&#39;t &quot;make install&quot;</span>
-<span class="n">samples</span> <span class="o">&lt;-</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s1">&#39;samples.txt&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="n">T</span><span class="p">);</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">library</span><span class="p">(</span><span class="n">Nonpareil</span><span class="p">);</span>
+<span class="n">samples</span> <span class="o">&lt;-</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s1">&#39;samples.txt&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">TRUE</span><span class="p">);</span>
 <span class="n">attach</span><span class="p">(</span><span class="n">samples</span><span class="p">);</span>
-<span class="n">np</span> <span class="o">&lt;-</span> <span class="n">Nonpareil</span><span class="o">.</span><span class="n">curve</span><span class="o">.</span><span class="n">batch</span><span class="p">(</span><span class="n">File</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">R</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">libnames</span><span class="o">=</span><span class="n">Name</span><span class="p">,</span> <span class="n">modelOnly</span><span class="o">=</span><span class="n">TRUE</span><span class="p">);</span>
-<span class="n">Nonpareil</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="s1">&#39;bottomright&#39;</span><span class="p">);</span>
+<span class="n">nps</span> <span class="o">&lt;-</span> <span class="n">Nonpareil</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">File</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="n">rgb</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="n">G</span><span class="p">,</span><span class="n">B</span><span class="p">,</span><span class="n">maxColorValue</span><span class="o">=</span><span class="mi">255</span><span class="p">),</span> <span class="n">labels</span><span class="o">=</span><span class="n">Name</span><span class="p">,</span>
+      <span class="n">plot</span><span class="o">.</span><span class="n">opts</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">plot</span><span class="o">.</span><span class="n">observed</span><span class="o">=</span><span class="n">FALSE</span><span class="p">));</span>
 <span class="n">detach</span><span class="p">(</span><span class="n">samples</span><span class="p">);</span>
+<span class="n">summary</span><span class="p">(</span><span class="n">nps</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>To execute examples with real data included in the package, you can execute:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">example</span><span class="p">(</span><span class="n">Nonpareil</span><span class="o">.</span><span class="n">curve</span><span class="p">);</span>
+<span class="n">example</span><span class="p">(</span><span class="n">Nonpareil</span><span class="o">.</span><span class="n">set</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -164,8 +145,7 @@ something like this in the <a class="reference external" href="http://www.r-proj
 <li><a class="reference internal" href="#">Nonpareil curves</a><ul>
 <li><a class="reference internal" href="#for-the-impatient">For the impatient</a></li>
 <li><a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a></li>
-<li><a class="reference internal" href="#nonpareil-legend">Nonpareil.legend()</a></li>
-<li><a class="reference internal" href="#nonpareil-curve-batch">Nonpareil.curve.batch()</a></li>
+<li><a class="reference internal" href="#nonpareil-set">Nonpareil.set()</a></li>
 </ul>
 </li>
 </ul>
@@ -209,7 +189,7 @@ something like this in the <a class="reference external" href="http://www.r-proj
         <li class="right" >
           <a href="redundancy.html" title="Redundancy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.2r0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

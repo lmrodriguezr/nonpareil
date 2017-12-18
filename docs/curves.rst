@@ -14,24 +14,23 @@ file (or ``-o`` value, if you used this option) generated in the estimation of
 For the impatient
 -----------------
 
-First, load the package. If you did `make install` (:doc:`installation`), you
-can simply open R_ and execute::
+First, load the package. If you don't have it installed yet, you can open R_ and
+execute::
+   
+   install.packages('Nonpareil');
+   library(Nonpareil);
+
+If you did `make install` (:doc:`installation`), you can simply open R_ and
+execute::
 
    library(Nonpareil);
 
 And you can get help messages using any of::
 
    ?Nonpareil.curve
-   ?Nonpareil.curve.batch
+   ?Nonpareil.set
    ?Nonpareil.legend
-   ?Nonpareil.f
-   ?Nonpareil.antif
-   ?Nonpareil.coverageFactor
-
-If you didn't install it, you have to load it from the source (although you
-won't have the embedded documentation)::
-   
-   source('utils/Nonpareil.R'); # Change utils/Nonpareil.R for the actual path to the utils folder
+   ?Nonpareil.predict
 
 Now, you can simply execute::
 
@@ -45,48 +44,23 @@ documentation of this function inside R_ after loading the Nonpareil package::
 
    ?Nonpareil.curve
    
-If you didn't install the Nonpareil package, you can see the documentation from
-the source::
-
-   tools::Rd2txt(tools::parse_Rd('utils/nonpareil/man/Nonpareil.curve.Rd'))
-
-
-Nonpareil.legend()
-------------------
-
-This function creates a legend for the Nonpareil curve(s) in the (active) plot.
-It's compatible with single or multiple calls of `Nonpareil.curve()`_ (using
-``new=F`` in all but the first call) and with `Nonpareil.curve.batch()`_. See
-the documentation inside R_ after loading the Nonpareil package::
-
-   ?Nonpareil.legend
-
-Or from the source::
-
-   tools::Rd2txt(tools::parse_Rd('utils/nonpareil/man/Nonpareil.legend.Rd'))
-
-Nonpareil.curve.batch()
+Nonpareil.set()
 -----------------------
 
 This function can generate a plot with several Nonpareil curves from ``.npo``
 files. See the documentation of this function in R_ after loading the Nonpareil
 package::
 
-   ?Nonpareil.curve.batch
-
-Or from the source::
-
-   tools::Rd2txt(tools::parse_Rd('utils/nonpareil/man/Nonpareil.curve.batch.Rd'))
+   ?Nonpareil.set
 
 **Example**: I find it very convenient to first prepare a table with the
 samples, something like::
 
     # samples.txt
     File	Name	R	G	B
-    # HMP
-    SRS063417.1.L50.npo	Posterior fornix	256	200	200
-    SRS063287.1.L50.npo	Buccal mucosa	256	120	120
-    SRS062540.1.L50.npo	Tongue dorsum	256	3	3
+    SRS063417.1.L50.npo	Posterior fornix	255	200	200
+    SRS063287.1.L50.npo	Buccal mucosa	255	120	120
+    SRS062540.1.L50.npo	Tongue dorsum	255	3	3
     SRS016335.1.L50.npo	Stool	200	135	76
     SRS015574.1.L50.npo	Supragingival plaque	230	100	120
     SRS019087.1.L50.npo	Anterior nares	220	220	130
@@ -95,13 +69,18 @@ Note that this table is tab-delimited, because I find it easier to read, but you
 can use anything you like (and is supported by R_). Next, you can simply type
 something like this in the R_ console::
 
-    library(Nonpareil); # Or source('utils/Nonpareil.R');, if you didn't "make install"
-    samples <- read.table('samples.txt', sep='\t', h=T);
+    library(Nonpareil);
+    samples <- read.table('samples.txt', sep='\t', header=TRUE);
     attach(samples);
-    np <- Nonpareil.curve.batch(File, r=R, g=G, b=B, libnames=Name, modelOnly=TRUE);
-    Nonpareil.legend('bottomright');
+    nps <- Nonpareil.set(File, col=rgb(R,G,B,maxColorValue=255), labels=Name,
+          plot.opts=list(plot.observed=FALSE));
     detach(samples);
+    summary(nps);
 
+To execute examples with real data included in the package, you can execute::
+
+   example(Nonpareil.curve);
+   example(Nonpareil.set);
 
 .. _R: http://www.r-project.org/
 
