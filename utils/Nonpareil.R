@@ -500,7 +500,7 @@ Nonpareil.col <- function(
       ){
   if(inherits(x, "Nonpareil.Curve")){
     col <- x$col
-  }else if(!inherits(x, "Nonpareil.Set")){
+  }else if(inherits(x, "Nonpareil.Set")){
     col <- sapply(x$np.curves, function(np) np$col)
   }else{
     stop("'x' must inherit from class `Nonpareil.Curve` or `Nonpareil.Set`")
