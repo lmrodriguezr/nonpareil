@@ -2,8 +2,7 @@ MPI support
 ===========
 
 Nonpareil supports MPI (Message Passing Interface) since v2.2. This code is
-relatively stable, but it's not as widely tested as the regular Nonpareil. MPI
-support only covers the alignment kernel, not the k-mer kernel.
+stable, but MPI support only covers the alignment kernel, not the k-mer kernel.
 
 Requirements
 ------------
@@ -128,5 +127,5 @@ How can I evaluate the performance in pilot runs?
 
 
 .. _OpenMPI: http://www.open-mpi.org/
-.. _Nonpareil paper: http://bioinformatics.oxfordjournals.org/content/early/2013/11/05/bioinformatics.btt584.abstract
+.. _Nonpareil 1 paper: https://doi.org/10.1093/bioinformatics/btt584
 

@@ -4,23 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>MPI support &#8212; Nonpareil 3.3.1rc1 documentation</title>
-    
+    <title>MPI support &#8212; Nonpareil 3.3.1rc2 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1rc1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -28,8 +17,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Updates history" href="updates.html" />
     <link rel="prev" title="Nonpareil curves" href="curves.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -42,7 +30,7 @@
         <li class="right" >
           <a href="curves.html" title="Nonpareil curves"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -54,22 +42,21 @@
   <div class="section" id="mpi-support">
 <h1>MPI support<a class="headerlink" href="#mpi-support" title="Permalink to this headline">¶</a></h1>
 <p>Nonpareil supports MPI (Message Passing Interface) since v2.2. This code is
-relatively stable, but it’s not as widely tested as the regular Nonpareil. MPI
-support only covers the alignment kernel, not the k-mer kernel.</p>
+stable, but MPI support only covers the alignment kernel, not the k-mer kernel.</p>
 <div class="section" id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
 <p>You will first need <a class="reference external" href="http://www.open-mpi.org/">OpenMPI</a> in your computer. There are other MPI
 implementations, but Nonpareil only supports OpenMPI (by now). Once you have it,
-you should have at least the C++ compiler (typically <code class="docutils literal"><span class="pre">mpic++</span></code>) and the
-interactive executable (typically <code class="docutils literal"><span class="pre">mpirun</span></code>). If you have the compiler in a
+you should have at least the C++ compiler (typically <code class="docutils literal notranslate"><span class="pre">mpic++</span></code>) and the
+interactive executable (typically <code class="docutils literal notranslate"><span class="pre">mpirun</span></code>). If you have the compiler in a
 non-standard location (for example, to coexist with mpich), change the value of
-<code class="docutils literal"><span class="pre">mpicpp</span></code> in the <code class="docutils literal"><span class="pre">globals.mk</span></code> file. Once you are ready, simply run:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">nonpareil</span> <span class="c1"># or wherever you have the nonpareil folder</span>
+<code class="docutils literal notranslate"><span class="pre">mpicpp</span></code> in the <code class="docutils literal notranslate"><span class="pre">globals.mk</span></code> file. Once you are ready, simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">nonpareil</span> <span class="c1"># or wherever you have the nonpareil folder</span>
 <span class="n">make</span> <span class="n">nonpareil</span><span class="o">-</span><span class="n">mpi</span>
 </pre></div>
 </div>
-<p>That’s it. Now you should have the <code class="docutils literal"><span class="pre">nonpareil-mpi</span></code> binary, that you can place
-in a location listed in your <code class="docutils literal"><span class="pre">$PATH</span></code> if you want.</p>
+<p>That's it. Now you should have the <code class="docutils literal notranslate"><span class="pre">nonpareil-mpi</span></code> binary, that you can place
+in a location listed in your <code class="docutils literal notranslate"><span class="pre">$PATH</span></code> if you want.</p>
 </div>
 <div class="section" id="running-nonpareil-mpi">
 <h2>Running Nonpareil MPI<a class="headerlink" href="#running-nonpareil-mpi" title="Permalink to this headline">¶</a></h2>
@@ -79,52 +66,52 @@ you have your own infrastructure, just make sure they are MPI-capable
 (network, permissions, software, etc.). If you are using a cluster, just
 request as many machines as you need (see the resources section below). For
 example, to request 10 machines with 16 CPUs each in PBS, use
-<code class="docutils literal"><span class="pre">-l</span> <span class="pre">nodes=10:ppn=16</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">-l</span> <span class="pre">nodes=10:ppn=16</span></code>.</p>
 </li>
 <li><p class="first">Obtain the machine names. Just prepare a raw text file with the list of
 machines you want to use. If you are using PBS, you can do this by running:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>cat $PBS_NODEFILE | awk &#39;NR%16==0&#39; &gt; hosts.txt # Change the &#39;16&#39; by the number of CPUs you are using (the value of ppn).
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cat $PBS_NODEFILE | awk &#39;NR%16==0&#39; &gt; hosts.txt # Change the &#39;16&#39; by the number of CPUs you are using (the value of ppn).
 </pre></div>
 </div>
 </li>
-<li><p class="first">Run Nonpareil MPI. All you need is to call <code class="docutils literal"><span class="pre">nonpareil-mpi</span></code> with <code class="docutils literal"><span class="pre">mpirun</span></code>.
+<li><p class="first">Run Nonpareil MPI. All you need is to call <code class="docutils literal notranslate"><span class="pre">nonpareil-mpi</span></code> with <code class="docutils literal notranslate"><span class="pre">mpirun</span></code>.
 For example, if you want to use 10 machines, with 16 CPUs each, and the list
-of machines is in <code class="docutils literal"><span class="pre">hosts.txt</span></code>, then run:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">10</span> <span class="o">-</span><span class="n">machinefile</span> <span class="n">hosts</span><span class="o">.</span><span class="n">txt</span> <span class="n">nonpareil</span><span class="o">-</span><span class="n">mpi</span> <span class="o">-</span><span class="n">t</span> <span class="mi">16</span> <span class="o">-</span><span class="n">s</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">sequences</span><span class="o">.</span><span class="n">fasta</span> <span class="o">-</span><span class="n">b</span> <span class="n">output</span> <span class="o">...</span>
+of machines is in <code class="docutils literal notranslate"><span class="pre">hosts.txt</span></code>, then run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">10</span> <span class="o">-</span><span class="n">machinefile</span> <span class="n">hosts</span><span class="o">.</span><span class="n">txt</span> <span class="n">nonpareil</span><span class="o">-</span><span class="n">mpi</span> <span class="o">-</span><span class="n">t</span> <span class="mi">16</span> <span class="o">-</span><span class="n">s</span> <span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">your</span><span class="o">/</span><span class="n">sequences</span><span class="o">.</span><span class="n">fasta</span> <span class="o">-</span><span class="n">b</span> <span class="n">output</span> <span class="o">...</span>
 </pre></div>
 </div>
-<p>Note that the options of <code class="docutils literal"><span class="pre">nonpareil-mpi</span></code> are the exact same as for
-<code class="docutils literal"><span class="pre">nonpareil</span></code>. Just remember that the value of <code class="docutils literal"><span class="pre">-t</span></code> is the number of
+<p>Note that the options of <code class="docutils literal notranslate"><span class="pre">nonpareil-mpi</span></code> are the exact same as for
+<code class="docutils literal notranslate"><span class="pre">nonpareil</span></code>. Just remember that the value of <code class="docutils literal notranslate"><span class="pre">-t</span></code> is the number of
 threads <em>per machine</em>, not the total number of CPUs.</p>
 </li>
 </ol>
 </div>
 <div class="section" id="resources">
 <h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
-<p>If you are interested on MPI, I’m assuming you have big files, so you may be
+<p>If you are interested on MPI, I'm assuming you have big files, so you may be
 also concerned about resources allocation.</p>
 <dl class="docutils">
 <dt>How much memory you will need?</dt>
-<dd>In the <a href="#id1"><span class="problematic" id="id2">`Nonpareil 1 paper`_</span></a> (Suppl. Fig. 6) you can see the linear
+<dd>In the <a class="reference external" href="https://doi.org/10.1093/bioinformatics/btt584">Nonpareil 1 paper</a> (Suppl. Fig. 6) you can see the linear
 relationship between maximum required RAM and the size of the dataset. The
-function is approximately <code class="docutils literal"><span class="pre">RAM</span> <span class="pre">=</span> <span class="pre">Size</span> <span class="pre">+</span> <span class="pre">2</span></code>, where <code class="docutils literal"><span class="pre">RAM</span></code> and <code class="docutils literal"><span class="pre">Size</span></code> are
+function is approximately <code class="docutils literal notranslate"><span class="pre">RAM</span> <span class="pre">=</span> <span class="pre">Size</span> <span class="pre">+</span> <span class="pre">2</span></code>, where <code class="docutils literal notranslate"><span class="pre">RAM</span></code> and <code class="docutils literal notranslate"><span class="pre">Size</span></code> are
 both in Gb. You can use less RAM than that, and Nonpareil will adapt, but
-it’ll take longer running times. This value is the “maximum required”, which
-means that if you assign more RAM than that, it won’t make any difference.
+it'll take longer running times. This value is the &quot;maximum required&quot;, which
+means that if you assign more RAM than that, it won't make any difference.
 Now, that value is the total RAM required. That means that if you use the MPI
-implementation, you can divide <code class="docutils literal"><span class="pre">Size</span></code> by the number of computers you are
+implementation, you can divide <code class="docutils literal notranslate"><span class="pre">Size</span></code> by the number of computers you are
 using, and then apply the function above. For example, if you have a 50Gb
 dataset, you will need (maximum) 52Gb (50 + 2) of RAM for the standard
 implementation of Nonpareil. However, if you use the MPI version with, for
-example, 10 machines, you’ll need (maximum) 7Gb (50/10 + 2) on each machine.</dd>
+example, 10 machines, you'll need (maximum) 7Gb (50/10 + 2) on each machine.</dd>
 <dt>How many machines you will need?</dt>
-<dd>I don’t have a large benchmarking yet for the MPI version, but at the end it
+<dd>I don't have a large benchmarking yet for the MPI version, but at the end it
 really depends on your resources. If you have more machines, it will run
 faster (unless you have a very small dataset) and it will require less memory
 (as discussed above).</dd>
 <dt>Should I use more machines or more threads?</dt>
 <dd><p class="first">Again, it depends on your resources. Multi-threading is (in general) more
-efficient, because it doesn’t have the overhead of network communication.
+efficient, because it doesn't have the overhead of network communication.
 That means that you should favor more CPUs over more machines. However, there
 are some aspects to take into account. One, as discussed above, is the RAM.
 More machines = less RAM per machine, while more threads have little impact
@@ -139,8 +126,8 @@ number of threads (256) can be gathered by asking for 16 machines, and 16
 processors per node. If you do that, you will give the scheduler more
 flexibility (note that the nodes=4 ppn=64 is a special case of nodes=16 and
 ppn=16) hence reducing your queue time. You may be asking: can I simply ask
-for nodes=256 and ppn=1? Well… you can, but as I said multi-threading is
-more efficient than multi-nodes, so don’t go to the extremes. Also, Nonpareil
+for nodes=256 and ppn=1? Well... you can, but as I said multi-threading is
+more efficient than multi-nodes, so don't go to the extremes. Also, Nonpareil
 has three expensive steps:</p>
 <ol class="last arabic simple">
 <li>Reading the fasta, which is strictly linear: only one thread is used in
@@ -151,29 +138,29 @@ expensive step, and it is distributed across machines and across CPUs on
 each machine. This process is linear in time with the size of the input
 file.</li>
 <li>Subsampling, which is threaded but not multi-node. This step is not too
-expensive, and it’s nearly constant time. With default parameters, it
-takes about 2 minutes with 64 threads, but it grows if you reduce <code class="docutils literal"><span class="pre">-i</span></code>.
-The time on this step is reduced by more threads (<code class="docutils literal"><span class="pre">-t</span></code>), but not by more
+expensive, and it's nearly constant time. With default parameters, it
+takes about 2 minutes with 64 threads, but it grows if you reduce <code class="docutils literal notranslate"><span class="pre">-i</span></code>.
+The time on this step is reduced by more threads (<code class="docutils literal notranslate"><span class="pre">-t</span></code>), but not by more
 machines.</li>
 </ol>
 </dd>
 <dt>How can I evaluate the performance in pilot runs?</dt>
-<dd>I must say: I rarely do pilot runs. However, I’m often interested on
+<dd>I must say: I rarely do pilot runs. However, I'm often interested on
 performance for future runs (for example, for other projects). There are two
 sources of information that can be handy. One, is the OS itself (or the PBS
 output file, if you have a good Epiloge configured). For example, to measure
 the total RAM used, the total walltime, real time, user time, etc. Another
 source is the .npl file, which contains a log of the Nonpareil run (assuming
-you used the <code class="docutils literal"><span class="pre">-b</span></code> option). The number in squared brackets is the CPU time
-in minutes. Note that the CPU time here is only for the “master” machine.
+you used the <code class="docutils literal notranslate"><span class="pre">-b</span></code> option). The number in squared brackets is the CPU time
+in minutes. Note that the CPU time here is only for the &quot;master&quot; machine.
 That means: the number of CPU minutes added for all the threads in the main
-machine. Another useful piece of information is the number of “blocks” used.
+machine. Another useful piece of information is the number of &quot;blocks&quot; used.
 Ideally, you should have one block per machine; if you have more it means
-that the RAM assigned (<code class="docutils literal"><span class="pre">-R</span></code>) was insufficient. You can find it right below
-the “Designing the blocks scheme…” line. In the ideal scenario (enough
+that the RAM assigned (<code class="docutils literal notranslate"><span class="pre">-R</span></code>) was insufficient. You can find it right below
+the &quot;Designing the blocks scheme...&quot; line. In the ideal scenario (enough
 RAM), you should have one Qry block, and as many Sbj blocks as machines (one,
 if you are not using the MPI implementation). If you have more than that, you
-could attain shorter running times by increasing the RAM (<code class="docutils literal"><span class="pre">-R</span></code>).</dd>
+could attain shorter running times by increasing the RAM (<code class="docutils literal notranslate"><span class="pre">-R</span></code>).</dd>
 </dl>
 </div>
 </div>
@@ -209,12 +196,14 @@ could attain shorter running times by increasing the RAM (<code class="docutils 
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -233,12 +222,12 @@ could attain shorter running times by increasing the RAM (<code class="docutils 
         <li class="right" >
           <a href="curves.html" title="Nonpareil curves"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2013-2017, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
     </div>
   </body>
 </html>

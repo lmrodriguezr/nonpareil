@@ -4,31 +4,19 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Updates history &#8212; Nonpareil 3.3.1rc1 documentation</title>
-    
+    <title>Updates history &#8212; Nonpareil 3.3.1rc2 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1rc1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="MPI support" href="mpi.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +26,7 @@
         <li class="right" >
           <a href="mpi.html" title="MPI support"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -49,40 +37,69 @@
             
   <div class="section" id="updates-history">
 <h1>Updates history<a class="headerlink" href="#updates-history" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-s-new-in-3-3">
+<h2>What’s new in 3.3<a class="headerlink" href="#what-s-new-in-3-3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Release used in the manuscript “Nonpareil 3: Fast Estimation of Metagenomic
+Coverage and Sequence Diversity”.</li>
+</ul>
+</div>
+<div class="section" id="what-s-new-in-3-2">
+<h2>What’s new in 3.2<a class="headerlink" href="#what-s-new-in-3-2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Minor bug fixes and documentation updates.</li>
+</ul>
+</div>
+<div class="section" id="what-s-new-in-3-1">
+<h2>What’s new in 3.1<a class="headerlink" href="#what-s-new-in-3-1" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Implemented additional controls for the robustness of the Nonpareil sequence
+diversity index (Nd).</li>
+<li>Revamped R code, now with Object-oriented structure and uniform R-style
+options. The new package also includes test data and examples and is now
+available at <cite>CRAN &lt;https://CRAN.R-project.org/package=Nonpareil&gt;</cite>.</li>
+</ul>
+</div>
 <div class="section" id="what-s-new-in-3-0">
 <h2>What’s new in 3.0<a class="headerlink" href="#what-s-new-in-3-0" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>New k-mer kernel: A much faster kernel is now provided as an alternative to the alignment-based
-kernel in previous versions.</li>
+<li>New k-mer kernel: A much faster kernel is now provided as an alternative to
+the alignment-based kernel in previous versions.</li>
 </ul>
 </div>
 <div class="section" id="what-s-new-in-2-4">
 <h2>What’s new in 2.4<a class="headerlink" href="#what-s-new-in-2-4" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Subsampling now defaults to logarithmic: Previous versions subsampled linearly, since 2.4 the -d
-option defaults to 0.7. Options -m, -M, &amp; -i still exist but they are ignored unless -d is 0.</li>
-<li>Nonpareil diversity: A logarithmic value of diversity is now reported, indicating the horizontal
-position of the Nonpareil curves. This value is the estimated mode of the fitted Gamma CDF, and
-cannot be calculated if model fitting fails.</li>
-<li>Experimental dataset comparisons: The -q option allows the paired comparison of datasets. The
-expectation is that the difference between the diversity of a sample by itself (without using -q)
-and the diversity of the same sample queried with a second sample (with -q) represents the distance
-between them. Note that this method experimental and is not symetric (hence not a real distance).
-Usually, the average of the distances in both ways can be used for clustering of samples.</li>
+<li>Subsampling now defaults to logarithmic: Previous versions subsampled
+linearly, since 2.4 the -d option defaults to 0.7. Options -m, -M, &amp; -i still
+exist but they are ignored unless -d is 0.</li>
+<li>Nonpareil diversity: A logarithmic value of diversity is now reported,
+indicating the horizontal position of the Nonpareil curves. This value is the
+estimated mode of the fitted Gamma CDF, and cannot be calculated if model
+fitting fails.</li>
+<li>Experimental dataset comparisons: The -q option allows the paired comparison
+of datasets. The expectation is that the difference between the diversity of a
+sample by itself (without using -q) and the diversity of the same sample
+queried with a second sample (with -q) represents the distance between them.
+Note that this method experimental and is not symetric (hence not a real
+distance). Usually, the average of the distances in both ways can be used for
+clustering of samples.</li>
 </ul>
 </div>
 <div class="section" id="what-s-new-in-2-3">
 <h2>What’s new in 2.3<a class="headerlink" href="#what-s-new-in-2-3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Updates history.</li>
-<li>Nonpareil R package: No changes in the functions were introduced, but they are now available
-as an R package complete with documentation. See <a class="reference internal" href="curves.html"><span class="doc">Nonpareil curves</span></a>.</li>
-<li>Make’s <code class="docutils literal"><span class="pre">install</span></code> target: This includes the installation of binaries, the manual page, and the
-new Nonpareil R package.</li>
-<li>Simplified help: Only mandatory and commonly used arguments are now displayed with <code class="docutils literal"><span class="pre">nonpareil</span> <span class="pre">-h</span></code>.
-Complete documentation is maintained both in the manual page (<code class="docutils literal"><span class="pre">man</span> <span class="pre">nonpareil</span></code>) and the
-<a class="reference external" href="http://nonpareil.readthedocs.org/">online documentation</a>. In order to maintain a centralized documentation, the complete help messages
-for the Nonpareil R package are now self-contained, and were removed from the <a class="reference external" href="http://nonpareil.readthedocs.org/">online documentation</a>.</li>
+<li>Nonpareil R package: No changes in the functions were introduced, but they are
+now available as an R package complete with documentation. See <a class="reference internal" href="curves.html"><span class="doc">Nonpareil curves</span></a>.</li>
+<li>Make’s <code class="docutils literal notranslate"><span class="pre">install</span></code> target: This includes the installation of binaries, the
+manual page, and the new Nonpareil R package.</li>
+<li>Simplified help: Only mandatory and commonly used arguments are now displayed
+with <code class="docutils literal notranslate"><span class="pre">nonpareil</span> <span class="pre">-h</span></code>. Complete documentation is maintained both in the manual
+page (<code class="docutils literal notranslate"><span class="pre">man</span> <span class="pre">nonpareil</span></code>) and the <a class="reference external" href="http://nonpareil.readthedocs.org/">online documentation</a>. In order to maintain
+a centralized documentation, the complete help messages for the Nonpareil R
+package are now self-contained, and were removed from the
+<a class="reference external" href="http://nonpareil.readthedocs.org/">online documentation</a>.</li>
 </ul>
 </div>
 </div>
@@ -96,6 +113,9 @@ for the Nonpareil R package are now self-contained, and were removed from the <a
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Updates history</a><ul>
+<li><a class="reference internal" href="#what-s-new-in-3-3">What’s new in 3.3</a></li>
+<li><a class="reference internal" href="#what-s-new-in-3-2">What’s new in 3.2</a></li>
+<li><a class="reference internal" href="#what-s-new-in-3-1">What’s new in 3.1</a></li>
 <li><a class="reference internal" href="#what-s-new-in-3-0">What’s new in 3.0</a></li>
 <li><a class="reference internal" href="#what-s-new-in-2-4">What’s new in 2.4</a></li>
 <li><a class="reference internal" href="#what-s-new-in-2-3">What’s new in 2.3</a></li>
@@ -115,12 +135,14 @@ for the Nonpareil R package are now self-contained, and were removed from the <a
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -136,12 +158,12 @@ for the Nonpareil R package are now self-contained, and were removed from the <a
         <li class="right" >
           <a href="mpi.html" title="MPI support"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2013-2017, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
     </div>
   </body>
 </html>

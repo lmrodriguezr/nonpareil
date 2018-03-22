@@ -4,23 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Redundancy &#8212; Nonpareil 3.3.1rc1 documentation</title>
-    
+    <title>Redundancy &#8212; Nonpareil 3.3.1rc2 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.3.1rc1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -28,8 +17,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Nonpareil curves" href="curves.html" />
     <link rel="prev" title="Preprocess the reads" href="preprocess.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -42,7 +30,7 @@
         <li class="right" >
           <a href="preprocess.html" title="Preprocess the reads"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -56,16 +44,16 @@
 <p>If you have large files (&gt;1Gb) and access to a cluster, take a look at <a class="reference internal" href="mpi.html"><span class="doc">MPI support</span></a>.</p>
 <div class="section" id="for-the-impatient">
 <h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Permalink to this headline">¶</a></h2>
-<p>Even if you’re in a hurry, taking a look at <a class="reference internal" href="preprocess.html"><span class="doc">Preprocess the reads</span></a> is very important.
+<p>Even if you're in a hurry, taking a look at <a class="reference internal" href="preprocess.html"><span class="doc">Preprocess the reads</span></a> is very important.
 If you already did, you can simply run:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">nonpareil</span> <span class="o">-</span><span class="n">s</span> <span class="n">reads</span><span class="o">.</span><span class="n">fa</span> <span class="o">-</span><span class="n">T</span> <span class="n">kmer</span> <span class="o">-</span><span class="n">f</span> <span class="n">fastq</span> <span class="o">-</span><span class="n">b</span> <span class="n">output</span> <span class="c1"># fastq is recommended for kmer algorithm</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nonpareil</span> <span class="o">-</span><span class="n">s</span> <span class="n">reads</span><span class="o">.</span><span class="n">fa</span> <span class="o">-</span><span class="n">T</span> <span class="n">kmer</span> <span class="o">-</span><span class="n">f</span> <span class="n">fastq</span> <span class="o">-</span><span class="n">b</span> <span class="n">output</span> <span class="c1"># fastq is recommended for kmer algorithm</span>
 <span class="n">nonpareil</span> <span class="o">-</span><span class="n">s</span> <span class="n">reads</span><span class="o">.</span><span class="n">fa</span> <span class="o">-</span><span class="n">T</span> <span class="n">kmer</span> <span class="o">-</span><span class="n">f</span> <span class="n">fasta</span> <span class="o">-</span><span class="n">b</span> <span class="n">output</span>
 <span class="n">nonpareil</span> <span class="o">-</span><span class="n">s</span> <span class="n">reads</span><span class="o">.</span><span class="n">fa</span> <span class="o">-</span><span class="n">T</span> <span class="n">alignment</span> <span class="o">-</span><span class="n">f</span> <span class="n">fasta</span> <span class="o">-</span><span class="n">b</span> <span class="n">output</span> <span class="c1"># fasta is recommended for alignment algorithm</span>
 <span class="n">nonpareil</span> <span class="o">-</span><span class="n">s</span> <span class="n">reads</span><span class="o">.</span><span class="n">fa</span> <span class="o">-</span><span class="n">T</span> <span class="n">alignment</span> <span class="o">-</span><span class="n">f</span> <span class="n">fastq</span> <span class="o">-</span><span class="n">b</span> <span class="n">output</span>
 </pre></div>
 </div>
-<p>Where <code class="docutils literal"><span class="pre">reads.fa</span></code> is the file containing the trimmed single reads, and
-<code class="docutils literal"><span class="pre">output</span></code> is the prefix of the output files to be created.</p>
+<p>Where <code class="docutils literal notranslate"><span class="pre">reads.fa</span></code> is the file containing the trimmed single reads, and
+<code class="docutils literal notranslate"><span class="pre">output</span></code> is the prefix of the output files to be created.</p>
 </div>
 <div class="section" id="mandatory-options">
 <h2>Mandatory options<a class="headerlink" href="#mandatory-options" title="Permalink to this headline">¶</a></h2>
@@ -79,10 +67,10 @@ If you already did, you can simply run:</p>
 <td>Path to the (input) file containing the sequences.  This is lowercase S.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-T <var>&lt;str&gt;</var></span></kbd></td>
-<td>nonpareil algorithm. can be ‘kmer’ or ‘alignment’.</td></tr>
+<td>nonpareil algorithm. can be 'kmer' or 'alignment'.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-f <var>&lt;str&gt;</var></span></kbd></td>
-<td>The format of the sequence. Can be ‘fasta’ or ‘fastq’.</td></tr>
+<td>The format of the sequence. Can be 'fasta' or 'fastq'.</td></tr>
 </tbody>
 </table>
 </div></blockquote>
@@ -167,7 +155,7 @@ STDERR.  If set, the log is sent to both the STDERR and the log file.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">-o <var>&lt;str&gt;</var></span></kbd></td>
 <td>Path to the (output) file where summary is to be saved.   By default the summary is sent to stdout (same
-behavior as using a dash ‘-‘).  If an empty string ” is provided, does not produce the summary. See the
+behavior as using a dash '-').  If an empty string '' is provided, does not produce the summary. See the
 OUTPUT section.</td></tr>
 </tbody>
 </table>
@@ -239,27 +227,27 @@ and re-run the analyses.  THIS IS EXPERIMENTAL CODE.</td></tr>
 <div class="section" id="output">
 <h2>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h2>
 <dl class="docutils">
-<dt>Redundancy summary: <code class="docutils literal"><span class="pre">.npo</span></code> file</dt>
+<dt>Redundancy summary: <code class="docutils literal notranslate"><span class="pre">.npo</span></code> file</dt>
 <dd>Tab-delimited file with six columns. The first column indicates the sequencing effort (in number of reads), and the
 remaining columns indicate the summary of the distribution of redundancy (from the replicates, 1,024 by default) at
 the given sequencing effort. These five columns are: average redundancy, standard deviation, quartile 1, median
 (quartile 2), and quartile 3.</dd>
-<dt>Redundancy values: <code class="docutils literal"><span class="pre">.npa</span></code> file</dt>
+<dt>Redundancy values: <code class="docutils literal notranslate"><span class="pre">.npa</span></code> file</dt>
 <dd>Tab-delimited file with three columns. Similar to the .npo files, it contains information about the redundancy at
 each sequencing effort, but it provides ALL the results from the replicates, not only the summary at each point. The
 first column indicates the sequencing effort (as a fraction of the dataset), the second column indicates the ID of
 the replicate (a number used only to introduce some controlled noise in plots), and the third column indicates the
 estimated redundancy value.</dd>
-<dt>Mates distribution: <code class="docutils literal"><span class="pre">.npc</span></code> file</dt>
+<dt>Mates distribution: <code class="docutils literal notranslate"><span class="pre">.npc</span></code> file</dt>
 <dd>Raw list with the number of reads in the dataset matching a query read. A set of query reads is randomly drawn by
 Nonpareil (1,000 by default), and compared against all reads in the dataset. Each line on this file corresponds to a
 query read (the order is not important). We have seen certain correspondance between these numbers and the distribution
 of abundances in the community (compared, for example, as rank-abundance plots), but this file is provided only for
 quality-control purposes and comparisons with other tools.</dd>
-<dt>Log: <code class="docutils literal"><span class="pre">.npl</span></code> file</dt>
+<dt>Log: <code class="docutils literal notranslate"><span class="pre">.npl</span></code> file</dt>
 <dd>A verbose log of internal Nonpareil processing. The number to the left (inside squared brackets) indicate the CPU time
 (in minutes). This file also provide quality assessment of the Nonpareil run (automated consistency evaluation). Ideally,
-the last line should read “Everything seems correct”. Otherwise, it suggests alternative parameters that may improve the
+the last line should read &quot;Everything seems correct&quot;. Otherwise, it suggests alternative parameters that may improve the
 estimation.</dd>
 </dl>
 </div>
@@ -299,12 +287,14 @@ estimation.</dd>
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -323,12 +313,12 @@ estimation.</dd>
         <li class="right" >
           <a href="preprocess.html" title="Preprocess the reads"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2013-2017, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
     </div>
   </body>
 </html>

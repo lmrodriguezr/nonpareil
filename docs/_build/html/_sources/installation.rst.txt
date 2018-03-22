@@ -1,9 +1,11 @@
 Install Nonpareil
 ====================
 
-Nonpareil can be installed using `conda <https://bioconda.github.io/recipes/nonpareil/README.html>`_,
-as a `Biocontainer <https://quay.io/repository/biocontainers/nonpareil>`_,
-with `Galaxy <https://galaxyproject.org/>`_, or via the source code
+Nonpareil can be installed using
+`conda <https://bioconda.github.io/recipes/nonpareil/README.html>`_, as a
+`Biocontainer <https://quay.io/repository/biocontainers/nonpareil>`_, with
+`Galaxy <https://galaxyproject.org/>`_, through `Homebrew <https://brew.sh>`
+or via the source code.
 
 Conda installation
 ------------------
@@ -41,6 +43,24 @@ You can install Nonpareil on your own Galaxy instance:
 3. Install it
 
   It will automatically install Nonpareil via the conda installation
+
+Homebrew
+--------
+
+You can install Nonpareil using `Homebrew <https://brew.sh>` or
+`Linuxbrew <http://linuxbrew.sh/>`.
+
+1. Install `Homebrew <https://brew.sh>` if you haven't yet::
+
+    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+2. Get the `brewsci/bio <https://brewsci.github.io/homebrew-bio/>` tap if you haven't yet::
+
+    $ brew tap brewsci/bio
+
+3. Install Nonpareil::
+
+    $ brew install nonpareil
 
 Source code installation
 ------------------------
