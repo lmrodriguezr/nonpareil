@@ -4,7 +4,8 @@
 \description{Generates a legend for Nonpareil plots}
 \usage{Nonpareil.legend(np, x, y = 0.3, ...)}
 \arguments{
-  \item{np}{A `Nonpareil.Set` object or a list of `Nonpareil.Curve` objects}
+  \item{np}{A `Nonpareil.Set` or `Nonpareil.Curve` object, or a list of
+`Nonpareil.Curve` objects}
   \item{x}{X coordinate, or any character string accepted by legend (e.g.,
 'bottomright').}
   \item{y}{Y coordinate.}
