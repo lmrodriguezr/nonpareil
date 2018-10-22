@@ -119,12 +119,14 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
 
    // File handlers
    if(alldata && strlen(alldata)>0){
-      alldatah = fopen(alldata, (samplepar.portion==samplepar.portion_min ? "w" : "a+"));
+      alldatah = fopen(alldata,
+        (samplepar.portion==samplepar.portion_min ? "w" : "a+"));
       if(alldatah==NULL) error("I cannot write on all-data file", alldata);
       reportAllData=true;
    }
    if(strlen(outfile)>0 && strcmp(outfile, "-")!=0){
-      summaryh = fopen(outfile, (samplepar.portion==samplepar.portion_min ? "w" : "a+"));
+      summaryh = fopen(outfile,
+        (samplepar.portion==samplepar.portion_min ? "w" : "a+"));
       if(summaryh==NULL) error("I cannot write on summary file", outfile);
       reportSummary=1;
    }else if(strlen(outfile)>0){
@@ -133,25 +135,25 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
 
    if(samplepar.portion==samplepar.portion_min){
       header = new char[LARGEST_LINE];
-      if(samplepar.type == 1) {
-        sprintf(header, "# @impl: Nonpareil\n# @ksize: %d\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
-                samplepar.k,
-                samplepar.np_version,
-                samplepar.max_read_len,
-      		      samplepar.avg_read_len,
-		            samplepar.total_reads,
-		            samplepar.seq_overlap*100.0,
-		            samplepar.divide);
-      }
-      else if(samplepar.type == 2) {
-        sprintf(header, "# @impl: Nonpareil\n# @ksize: %d\n# @version: %.2f\n# @L: %.3f\n# @AL: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
-                  samplepar.k,
-                  samplepar.np_version,
-        		      samplepar.avg_read_len,
-                  samplepar.adj_avg_read_len,
-  		            samplepar.total_reads,
-  		            samplepar.seq_overlap*100.0,
-  		            samplepar.divide);
+      if(samplepar.type == 1) { // Kernel: Alignment
+        sprintf(header,
+          "# @impl: Nonpareil\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+          samplepar.np_version,		// @version
+          samplepar.max_read_len,	// @maxL
+          samplepar.avg_read_len,	// @L
+          samplepar.total_reads,	// @R
+          samplepar.seq_overlap*100.0,	// @overlap
+          samplepar.divide);		// @divide
+      }else if(samplepar.type == 2) { // Kernel: Kmer
+        sprintf(header,
+          "# @impl: Nonpareil\n# @ksize: %d\n# @version: %.2f\n# @L: %.3f\n# @AL: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+          samplepar.k,			// @ksize
+          samplepar.np_version,		// @version
+          samplepar.avg_read_len,	// @L
+          samplepar.adj_avg_read_len,	// @AL
+          samplepar.total_reads,	// @R
+          samplepar.seq_overlap*100.0,	// @overlap
+          samplepar.divide);		// @divide
       }
    }
 
@@ -162,7 +164,9 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
 	 s.avg += (double)sample_result[a];
 	 x2  += pow((double)sample_result[a], 2.0);
 	 dataPoints.push_back(sample_result[a]);
-	 if(reportAllData) fprintf(alldatah, "%.2f\t%d\t%.10f\n", samplepar.portion, a, sample_result[a]);
+	 if(reportAllData)
+	   fprintf(alldatah, "%.2f\t%d\t%.10f\n",
+	     samplepar.portion, a, sample_result[a]);
       }
       fclose(alldatah);
       s.avg /= (double)sample_number;

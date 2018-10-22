@@ -1,6 +1,7 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
-// @license artistic license 2.0
+// @author Santosh Kumar G.
+// @license Artistic-2.0
 
 #include <math.h>
 #include <getopt.h>
@@ -14,7 +15,7 @@
 #include <string>
 
 #define LARGEST_PATH 4096
-#define NP_VERSION 3.301
+#define NP_VERSION 3.303
 
 using namespace std;
 int processID;
