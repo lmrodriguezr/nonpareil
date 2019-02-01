@@ -1,95 +1,187 @@
-# Classes
+# Package Docs -----------------------------------------------------------------
+
+#' Nonpareil: Metagenome Coverage Estimation and Projections for 'Nonpareil'.
+#'
+#' Plot, process, and analyze NPO files produced by 'Nonpareil'
+#' \url{http://enve-omics.ce.gatech.edu/nonpareil}.
+#'
+#' @section Citation:
+#' If you use Nonpareil, please cite:
+#' Rodriguez-R et al. 2018. Nonpareil 3: Fast estimation of metagenomic coverage
+#' and sequence diversity.
+#' mSystems 3(3): e00039-18. DOI: 10.1128/mSystems.00039-18.
+#'
+#' Rodriguez-R & Konstantinidis. 2014. Nonpareil: a redundancy-based approach to
+#' assess the level of coverage in metagenomic datasets.
+#' Bioinformatics 30 (5): 629-635. DOI: 10.1093/bioinformatics/btt584.
+#'
+#' For an extended discussion on coverage in metagenomic data, see also:
+#'
+#' Rodriguez-R & Konstantinidis. 2014. Estimating coverage in metagenomic data
+#' sets and why it matters.
+#' The ISME Journal 8: 2349–2351. DOI: 10.1038/ismej.2014.76.
+#'
+#' @docType package
+#' @name Nonpareil
+NULL
+
+# Classes ----------------------------------------------------------------------
+
+#' A single Nonpareil curve. This object can be produced by
+#' \code{Nonpareil.curve} and supports S4 methods \code{plot}, \code{summary},
+#' \code{print}, and \code{predict}. For additional details, see help for
+#' \code{summary.Nonpareil.Curve}.
 setClass("Nonpareil.Curve",
-  ### A single Nonpareil curve. This object can be produced by `Nonpareil.curve`
-  ### and supports S4 methods `plot`, `summary`, `print`, and `predict`.
-  ### For additional details, see help for `summary.Nonpareil.Curve`
   representation(
+  
   # Dataset info
-  file='character',      ##<< Input .npo file
-  label='character',     ##<< Name of the dataset
-  col='character',       ##<< Color of the dataset
+  #' @slot file Input .npo file.
+  file = 'character',
+  #' @slot label Name of the dataset.
+  label = 'character',
+  #' @slot col Color of the dataset.
+  col = 'character',
+  
   # Input .npo metadata
-  L='numeric',           ##<< Read length
-  AL='numeric',          ##<< Adjusted read length (same as L for alignment)
-  R='numeric',           ##<< Number of reads
-  LR='numeric',          ##<< Effective sequencing effort used
-  overlap='numeric',     ##<< Minimum read overlap
-  ksize='numeric',       ##<< K-mer size (for kmer kernel only)
-  log.sample='numeric',  ##<< Multiplier of the log-sampling (or zero if linear)
-  kernel='character',    ##<< Read-comparison kernel
-  version='character',   ##<< Nonpareil version used
+  #' @slot L Read length.
+  L = 'numeric',
+  #' @slot AL Adjusted read length (same as L for alignment).
+  AL = 'numeric',
+  #' @slot R Number of reads.
+  R = 'numeric',
+  #' @slot LR Effective sequencing effort used.
+  LR = 'numeric',
+  #' @slot overlap Minimum read overlap.
+  overlap = 'numeric',
+  #' @slot ksize K-mer size (for kmer kernel only).
+  ksize = 'numeric',
+  #' @slot log.sample Multiplier of the log-sampling (or zero if linear).
+  log.sample = 'numeric',
+  #' @slot kernel Read-comparison kernel.
+  kernel = 'character',
+  #' @slot version Nonpareil version used.
+  version = 'character',
+
   # Input .npo data
-  x.obs='numeric',       ##<< Rarefied sequencing effort
-  x.adj='numeric',       ##<< Adjusted rarefied sequencing effort
-  y.red='numeric',       ##<< Rarefied redundancy (observed)
-  y.cov='numeric',       ##<< Rarefied coverage (corrected)
-  y.sd= 'numeric',       ##<< Standard deviation of rarefied coverage
-  y.p25='numeric',       ##<< Percentile 25 (1st quartile) of rarefied coverage
-  y.p50='numeric',       ##<< Percentile 50 (median) of rarefied coverage
-  y.p75='numeric',       ##<< Percentile 75 (3rd quartile) of rarefied coverage
+  #' @slot x.obs Rarefied sequencing effort.
+  x.obs = 'numeric',
+  #' @slot x.adj Adjusted rarefied sequencing effort.
+  x.adj = 'numeric',
+  #' @slot y.red Rarefied redundancy (observed).
+  y.red = 'numeric',
+  #' @slot y.cov Rarefied coverage (corrected).
+  y.cov = 'numeric',
+  #' @slot y.sd Standard deviation of rarefied coverage.
+  y.sd = 'numeric',
+  #' @slot y.p25 Percentile 25 (1st quartile) of rarefied coverage.
+  y.p25 = 'numeric',
+  #' @slot y.p50 Percentile 50 (median) of rarefied coverage.
+  y.p50 = 'numeric',
+  #' @slot y.p75 Percentile 75 (3rd quartile) of rarefied coverage.
+  y.p75 = 'numeric',
+
   # Estimated coverage
-  kappa='numeric',       ##<< Dataset redundancy
-  C='numeric',           ##<< Dataset coverage
-  consistent='logical',  ##<< Is the data sufficient for accurate estimation?
+  #' @slot kappa Dataset redundancy.
+  kappa = 'numeric',
+  #' @slot C Dataset coverage.
+  C = 'numeric',
+  #' @slot consistent Is the data sufficient for accurate estimation?
+  consistent = 'logical',
+
   # Projected coverage
-  star='numeric',        ##<< Coverage considered 'nearly complete'
-  has.model='logical',   ##<< Was the model successfully estimated?
-  warning='character',   ##<< Warnings generated on consistency or model fitting
-  LRstar='numeric',      ##<< Projected seq. effort for nearly complete coverage
-  modelR='numeric',      ##<< Pearson's R for the estimated model
-  diversity='numeric',   ##<< Dataset Nd index of sequence diversity
-  model='list',          ##<< Fitted sigmoidal model
+  #' @slot star Coverage considered 'nearly complete'.
+  star = 'numeric',
+  #' @slot has.model Was the model successfully estimated?
+  has.model = 'logical',
+  #' @slot warning Warnings generated on consistency or model fitting.
+  warning = 'character',
+  #' @slot LRstar Projected seq. effort for nearly complete coverage.
+  LRstar = 'numeric',
+  #' @slot modelR Pearson's R for the estimated model.
+  modelR = 'numeric',
+  #' @slot diversity Dataset Nd index of sequence diversity.
+  diversity = 'numeric',
+  #' @slot model Fitted sigmoidal model.
+  model = 'list',
   # Call
-  call='call'            ##<< Call producing this object
-  ), package='Nonpareil'
-  );
+  #' @slot call Call producing this object.
+  call = 'call'
+
+  ), package = 'Nonpareil' );
+
+#' Collection of \code{Nonpareil.Curve} objects. This object can be produced by
+#' \code{Nonpareil.curve.batch} and supports S4 methods \code{plot},
+#' \code{summary}, and \code{print}.
 setClass("Nonpareil.Set",
-  ### Collection of `Nonpareil.Curve` objects. This object can be produced by
-  ### `Nonpareil.curve.batch` and supports S4 methods `plot`, `summary`, and
-  ### `print`
   representation(
-  np.curves='list',      ##<< List of `Nonpareil.Curve` objects
-  call='call'            ##<< Call producing this object
-  ), package='Nonpareil'
-  );
+  #' @slot np.curves List of \code{Nonpareil.Curve} objects.
+  np.curves = 'list',
+  #' @slot call Call producing this object.
+  call = 'call'
 
-# S3 Methods
-setMethod("$", "Nonpareil.Curve", function(x, name) attr(x, name))
+  ), package='Nonpareil' );
+
+# S3 Methods -------------------------------------------------------------------
+
+#' Get attribute.
+setMethod("$", "Nonpareil.Curve",
+  #' @param x \code{Nonpareil.Curve} object.
+  #' @param name Attribute.
+  function(x, name) attr(x, name))
+#' Set attribute.
 setMethod("$<-", "Nonpareil.Curve",
-      function(x, name, value) { attr(x, name) <- value ; x })
-setMethod("$", "Nonpareil.Set", function(x, name) attr(x, name))
+  #' @param x \code{Nonpareil.Curve} object.
+  #' @param name Attribute.
+  #' @param value New value.
+  function(x, name, value) { attr(x, name) <- value ; x })
+#' Get attribute.
+setMethod("$", "Nonpareil.Set",
+  #' @param x \code{Nonpareil.Set} object.
+  #' @param name Attribute.
+  function(x, name) attr(x, name))
+#' Set attribute.
 setMethod("$<-", "Nonpareil.Set",
-      function(x, name, value) { attr(x, name) <- value ; x })
+  #' @param x \code{Nonpareil.Set} object.
+  #' @param name Attribute.
+  #' @param value New value.
+  function(x, name, value) { attr(x, name) <- value ; x })
 
+#' Plot a \code{Nonpareil.Set} object.
 plot.Nonpareil.Set <- function(
-      ### Plot a `Nonpareil.Set` object
+      #' @param x
+      #' \code{Nonpareil.Set} object to plot.
       x,
-      ### `Nonpareil.Set` object to plot
-      col=NA,
-      ### Color of the curves (vector). If passed, it overrides the colors set
-      ### in the `Nonpareil.Curve` objects. Values are recycled
-      labels=NA,
-      ### Labels of the curves (vector). If passed, it overrides the labels set
-      ### in the `Nonpareil.Curve` objects. Values are recycled
-      main="Nonpareil Curves",
-      ### Title of the plot
-      legend.opts=list(),
-      ### Any additional parameters passed to `Nonpareil.legend`. If FALSE, the
-      ### legend is not displayed
+      #' @param col
+      #' Color of the curves (vector).
+      #' If passed, it overrides the colors set in the \code{Nonpareil.Curve}
+      #' objects. Values are recycled.
+      col = NA,
+      #' @param labels
+      #' Labels of the curves (vector). If passed, it overrides the labels set
+      #' in the \code{Nonpareil.Curve} objects. Values are recycled.
+      labels = NA,
+      #' @param main
+      #' Title of the plot.
+      main = "Nonpareil Curves",
+      #' @param legend.opts
+      #' Any additional parameters passed to \code{Nonpareil.legend}.
+      #' If FALSE, the legend is not displayed.
+      legend.opts = list(),
+      #' @param ...
+      #' Any additional parameters passed to \code{plot.Nonpareil.Curve}.
       ...
-      ### Any additional parameters passed to `plot.Nonpareil.Curve`
       ){
   if(!inherits(x, "Nonpareil.Set"))
     stop("'x' must inherit from class `Nonpareil.Set`")
 
   # Plots
   new <- TRUE;
-  col <- rep(col, length.out=length(x$np.curves))
-  labels <- rep(labels, length.out=length(x$np.curves))
+  col <- rep(col, length.out = length(x$np.curves))
+  labels <- rep(labels, length.out = length(x$np.curves))
   for(i in 1:length(x$np.curves)){
     if(!is.na(col[i])) x$np.curves[[i]]$col <- col[i]
     if(!is.na(labels[i])) x$np.curves[[i]]$label <- labels[i]
-    plot(x$np.curves[[i]], new=new, main=ifelse(new, main, ""), ...)
+    plot(x$np.curves[[i]], new = new, main = ifelse(new, main, ""), ...)
     new <- FALSE
   }
 
@@ -100,70 +192,96 @@ plot.Nonpareil.Set <- function(
     do.call(Nonpareil.legend, legend.opts)
   }
 
-  # Return
+  #' @return
+  #' Returns invisibly a \code{Nonpareil.Set} object (same as \code{x} input).
   invisible(x)
-  ### Returns invisibly a `Nonpareil.Set` object (same as `x` input).
 }
+
+#' Plot a \code{Nonpareil.Curve} object.
 plot.Nonpareil.Curve <- function(
-      ### Plot a `Nonpareil.Curve` object
+      #' @param x
+      #' \code{Nonpareil.Curve} object to plot.
       x,
-      ### `Nonpareil.Curve` object to plot
-      col=NA,
-      ### Color of the curve. If passed, it overrides the colors set in the
-      ### `Nonpareil.Curve` object
-      add=FALSE,
-      ### If TRUE, it attempts to use a previous (active) canvas to plot the
-      ### curve
-      new=!add,
-      ### Inverse of `add`
-      plot.observed=TRUE,
-      ### Indicates if the observed (rarefied) coverage is to be plotted
-      plot.model=TRUE,
-      ### Indicates if the fitted model is to be plotted
-      plot.dispersion=FALSE,
-      ### Indicates if (and how) dispersion of the replicates should be plotted.
-      ### Supported values are:
-      ### FALSE: no dispersion is plotted (default),
-      ### 'sd': one standard deviation around the mean,
-      ### 'ci95': 95% confidence interval,
-      ### 'ci90': 90% confidence interval,
-      ### 'ci50': 50% confidence interval,
-      ### 'iq': Inter-quartile range
-      plot.diversity=TRUE,
-      ### If TRUE, the diversity estimate is plotted as a small arrow below the
-      ### Nonpareil curve
-      xlim=c(1e3,10e12),
-      ### Limits of the sequencing effort (X-axis)
-      ylim=c(1e-6,1),
-      ### Limits of the coverage (Y-axis)
-      main=paste("Nonpareil Curve for", x$label),
-      ### Title of the plot
-      xlab="Sequencing effort (bp)",
-      ### Label of the X-axis
-      ylab="Estimated Average Coverage",
-      ### Label of the Y-axis
-      curve.lwd=2,
-      ### Line width of the rarefied coverage
+      #' @param col
+      #' Color of the curve. If passed, it overrides the colors set in the
+      #' \code{Nonpareil.Curve} object.
+      col = NA,
+      #' @param add
+      #' If TRUE, it attempts to use a previous (active) canvas to plot the
+      #' curve.
+      add = FALSE,
+      #' @param new
+      #' Inverse of `add`.
+      new = !add,
+      #' @param plot.observed
+      #' Indicates if the observed (rarefied) coverage is to be plotted.
+      plot.observed = TRUE,
+      #' @param plot.model
+      #' Indicates if the fitted model is to be plotted.
+      plot.model = TRUE,
+      #' @param plot.dispersion
+      #' Indicates if (and how) dispersion of the replicates should be
+      #' plotted. Supported values are:
+      #' \itemize{
+      #'   \item \code{FALSE}: no dispersion is plotted (default),
+      #'   \item \code{'sd'}: one standard deviation around the mean,
+      #'   \item \code{'ci95'}: 95% confidence interval,
+      #'   \item \code{'ci90'}: 90% confidence interval,
+      #'   \item \code{'ci50'}: 50% confidence interval,
+      #'   \item \code{'iq'}: Inter-quartile range.
+      #' }
+      plot.dispersion = FALSE,
+      #' @param plot.diversity
+      #' If TRUE, the diversity estimate is plotted as a small arrow below the
+      #' Nonpareil curve.
+      plot.diversity = TRUE,
+      #' @param xlim
+      #' Limits of the sequencing effort (X-axis).
+      xlim = c(1e3, 10e12),
+      #' @param ylim
+      #' Limits of the coverage (Y-axis).
+      ylim = c(1e-6, 1),
+      #' @param main
+      #' Title of the plot.
+      main = paste("Nonpareil Curve for", x$label),
+      #' @param xlab
+      #' Label of the X-axis.
+      xlab = "Sequencing effort (bp)",
+      #' @param ylab
+      #' Label of the Y-axis.
+      ylab = "Estimated Average Coverage",
+      #' @param curve.lwd
+      #' Line width of the rarefied coverage.
+      curve.lwd = 2,
+      #' @param curve.alpha
+      #' Alpha value (from 0 to 1) of the rarefied coverage.
       curve.alpha=0.4,
-      ### Alpha value (from 0 to 1) of the rarefied coverage
-      model.lwd=1,
-      ### Line width of the model
-      model.alpha=1,
-      ### Alpha value (from 0 to 1) of the model
-      log="x",
-      ### Axis to plot in logarithmic scale. Supported values are:
-      ### 'x': sequencing effort (default),
-      ### 'y': coverage,
-      ### 'xy': both logarithmic, or
-      ### '': both linear
-      arrow.length=0.05,
-      ### If plot.diversity=TRUE, it determines the length of the arrow to
-      ### display the divsersity (as a fraction of the ylim range).
-      arrow.head=arrow.length,
-      ### If plot.diversity=TRUE, it determines the length of the arrow head to
-      ### display the diversity index (in inches).
+      #' @param model.lwd
+      #' Line width of the model.
+      model.lwd = 1,
+      #' @param model.alpha
+      #' Alpha value (from 0 to 1) of the model.
+      model.alpha = 1,
+      #' @param log
+      #' Axis to plot in logarithmic scale. Supported values are:
+      #' \itemize{
+      #'   \item \code{'x'}: sequencing effort (default),
+      #'   \item \code{'y'}: coverage,
+      #'   \item \code{'xy'}: both logarithmic, or
+      #'   \item \code{''}: both linear.
+      #' }
+      log = "x",
+      #' @param arrow.length
+      #' If \code{plot.diversity = TRUE}, it determines the length of the
+      #' arrow to display the divsersity (as a fraction of the ylim range).
+      arrow.length = 0.05,
+      #' @param arrow.head
+      #' If \code{plot.diversity = TRUE}, it determines the length of the
+      #' arrow head to display the diversity index (in inches).
+      arrow.head = arrow.length,
+      #' @param ...
+      #' Additional graphical parameters.
       ...
-      ### Additional graphical parameters
       ){
   if(!inherits(x, "Nonpareil.Curve"))
     stop("'x' must inherit from class `Nonpareil.Curve`")
@@ -218,67 +336,75 @@ plot.Nonpareil.Curve <- function(
           y0=ylim[1], col=Nonpareil.col(x, model.alpha));
   }
 
-  # Return
+  #' @return
+  #' Retuns invisibly a \code{Nonpareil.Curve} object (same as \code{x} input).
+  #' For additional details see help for \code{summary.Nonpareil.Curve}.
   invisible(x)
-  ### Retuns invisibly a `Nonpareil.Curve` object (same as `x` input). For
-  ### additional details see help for `summary.Nonpareil.Curve`
 }
+
+#' Returns a summary of the \code{Nonpareil.Set} results.
 summary.Nonpareil.Set <- function(
-      ### Returns a summary of the Nonpareil.Set results
+      #' @param object
+      #' \code{Nonpareil.Set} object.
       object,
-      ### `Nonpareil.Set` object
+      #' @param ...
+      #' Additional parameters ignored.
       ...
-      ### Additional parameters ignored
       ){
   if(!inherits(object, "Nonpareil.Set"))
     stop("'object' must inherit from class `Nonpareil.Set`")
   y <- rbind(sapply(object$np.curves, "summary"))
   colnames(y) <- sapply(object$np.curves, function(n) n$label)
+
+  #' @return
+  #' Returns a matrix with different values for each dataset. For additional
+  #' details on the values returned, see help for
+  #' \code{summary.Nonpareil.Curve}.
   t(y)
-  ### Returns a matrix with different values for each dataset. For additional
-  ### details on the values returned, see help for `summary.Nonpareil.Curve`
 }
+
+#' Returns a summary of the \code{Nonpareil.Curve} results.
 summary.Nonpareil.Curve <- function(
-      ### Returns a summary of the Nonpareil.Curve results
+      #' @param object
+      #' \code{Nonpareil.Curve} object.
       object,
-      ### `Nonpareil.Curve` object
+      #' @param ...
+      #' Additional parameters ignored.
       ...
-      ### Additional parameters ignored
       ){
   if(!inherits(object, "Nonpareil.Curve"))
     stop("'object' must inherit from class `Nonpareil.Curve`")
   n <- c("kappa","C","LR","modelR","LRstar","diversity")
   y <- sapply(n, function(v) attr(object,v))
   names(y) <- n
-  # Return
+
+  #' @return
+  #' Returns a matrix with the following values for the dataset:
+  #' \itemize{
+  #'   \item kappa: "Redundancy" value of the entire dataset.
+  #'   \item C: Average coverage of the entire dataset.
+  #'   \item LRstar: Estimated sequencing effort required to reach the objective
+  #'     average coverage (star, 95% by default).
+  #'   \item LR: Actual sequencing effort of the dataset.
+  #'   \item modelR: Pearson's R coefficient betweeen the rarefied data and the
+  #'     projected model.
+  #'   \item diversity: Nonpareil sequence-diversity index (Nd). This value's
+  #'     units are the natural logarithm of the units of sequencing effort
+  #'     (log-bp), and indicates the inflection point of the fitted model for
+  #'     the Nonpareil curve. If the fit doesn't converge, or the model is not
+  #'     estimated, the value is zero (0).
+  #' }
   y
-  ### Returns a matrix with the following values for the dataset:
-  ### 
-  ### kappa: "Redundancy" value of the entire dataset.
-  ### 
-  ### C: Average coverage of the entire dataset.
-  ### 
-  ### LRstar: Estimated sequencing effort required to reach the objective
-  ###   average coverage (star, 95% by default).
-  ### 
-  ### LR: Actual sequencing effort of the dataset.
-  ### 
-  ### modelR: Pearson's R coefficient betweeen the rarefied data and the
-  ###   projected model.
-  ### 
-  ### diversity: Nonpareil sequence-diversity index (Nd). This value's units are
-  ###   the natural logarithm of the units of sequencing effort (log-bp), and
-  ###   indicates the inflection point of the fitted model for the Nonpareil
-  ###   curve. If the fit doesn't converge, or the model is not estimated, the
-  ###   value is zero (0).
-  ### 
 }
+
+#' Prints and returns invisibly a summary of the \code{Nonpareil.Set} results.
 print.Nonpareil.Set <- function(
-      ### Prints and returns invisibly a summary of the `Nonpareil.Set` results
+      #' @param x
+      #' \code{Nonpareil.Set} object.
       x,
-      ### `Nonpareil.Set` object
+      #' @param ...
+      #' Additional parameters ignored.
       ...
-      ### Additional parameters ignored
       ){
   if(!inherits(x, "Nonpareil.Set"))
     stop("'x' must inherit from class `Nonpareil.Set`")
@@ -289,18 +415,22 @@ print.Nonpareil.Set <- function(
   cat("-------------------------------------------------------\n")
   cat("call:",as.character(x$call),"\n")
   cat("-------------------------------------------------------\n")
-  # Return
+
+  #' @return
+  #' Returns the summary invisibly. See help for
+  #' \code{summary.Nonpareil.Curve} and \code{summary.Nonpareil.Set} for
+  #' additional information.
   invisible(y)
-  ### Returns the summary invisibly. See help for `summary.Nonpareil.Curve` and
-  ### `summary.Nonpareil.Set` for additional information
 }
+
+#' Prints and returns invisibly a summary of the \code{Nonpareil.Curve} results.
 print.Nonpareil.Curve <- function(
-      ### Prints and returns invisibly a summary of the `Nonpareil.Curve`
-      ### results
+      #' @param x
+      #' \code{Nonpareil.Set} object.
       x,
-      ### `Nonpareil.Set` object
+      #' @param ...
+      #' Additional parameters ignored.
       ...
-      ### Additional parameters ignored
       ){
   if(!inherits(x, "Nonpareil.Curve"))
     stop("'x' must inherit from class `Nonpareil.Curve`")
@@ -312,37 +442,45 @@ print.Nonpareil.Curve <- function(
   cat("-------------------------------------------------------\n")
   cat("call:",as.character(x$call),"\n")
   cat("-------------------------------------------------------\n")
-  # Return
+
+  #' @return
+  #' Returns the summary invisibly. See help for
+  #' \code{summary.Nonpareil.Curve} for additional information.
   invisible(y)
-  ### Returns the summary invisibly. See help for `summary.Nonpareil.Curve` for
-  ### additional information.
 }
+
+#' Predict the coverage for a given sequencing effort.
 predict.Nonpareil.Curve <- function(
-      ### Predict the coverage for a given sequencing effort
+      #' @param object
+      #' \code{Nonpareil.Curve} object.
       object,
-      ### `Nonpareil.Curve` object
-      lr=object$LR,
-      ### Sequencing effort for the prediction (in bp)
+      #' @param lr
+      #' Sequencing effort for the prediction (in bp).
+      lr = object$LR,
+      #' @param ...
+      #' Additional parameters ignored.
       ...
-      ### Additional parameters ignored
       ){
   if(!inherits(object, "Nonpareil.Curve"))
     stop("'object' must inherit from class `Nonpareil.Curve`")
   if(!object$has.model)
     stop("'object' must be a Nonpareil Curve with a fitted model")
-  # Return
-  predict(object$model, list(x=lr))
-  ### Returns the expected coverage at the given sequencing effort.
+  
+  #' @return
+  #' Returns the expected coverage at the given sequencing effort.
+  predict(object$model, list(x = lr))
 }
 
-# Ancillary functions
+# Ancillary functions ----------------------------------------------------------
+
+#' Read the metadata headers.
 Nonpareil.read_metadata <- function(
-      ### Read the metadata headers
+      #' @param x
+      #' \code{Nonpareil.Curve} object.
       x
-      ### `Nonpareil.Curve` object
       ){
   # Load key-values and defaults
-  meta_data <- gsub('^# @', "", grep("^# @", readLines(x$file), value=TRUE))
+  meta_data <- gsub('^# @', "", grep("^# @", readLines(x$file), value = TRUE))
   keys <- gsub(': .*', "", meta_data)
   vals <- gsub('.*: ', "", meta_data)
   x$kernel <- "alignment"
@@ -370,15 +508,19 @@ Nonpareil.read_metadata <- function(
 
   invisible(x)
 }
+
+#' Read the data tables and extract direct estimates.
 Nonpareil.read_data <- function(
-      ### Read the data tables and extract direct estimates
+      #' @param x
+      #' \code{Nonpareil.Curve} object.
       x,
-      ### `Nonpareil.Curve` object
+      #' @param correction.factor
+      #' Logical; see \code{Nonpareil.curve} for details.
       correction.factor
-      ### Logical; see `Nonpareil.curve` for details
       ){
   # Read input
   a <- read.table(x$file, sep="\t", header=FALSE)
+  a <- a[order(a[,1]),]
   x$x.obs <- a[,1]
   x$y.red <- a[,2]
   x$kappa <- tail(x$y.red, n=1)
@@ -407,39 +549,43 @@ Nonpareil.read_data <- function(
   # Check consistency
   x$consistent <- TRUE
   twenty.pc = which.max(x$x.adj[x$x.adj <= 0.5*tail(x$x.adj, n=1)]);
-  if(x$y.p50[twenty.pc]==0){
+  if(length(twenty.pc) == 0) twenty.pc = length(x$x.adj)
+  if(x$y.p50[twenty.pc] == 0){
     x$consistent <- FALSE
     x$warnings <- c(x$warnings,
-          paste("Median of the curve is zero at 50% of the reads, check",
-          "parameters and re-run (e.g., decrease -L in nonpareil -T alignment)."))
+        paste("Median of the curve is zero at 50% of the reads, check",
+        "parameters and re-run (e.g., decrease -L in nonpareil -T alignment)."))
   }
   if(x$kappa <= 1e-5){
     x$consistent <- FALSE
     x$warnings <- c(x$warnings,
-          paste("Redundancy curve too low, check parameters and re-run",
-          "(e.g., decrease -L in nonpareil -T alignment)."))
+        paste("Redundancy curve too low, check parameters and re-run",
+        "(e.g., decrease -L in nonpareil -T alignment)."))
   }
-  if(x$y.cov[2]>=1-1e-5){
+  if(x$y.cov[2] >= 1-1e-5){
     x$consistent <- FALSE
     x$warnings <- c(x$warnings,
-          paste("Curve too steep, check parameters and re-run",
-          "(e.g., increase value of -d in nonpareil)."))
+        paste("Curve too steep, check parameters and re-run",
+        "(e.g., increase value of -d in nonpareil)."))
   }
   if(sum(x$y.cov>0 & x$y.cov<0.9) <= 10){
     x$consistent <- FALSE
     x$warnings <- c(x$warnings,
-          paste("Insufficient resolution below 90% coverage, check",
-          "parameters and re-run (e.g., increase the value of -d in nonpareil)."))
+        paste("Insufficient resolution below 90% coverage, check",
+        "parameters and re-run (e.g., increase the value of -d in nonpareil)."))
   }
 
   invisible(x)
 }
+
+#' Fit the sigmoidal model to the rarefied coverage.
 Nonpareil.fit_model <- function(
-      ### Fit the sigmoidal model to the rarefied coverage
+      #' @param np
+      #' \code{Nonpareil.Curve} object.
       np,
-      ### `Nonpareil.Curve` object
+      #' @param weights.exp
+      #' Numeric; see \code{Nonpareil.curve} for details.
       weights.exp
-      ### Numeric; See `Nonpareil.curve` for details
       ){
   if(!inherits(np, "Nonpareil.Curve"))
     stop("'np' must inherit from class `Nonpareil.Curve`")
@@ -486,20 +632,26 @@ Nonpareil.fit_model <- function(
 
   invisible(np)
 }
+
+#' Factor to transform redundancy into coverage (internal function).
 Nonpareil.coverage_factor <- function(
-      ### Factor to transform redundancy into coverage (internal function).
+      #' @param x
+      #' \code{Nonpareil.Curve} object.
       x
-      ### `Nonpareil.Curve` object
       ){
+  #' @return
+  #' A numeric scalar.
   return(1 - exp(2.23E-2 * x$overlap - 3.5698))
-  ### A numeric scalar.
 }
+
+#' Returns the color of the curve.
 Nonpareil.col <- function(
-      ### Returns the color of the curve
+      #' @param x
+      #' \code{Nonpareil.Curve} or \code{Nonpareil.Set} object.
       x,
-      ### `Nonpareil.Curve` or `Nonpareil.Set` object
-      alpha=1
-      ### Alpha level of the color from 0 to 1
+      #' @param alpha
+      #' Alpha level of the color from 0 to 1.
+      alpha = 1
       ){
   if(inherits(x, "Nonpareil.Curve")){
     col <- x$col
@@ -508,39 +660,49 @@ Nonpareil.col <- function(
   }else{
     stop("'x' must inherit from class `Nonpareil.Curve` or `Nonpareil.Set`")
   }
-  apply(col2rgb(col), 2, function(x) do.call(rgb, as.list(c(x[1:3]/256, alpha))) )
+  apply(col2rgb(col), 2,
+    function(x) do.call(rgb, as.list(c(x[1:3]/256, alpha))) )
 }
+
+#' Generates a legend for Nonpareil plots.
 Nonpareil.legend <- function(
-      ### Generates a legend for Nonpareil plots
+      #' @param np
+      #' A \code{Nonpareil.Set} or \code{Nonpareil.Curve} object, or a list of
+      #' \code{Nonpareil.Curve} objects.
       np,
-      ### A `Nonpareil.Set` or `Nonpareil.Curve` object, or a list of
-      ### `Nonpareil.Curve` objects
+      #' @param x
+      #' X coordinate, or any character string accepted by legend (e.g.,
+      #' 'bottomright').
       x,
-      ### X coordinate, or any character string accepted by legend (e.g.,
-      ### 'bottomright').
-      y=.3,
-      ### Y coordinate.
+      #' @param y
+      #' Y coordinate.
+      y = 0.3,
+      #' @param ...
+      #' Any other parameters supported by legend().
       ...
-      ### Any other parameters supported by legend().
       ){
   if(inherits(np, "Nonpareil.Set")) np <- np$np.curves
   if(inherits(np, "Nonpareil.Curve")) np <- list(np)
   if(!inherits(np, "list"))
-    stop("'np' must inherit from `list` or class `Nonpareil.Set` or `Nonpareil.Curve`")
+    stop("'np' must inherit from `list`, `Nonpareil.Set`, or `Nonpareil.Curve`")
   if(missing(x)) x <- 'bottomright'
 
   labels <- sapply(np, function(x) x$label)
   cols <- sapply(np, Nonpareil.col)
-  # Return
-  legend(x=x, y=y, legend=labels, fill=cols, ...);
-  ### Returns invisibly a list, same as `legend`
+
+  #' @return
+  #' Returns invisibly a list, same as \code{legend}.
+  legend(x = x, y = y, legend = labels, fill = cols, ...)
 }
+
+#' Adds a \code{Nonpareil.Curve} to a \code{Nonpareil.Set}.
 Nonpareil.add.curve <- function(
-      ### Adds a `Nonpareil.Curve` to a `Nonpareil.Set`
+      #' @param nps
+      #' \code{Nonpareil.Set} object.
       nps,
-      ### `Nonpareil.Set` object
+      #' @param np
+      #' \code{Nonpareil.Curve} object.
       np
-      ### `Nonpareil.Curve` object
       ){
   if(!inherits(nps, "Nonpareil.Set"))
     stop("'nps' must inherit from class `Nonpareil.Set`")
@@ -548,71 +710,99 @@ Nonpareil.add.curve <- function(
     stop("'np' must inherit from class `Nonpareil.Curve`")
 
   nps$np.curves[[ length(nps$np.curves)+1 ]] <- np
-  # Return
+
+  #' @return
+  #' Returns the \code{Nonpareil.Set} including the newly added
+  #' \code{Nonpareil.Curve}.
   return(nps)
-  ### Returns the `Nonpareil.Set` including the added `Nonpareil.Curve`
 }
-setMethod("+", "Nonpareil.Set", function(e1,e2) Nonpareil.add.curve(e1,e2))
 
-# Model Functions
+#' Alias of \code{Nonpareil.add.curve}.
+setMethod("+", "Nonpareil.Set",
+  #' @param e1 \code{Nonpareil.Set} object (\code{nps}).
+  #' @param e2 \code{Nonpareil.Curve} object (\code{np}).
+  function(e1,e2) Nonpareil.add.curve(e1,e2))
+
+# Model Functions --------------------------------------------------------------
+
+#' Function of the projected model.
 Nonpareil.f <- function(
-      ### Function of the projected model
+      #' @param x
+      #' Values of sequencing effort (in bp).
       x,
-      ### Values of sequencing effort (in bp)
+      #' @param a
+      #' Parameter alpha of the Gamma CDF.
       a,
-      ### Parameter alpha of the Gamma CDF
+      #' @param b
+      #' Parameter beta of the Gamma CDF.
       b
-      ### Parameter beta of the Gamma CDF
       ){
+  #' @return
+  #' Predicted values of abundance-weighted average coverage.
   return(pgamma(log1p(x), a, b))
-  ### Predicted values of abundance-weighted average coverage.
-}
-Nonpareil.antif <- function(
-    ### Complement function of `Nonpareil.f`
-    y,
-    ### Values of abundance-weighted average coverage
-    a,
-    ### Parameter alpha of the gamma CDF.
-    b
-    ### Parameter beta of the gamma CDF.
-    ){
-  return(exp(qgamma(y,a,b))-1)
-  ### Estimated sequencing effort.
 }
 
-# Main functions
-Nonpareil.curve <- structure(function(
-      ### Generates a Nonpareil curve from an .npo file
+#' Complement function of \code{Nonpareil.f}.
+Nonpareil.antif <- function(
+    #' @param y
+    #' Values of abundance-weighted average coverage.
+    y,
+    #' @param a
+    #' Parameter alpha of the gamma CDF.
+    a,
+    #' @param b
+    #' Parameter beta of the gamma CDF.
+    b
+    ){
+  #' @return
+  #' Estimated sequencing effort.
+  return(exp(qgamma(y,a,b))-1)
+}
+
+# Main functions ---------------------------------------------------------------
+
+#' Generates a Nonpareil curve from an .npo file
+Nonpareil.curve <- function(
+      #' @param file
+      #' Path to the .npo file, containing the read redundancy.
       file,
-      ### Path to the .npo file, containing the read redundancy
-      plot=TRUE,
-      ### Determines if the plot should be produced. If FALSE, it still computes
-      ### the coverage and the model
-      label=NA,
-      ### Name of the dataset. If NA, it is determined by the file name
-      col=NA,
-      ### Color of the curve. If NA, a random color is assigned (even if
-      ### plot=FALSE),
-      enforce.consistency=TRUE,
-      ### If TRUE, it fails verbosely on insufficient data, otherwise it warns
-      ### about the inconsistencies and attempts the estimations
-      star=95,
-      ### Objective coverage in percentage; i.e., coverage value considered
-      ### near-complete
-      correction.factor=TRUE,
-      ### Should the overlap-dependent (or kmer-length-dependent) correction
-      ### factor be applied? If FALSE, redundancy is assumed to equal coverage.
-      weights.exp=NA,
-      ### Vector of values to be tested (in order) as exponent of the weights
-      ### distribution. If the model fails to converge, sometimes manual
-      ### modifications in this parameter may help. By default (NA), five
-      ### different values are tested in the following order: For linear
-      ### sampling, -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d
-      ### option in Nonpareil), 0, 1, -1, 1.3, -1.1, 1.5, -1.5.
-      skip.model=FALSE,
-      ### If set, skips the model estimation altogether.
+      #' @param plot
+      #' Determines if the plot should be produced. If FALSE, it computes the
+      #' coverage and the model wihtout plotting.
+      plot = TRUE,
+      #' @param label
+      #' Name of the dataset. If NA, it is determined by the file name.
+      label = NA,
+      #' @param col
+      #' Color of the curve.
+      #' If NA, a random color is assigned (even if \code{plot = FALSE}).
+      col = NA,
+      #' @param enforce.consistency
+      #' If TRUE, it fails verbosely on insufficient data, otherwise it warns
+      #' about the inconsistencies and attempts the estimations.
+      enforce.consistency = TRUE,
+      #' @param star
+      #' Objective coverage in percentage; i.e., coverage value considered
+      #' near-complete.
+      star = 95,
+      #' @param correction.factor
+      #' Should the overlap-dependent (or kmer-length-dependent) correction
+      #' factor be applied? If FALSE, redundancy is assumed to equal coverage.
+      correction.factor = TRUE,
+      #' @param weights.exp
+      #' Vector of values to be tested (in order) as exponent of the weights
+      #' distribution. If the model fails to converge, sometimes manual
+      #' modifications in this parameter may help. By default (NA), five
+      #' different values are tested in the following order: For linear
+      #' sampling, -1.1, -1.2, -0.9, -1.3, -1. For logarithmic sampling (-d
+      #' option in Nonpareil), 0, 1, -1, 1.3, -1.1, 1.5, -1.5.
+      weights.exp = NA,
+      #' @param skip.model
+      #' If set, skips the model estimation altogether.
+      skip.model = FALSE,
+      #' @param ...
+      #' Any additional parameters passed to \code{plot.Nonpareil.Curve}.
       ...
-      ### Any additional parameters passed to `plot.Nonpareil.Curve`
       ){
   # Check parameters and initialize object
   if(is.na(label)){
@@ -646,40 +836,48 @@ Nonpareil.curve <- structure(function(
   # Warnings
   for(w in np$warnings) warning(w)
 
-  # Return
+  #' @return
+  #' Returns invisibly a \code{Nonpareil.Curve} object
   invisible(np)
-  ### Returns invisibly a `Nonpareil.Curve` object
-}, ex=function(){
-  # Generate a Nonpareil plot
-  file <- system.file("extdata", "LakeLanier.npo", package="Nonpareil")
-  np <- Nonpareil.curve(file)
 
-  # Show the estimated values
-  print(np)
+  #' @examples
+  #' # Generate a Nonpareil plot
+  #' file <- system.file("extdata", "LakeLanier.npo", package="Nonpareil")
+  #' np <- Nonpareil.curve(file)
+  #'
+  #' # Show the estimated values
+  #' print(np)
+  #'
+  #' # Predict coverage for 20Gbp
+  #' predict(np, 20e9)
+  #'
+  #' # Obtain the Nd diversity index
+  #' np$diversity
+}
 
-  # Predict coverage for 20Gbp
-  predict(np, 20e9)
-
-  # Obtain the Nd diversity index
-  np$diversity
-})
-Nonpareil.set <- structure(function(
-      ### Generates a collection of Nonpareil curves (a `Nonpareil.Set` object)
-      ### and (optionally) plots all of them in a single canvas
+#' Generates a collection of Nonpareil curves (a \code{Nonpareil.Set} object)
+#' and (optionally) plots all of them in a single canvas.
+Nonpareil.set <- function(
+      #' @param files
+      #' Vector with the paths to the .npo files.
       files,
-      ### Vector with the paths to the .npo files
-      col=NA,
-      ### Color of the curves (vector). If not passed, values are randomly
-      ### assigned. Values are recycled
-      labels=NA,
-      ### Labels of the curves (vector). If not passed, values are determined by
-      ### the filename. Values are recycled
-      plot=TRUE,
-      ### If TRUE, it generates the Nonpareil curve plots
-      plot.opts=list(),
-      ### Any parameters accepted by `plot.Nonpareil.Set` as a list
+      #' @param col
+      #' Color of the curves (vector). If not passed, values are randomly
+      #' assigned. Values are recycled.
+      col = NA,
+      #' @param labels
+      #' Labels of the curves (vector). If not passed, values are determined by
+      #' the filename. Values are recycled.
+      labels = NA,
+      #' @param plot
+      #' If TRUE, it generates the Nonpareil curve plots.
+      plot = TRUE,
+      #' @param plot.opts
+      #' Any parameters accepted by \code{plot.Nonpareil.Set} as a list.
+      plot.opts = list(),
+      #' @param ...
+      #' Any additional parameters accepted by \code{Nonpareil.curve}.
       ...
-      ### Any additional parameters accepted by `Nonpareil.curve`
       ){
   files <- as.vector(files)
   y <- new("Nonpareil.Set", call=match.call())
@@ -692,7 +890,8 @@ Nonpareil.set <- structure(function(
     nonpareil.opts[["file"]] <- files[i]
     nonpareil.opts[["col"]] <- col[i]
     nonpareil.opts[["label"]] <- labels[i]
-    y$np.curves[[ length(y$np.curve)+1 ]] <- do.call("Nonpareil.curve", nonpareil.opts)
+    y$np.curves[[ length(y$np.curve)+1 ]] <- do.call("Nonpareil.curve",
+      nonpareil.opts)
   }
 
   # Plot
@@ -701,30 +900,36 @@ Nonpareil.set <- structure(function(
     y <- do.call("plot", plot.opts)
   }
 
-  # Return
+  #' @return
+  #' Returns invisibly a \code{Nonpareil.Set} object.
   invisible(y)
-  ### Returns invisibly a `Nonpareil.Set` object
-}, ex=function(){
-  # Generate a Nonpareil plot with multiple curves
-  files <- system.file("extdata",
-        c("HumanGut.npo","LakeLanier.npo","IowaSoil.npo"), package="Nonpareil")
-  col <- c("orange","darkcyan","firebrick4")
-  nps <- Nonpareil.set(files, col=col,
-        plot.opts=list(plot.observed=FALSE, model.lwd=2))
 
-  # Show the estimated values
-  print(nps)
+  #' @examples
+  #' # Generate a Nonpareil plot with multiple curves
+  #' files <- system.file("extdata",
+  #'       c("HumanGut.npo","LakeLanier.npo","IowaSoil.npo"),
+  #'       package="Nonpareil")
+  #' col <- c("orange","darkcyan","firebrick4")
+  #' nps <- Nonpareil.set(files, col=col,
+  #'       plot.opts=list(plot.observed=FALSE, model.lwd=2))
+  #'
+  #' # Show the estimated values
+  #' print(nps)
+  #'
+  #' # Show current coverage (as %)
+  #' summary(nps)[,"C"]*100
+  #'
+  #' # Extract Nd diversity index
+  #' summary(nps)[,"diversity"]
+  #'
+  #' # Extract sequencing effort for nearly complete coverage (in Gbp)
+  #' summary(nps)[,"LRstar"]/1e9
+  #'
+  #' # Predict coverage for a sequencing effort of 10Gbp
+  #' sapply(nps$np.curves, predict, 10e9)
+}
 
-  # Show current coverage (as %)
-  summary(nps)[,"C"]*100
-
-  # Extract Nd diversity index
-  summary(nps)[,"diversity"]
-
-  # Extract sequencing effort for nearly complete coverage (in Gbp)
-  summary(nps)[,"LRstar"]/1e9
-
-  # Predict coverage for a sequencing effort of 10Gbp
-  sapply(nps$np.curves, predict, 10e9)
-})
+#' Alias of \code{Nonpareil.set}.
+#' @inheritParams Nonpareil.set
 Nonpareil.curve.batch <- Nonpareil.set
+

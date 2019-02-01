@@ -1,7 +1,7 @@
 Package: Nonpareil
 Title: Metagenome Coverage Estimation and Projections for 'Nonpareil'
 Type: Package
-Version: 3.3.3
+Version: 3.3.4
 Authors@R: c(person("Luis M.","Rodriguez-R",role=c("aut","cre"),
 	   email="lmrodriguezr@gmail.com"))
 Author: Luis M. Rodriguez-R [aut, cre]
@@ -15,3 +15,4 @@ Imports:
 License: Artistic-2.0
 LazyLoad: yes
 Encoding: UTF-8
+RoxygenNote: 6.1.1
