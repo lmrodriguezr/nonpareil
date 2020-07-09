@@ -15,7 +15,7 @@
 #include <string>
 
 #define LARGEST_PATH 4096
-#define NP_VERSION 3.303
+#define NP_VERSION 3.304
 
 using namespace std;
 int processID;
