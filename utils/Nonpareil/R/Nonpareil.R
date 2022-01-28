@@ -854,6 +854,13 @@ Nonpareil.curve <- function(
   #' file <- system.file("extdata", "LakeLanier.npo", package = "Nonpareil")
   #' np <- Nonpareil.curve(file)
   #'
+  #' # Produce the same plot but using powers of 1,000bp as X axis labels
+  #' Nonpareil.curve(file, xaxt = "n", xlab = "Sequencing Effort")
+  #' axis(
+  #'   1L, at = 10L^seq(3L, 12L, by = 3L),
+  #'   labels = paste(1L, c("Kbp", "Mbp", "Gbp", "Tbp"))
+  #' )
+  #'
   #' # Show the estimated values
   #' print(np)
   #'
