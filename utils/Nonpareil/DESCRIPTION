@@ -7,8 +7,8 @@ Authors@R: c(person("Luis M.","Rodriguez-R",role=c("aut","cre"),
 Author: Luis M. Rodriguez-R [aut, cre]
 Maintainer: Luis M. Rodriguez-R <lmrodriguezr@gmail.com>
 Description: Plot, process, and analyze NPO files produced by
-    'Nonpareil' <http://enve-omics.ce.gatech.edu/nonpareil>.
-URL: http://enve-omics.ce.gatech.edu/nonpareil
+    'Nonpareil' <http://enve-omics.ce.gatech.edu/nonpareil/>.
+URL: http://enve-omics.ce.gatech.edu/nonpareil/
 Depends: R (>= 2.9)
 Imports:
     methods
