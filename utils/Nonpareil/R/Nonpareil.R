@@ -107,19 +107,22 @@ setClass("Nonpareil.Curve",
   #' @slot call Call producing this object.
   call = 'call'
 
-  ), package = 'Nonpareil' );
+  ), package = "Nonpareil"
+);
 
 #' Collection of \code{Nonpareil.Curve} objects. This object can be produced by
 #' \code{Nonpareil.curve.batch} and supports S4 methods \code{plot},
 #' \code{summary}, and \code{print}.
-setClass("Nonpareil.Set",
+setClass(
+  "Nonpareil.Set",
   representation(
-  #' @slot np.curves List of \code{Nonpareil.Curve} objects.
-  np.curves = 'list',
-  #' @slot call Call producing this object.
-  call = 'call'
+    #' @slot np.curves List of \code{Nonpareil.Curve} objects.
+    np.curves = "list",
+    #' @slot call Call producing this object.
+    call = "call"
 
-  ), package='Nonpareil' );
+  ), package = "Nonpareil"
+);
 
 # S3 Methods -------------------------------------------------------------------
 
@@ -128,17 +131,20 @@ setMethod("$", "Nonpareil.Curve",
   #' @param x \code{Nonpareil.Curve} object.
   #' @param name Attribute.
   function(x, name) attr(x, name))
+
 #' Set attribute.
 setMethod("$<-", "Nonpareil.Curve",
   #' @param x \code{Nonpareil.Curve} object.
   #' @param name Attribute.
   #' @param value New value.
   function(x, name, value) { attr(x, name) <- value ; x })
+
 #' Get attribute.
 setMethod("$", "Nonpareil.Set",
   #' @param x \code{Nonpareil.Set} object.
   #' @param name Attribute.
   function(x, name) attr(x, name))
+
 #' Set attribute.
 setMethod("$<-", "Nonpareil.Set",
   #' @param x \code{Nonpareil.Set} object.
@@ -170,25 +176,25 @@ plot.Nonpareil.Set <- function(
       #' @param ...
       #' Any additional parameters passed to \code{plot.Nonpareil.Curve}.
       ...
-      ){
-  if(!inherits(x, "Nonpareil.Set"))
+      ) {
+  if (!inherits(x, "Nonpareil.Set"))
     stop("'x' must inherit from class `Nonpareil.Set`")
 
   # Plots
   new <- TRUE;
   col <- rep(col, length.out = length(x$np.curves))
   labels <- rep(labels, length.out = length(x$np.curves))
-  for(i in 1:length(x$np.curves)){
-    if(!is.na(col[i])) x$np.curves[[i]]$col <- col[i]
-    if(!is.na(labels[i])) x$np.curves[[i]]$label <- labels[i]
+  for (i in 1:length(x$np.curves)) {
+    if (!is.na(col[i])) x$np.curves[[i]]$col <- col[i]
+    if (!is.na(labels[i])) x$np.curves[[i]]$label <- labels[i]
     plot(x$np.curves[[i]], new = new, main = ifelse(new, main, ""), ...)
     new <- FALSE
   }
 
   # Legend
-  if(inherits(legend.opts, "list")){
+  if (inherits(legend.opts, "list")) {
     legend.opts[["np"]] <- x
-    if(is.null(legend.opts[["x"]])) legend.opts[["x"]] <- "bottomright"
+    if (is.null(legend.opts[["x"]])) legend.opts[["x"]] <- "bottomright"
     do.call(Nonpareil.legend, legend.opts)
   }
 
@@ -288,10 +294,13 @@ plot.Nonpareil.Curve <- function(
 
   # Create empty canvas
   if(new){
-    plot(1, type="n", xlim=xlim, ylim=ylim, bty="l",
-          xlab=xlab, ylab=ylab, main=main, xaxs="i", yaxs="i", log=log, ...)
-    abline(h=c(1, x$star/100), lty=2, col="red")
-    abline(v=10^seq(0,15,by=3), lty=2, col="gray80")
+    plot(
+      1, type = "n", xlim = xlim, ylim = ylim, bty = "l",
+      xlab = xlab, ylab = ylab, main = main,
+      xaxs = "i", yaxs = "i", log = log, ...
+    )
+    abline(h = c(1, x$star/100), lty = 2, col = "red")
+    abline(v = 10^seq(0, 15, by = 3), lty = 2, col = "gray80")
   }
 
   # Dispersion
@@ -842,7 +851,7 @@ Nonpareil.curve <- function(
 
   #' @examples
   #' # Generate a Nonpareil plot
-  #' file <- system.file("extdata", "LakeLanier.npo", package="Nonpareil")
+  #' file <- system.file("extdata", "LakeLanier.npo", package = "Nonpareil")
   #' np <- Nonpareil.curve(file)
   #'
   #' # Show the estimated values
@@ -906,24 +915,28 @@ Nonpareil.set <- function(
 
   #' @examples
   #' # Generate a Nonpareil plot with multiple curves
-  #' files <- system.file("extdata",
-  #'       c("HumanGut.npo","LakeLanier.npo","IowaSoil.npo"),
-  #'       package="Nonpareil")
+  #' files <- system.file(
+  #'   "extdata",
+  #'   c("HumanGut.npo", "LakeLanier.npo", "IowaSoil.npo"),
+  #'   package = "Nonpareil"
+  #' )
   #' col <- c("orange","darkcyan","firebrick4")
-  #' nps <- Nonpareil.set(files, col=col,
-  #'       plot.opts=list(plot.observed=FALSE, model.lwd=2))
+  #' nps <- Nonpareil.set(
+  #'   files, col = col,
+  #'   plot.opts = list(plot.observed = FALSE, model.lwd = 2)
+  #' )
   #'
   #' # Show the estimated values
   #' print(nps)
   #'
   #' # Show current coverage (as %)
-  #' summary(nps)[,"C"]*100
+  #' summary(nps)[, "C"] * 100
   #'
   #' # Extract Nd diversity index
-  #' summary(nps)[,"diversity"]
+  #' summary(nps)[, "diversity"]
   #'
   #' # Extract sequencing effort for nearly complete coverage (in Gbp)
-  #' summary(nps)[,"LRstar"]/1e9
+  #' summary(nps)[, "LRstar"] / 1e9
   #'
   #' # Predict coverage for a sequencing effort of 10Gbp
   #' sapply(nps$np.curves, predict, 10e9)
