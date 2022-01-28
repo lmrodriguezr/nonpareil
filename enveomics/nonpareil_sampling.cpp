@@ -26,83 +26,89 @@
 
 using namespace std;
 
-int nonpareil_sample_portion(double *&result, int threads, samplepar_t samplepar){
-   // Vars
-   if(samplepar.replicates<threads) threads = samplepar.replicates;
-   samplejob_t		samplejob[threads];
-   pthread_t		thread[threads];
-   pthread_mutex_t	mutex = PTHREAD_MUTEX_INITIALIZER;
-   int			rc, samples_per_thr, launched_replicates=0;
+int nonpareil_sample_portion(double *&result, int threads, samplepar_t samplepar) {
+  // Vars
+  if(samplepar.replicates<threads) threads = samplepar.replicates;
+  samplejob_t		samplejob[threads];
+  pthread_t		thread[threads];
+  pthread_mutex_t	mutex = PTHREAD_MUTEX_INITIALIZER;
+  int			rc, samples_per_thr, launched_replicates = 0;
+  unsigned int		predictable_seed = rand();
 
-   // Blank result
-   result = new double[samplepar.replicates];
-   for(int a=0; a<samplepar.replicates; a++) result[a] = 0.0;
+  // Blank result
+  result = new double[samplepar.replicates];
+  for (int a = 0; a < samplepar.replicates; a++) result[a] = 0.0;
 
-   // Set sample
-   //if(processID==0)
-   say("4sfs^", "Sampling at ", samplepar.portion*100, "%");
-   samples_per_thr = (int)ceil((double)samplepar.replicates/(double)threads);
-   threads = (int)ceil((double)samplepar.replicates/samples_per_thr);
+  // Set sample
+  say("4sfs^", "Sampling at ", samplepar.portion * 100, "%");
+  samples_per_thr = (int)ceil((double)samplepar.replicates/(double)threads);
+  threads = (int)ceil((double)samplepar.replicates/samples_per_thr);
 
-   // Launch samplings
-   for(int thr=0; thr<threads; thr++){
-      samplejob[thr].id = thr;
-      samplejob[thr].from_in_result = thr*samples_per_thr; // Zero-based index to start at in the results array
-      samplejob[thr].number = samplejob[thr].from_in_result+samples_per_thr > samplepar.replicates ? samplepar.replicates-samplejob[thr].from_in_result : samples_per_thr;
-      samplejob[thr].samplepar = samplepar;
-      samplejob[thr].result = &result;
-      samplejob[thr].mutex = &mutex;
-      launched_replicates += samplejob[thr].number;
+  // Launch samplings
+  for (int thr = 0; thr < threads; thr++){
+    samplejob[thr].id = thr;
+    // Zero-based index to start at in the results array
+    samplejob[thr].from_in_result = thr*samples_per_thr;
+    samplejob[thr].number =
+      samplejob[thr].from_in_result+samples_per_thr > samplepar.replicates ?
+        samplepar.replicates-samplejob[thr].from_in_result : samples_per_thr;
+    samplejob[thr].samplepar = samplepar;
+    samplejob[thr].result = &result;
+    samplejob[thr].mutex = &mutex;
+    samplejob[thr].rseed = predictable_seed + thr;
+    launched_replicates += samplejob[thr].number;
 
-      if((rc=pthread_create(&thread[thr], NULL, &nonpareil_sample_portion_thr, (void *)&samplejob[thr]  )))
-	 error("Thread creation failed", (char)rc);
-   }
+    rc = pthread_create(
+      &thread[thr], NULL, &nonpareil_sample_portion_thr,
+      (void *)&samplejob[thr]
+    );
+    if (rc) error("Thread creation failed", (char)rc);
+  }
 
-   // Gather jobs
-   for(int thr=0; thr<threads; thr++){
-      //if(thr%processes == processID)
-      pthread_join(thread[thr], NULL);
-   }
+  // Gather jobs
+  for (int thr = 0; thr < threads; thr++) pthread_join(thread[thr], NULL);
 
-   // Return
-   return launched_replicates;
+  // Return
+  return launched_replicates;
 }
 
 void *nonpareil_sample_portion_thr(void *samplejob_ref){
-   // Vars
-   samplejob_t	*samplejob = (samplejob_t *)samplejob_ref;
-   int		*&mates_ref = *samplejob->samplepar.mates, n;
-   double	*result_cp = new double[samplejob->number], p, p_gt_0;
+  // Vars
+  samplejob_t	*samplejob = (samplejob_t *)samplejob_ref;
+  int		*&mates_ref = *samplejob->samplepar.mates, n;
+  double	*result_cp = new double[samplejob->number], p, p_gt_0;
 
-   // Sample
-   for(int i=0; i<samplejob->number; i++){
-      int	found=0, sample_size=0;
-      // For each read with known number of mates
-      for(int j=0; j<samplejob->samplepar.mates_size; j++){
-         // Include the read in the sample?
-	 if(((double)rand()/(double)RAND_MAX) < samplejob->samplepar.portion){
-	    sample_size++;
-	    // Does the sample contain at least one mate?
-	    // if((double)rand()/(double)RAND_MAX < 1.0-pow(1-samplejob->samplepar.portion, mates_ref[j]-1)) found++;
-	    n=(int)floor((samplejob->samplepar.total_reads)*samplejob->samplepar.portion)-1; // -1 because we exclude the query read from the sample
-	    if(n<0) n=0;
-	    p=(double)(mates_ref[j]-1.0)/(samplejob->samplepar.total_reads-1.0); // Again, -1 in both terms because of the query read
-	    p_gt_0 = 1.0 - pow(1.0-p, n);
-	    //cout << "n=" << n << ", p=" << p << "P(X>0)=" << p_gt_0 << endl;
-	    if((double)rand()/(double)RAND_MAX < p_gt_0) found++;
-	 }
+  // Sample
+  for (int i = 0; i < samplejob->number; i++) {
+    int	found = 0, sample_size = 0;
+    // For each read with known number of mates
+    for (int j = 0; j < samplejob->samplepar.mates_size; j++) {
+      // Include the read in the sample?
+      if (((double)rand_r(&samplejob->rseed)/(double)RAND_MAX) < samplejob->samplepar.portion) {
+        sample_size++;
+        // Does the sample contain at least one mate?
+        n = (int)floor((samplejob->samplepar.total_reads)*samplejob->samplepar.portion)-1;
+        // -1 because we exclude the query read from the sample
+
+        if (n < 0) n = 0;
+        p = (double)(mates_ref[j] - 1.0)/(samplejob->samplepar.total_reads - 1.0);
+        // Again, -1 in both terms because of the query read
+
+        p_gt_0 = 1.0 - pow(1.0-p, n);
+        if((double)rand_r(&samplejob->rseed)/(double)RAND_MAX < p_gt_0) found++;
       }
-      result_cp[i] = sample_size==0 ? 0.0 : (double)found/(double)sample_size;
-   }
+    }
+    result_cp[i] = sample_size==0 ? 0.0 : (double)found/(double)sample_size;
+  }
 
-   // Transfer results to the external vector
-   pthread_mutex_lock( samplejob->mutex );
-      double *&result_ref = *samplejob->result;
-      //					        v--> position + first of the thread
-      for(int i=0; i<samplejob->number; i++) result_ref[i + samplejob->from_in_result] = result_cp[i];
-   pthread_mutex_unlock( samplejob->mutex );
+  // Transfer results to the external vector
+  pthread_mutex_lock( samplejob->mutex );
+  double *&result_ref = *samplejob->result;
+  //						    v--> position + first of the thread
+  for(int i=0; i<samplejob->number; i++) result_ref[i + samplejob->from_in_result] = result_cp[i];
+  pthread_mutex_unlock( samplejob->mutex );
 
-   return (void *)0;
+  return (void *)0;
 }
 
 sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, char *alldata, char *outfile, samplepar_t samplepar){

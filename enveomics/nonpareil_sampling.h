@@ -78,6 +78,7 @@ typedef struct {
  *   double **result: A reference to a double array to be filled with the
  *      sub-sampling results.
  *   pthread_mutex_t *mutex: A mutex to be used when modifying the result array.
+ *   unsigned int rseed: Random seed.
  */
 typedef struct {
    int			id;
@@ -86,6 +87,7 @@ typedef struct {
    samplepar_t		samplepar;
    double		**result;
    pthread_mutex_t	*mutex;
+   unsigned int		rseed;
 } samplejob_t;
 
 /**
