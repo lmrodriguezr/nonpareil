@@ -521,9 +521,6 @@ restart_checkings:
     }
     // High sequencing depth
     if(sample_summary[sample_i-1].avg >= 0.95){
-      say("1ss$",
-        "WARNING: The curve reached near-saturation, ",
-        "hence coverage estimations could be unreliable");
       if(ovl<1.0){
         if(autoadjust){
                if(ovl<0.25)  ovl = 0.25;
@@ -532,9 +529,7 @@ restart_checkings:
           else if(ovl<1.0) ovl = 1.0;
           say("1sf$", "AUTOADJUST: -L ", ovl*100.0);
           goto restart_mates;
-        }else say("1sf$",
-          "To avoid saturation increase the -L parameter, currently set at ",
-          ovl*100);
+        }
       } else {
 	  say("1ss$",
             "The overlap (-L) is currently set to the maximum, ",
