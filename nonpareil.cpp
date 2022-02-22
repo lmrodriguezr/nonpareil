@@ -15,7 +15,7 @@
 #include <string>
 
 #define LARGEST_PATH 4096
-#define NP_VERSION 3.400
+#define NP_VERSION 3.401
 
 using namespace std;
 int processID;
@@ -205,28 +205,29 @@ int main(int argc, char *argv[]) {
   int count = 0;
   int limit = 10 * hX; //metagenome should have 10 times more than query reads
   if (strcmp(nonpareiltype, "alignment") == 0) limit = hX;
-  
+
   Sequence test_temp;
+  ifstream testifs((string(file)));
   if (strcmp(format,"fasta") == 0) {
-    ifstream testifs((string(file)));
     FastaReader testfastaReader(testifs);
     while(testfastaReader.readNextSeq(test_temp) != (size_t)(-1)) {
       count++;
       if (count > limit) break;
     }
   } else if(strcmp(format,"fastq") == 0) {
-    ifstream testifs((string(file)));
     FastqReader testfastqReader(testifs);
     while(testfastqReader.readNextSeq(test_temp) != (size_t)(-1)) {
       count++;
       if (count > limit) break;
     }
   }
-  if (count < limit) {
+  if (count == 0) {
+    error("No reads found, probably the input file doesn't exist or it's unreadable");
+  } else if (count < limit) {
     if (strcmp(nonpareiltype, "alignment") == 0)
       error("Reduce the number of query reads (-X) to fit total reads");
     else
-      error("Reduce the number of query reads (-X) to 10%% of total reads");
+      error("Reduce the number of query reads (-X) to ≤ 10\% of total reads");
   }
   if(alldata && (strlen(alldata) > 0)) remove(alldata);
   if(cntfile && (strlen(cntfile) > 0)) remove(cntfile);
