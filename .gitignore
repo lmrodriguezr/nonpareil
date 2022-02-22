@@ -5,3 +5,4 @@ enveomics/*.o
 /Nonpareil_*.tar.gz
 /Nonpareil.Rcheck*
 /*.np?
+.DS_Store
