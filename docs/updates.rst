@@ -1,6 +1,12 @@
 Updates history
 ===============
 
+What's new in 3.5
+-----------------
+* Gzipped input now supported.
+* MPI support extended by using C bindings.
+* Safer RAM handling.
+
 What's new in 3.3
 -----------------
 * Release used in the manuscript "Nonpareil 3: Fast Estimation of Metagenomic
