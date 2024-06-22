@@ -31,45 +31,71 @@ typedef struct {
    unsigned int	hang;	// <- The hang in the above expression
 } count_t;
 
-int	V=0;
-char	nuc_char[] = {'N','A','C','G','T','R','Y','S','W','K','M','B','D','H','V','.'};
-char	hex_char[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+int  V=0;
+char nuc_char[] = {
+  'N', 'A', 'C', 'G', 'T', 'R', 'Y', 'S', 'W', 'K', 'M', 'B', 'D', 'H', 'V', '.'
+};
+char hex_char[] = {
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
+};
 
 void help(const char *msg){
-   if(msg!=NULL && strlen(msg) != 0) cerr << endl << msg << endl << endl;
-   cerr << "Goal:"<< endl
-   	<< "   Calculate (or approximate) the composition of (poly-)nucleotides in large datasets." << endl
-   	<< "Usage:" << endl
-	<< "   nuc_sampler -s sequences.fa [options]" << endl
-	<< "   nuc_sampler -h" << endl
-	<< "   nuc_sampler -V" << endl
-   	<< "Mandatory arguments:" << endl
-	<< "   -s <str> : Path to the (input) file containing the sequences.  This is lowercase s." << endl
-	<< "Additional options:" << endl
-	<< "   -o <str> : Path to the (output) file where results will be saved.  By default the results are sent to stdout.  This" << endl
-	<< "              is the same behavior as using a dash (-).  If an empty string is provided, does not produce the output." << endl
-	<< "   -e       : Produce extended output." << endl
-	<< "   -f <str> : The format of the sequences.  Can be 'fasta' or 'fastq'.  By default: 'fasta'" << endl
-	<< "   -k <int> : Size of the polynucleotides (words) to count.  By default: 1." << endl
-	<< "   -r <int> : Random generator seed.  By default current time." << endl
-	<< "   -v <int> : Verbose, for debugging purposes.  By default 0.  This is lowercase v." << endl
-	<< "   -x <num> : Probability of taking a sequence into account, regardless of the sequence's length. Higher values reduce" << endl
-	<< "              accuracy but increase speed.   Any value lower than 1 produces and approximation of the composition.  By" << endl
-	<< "              default 1." << endl
-	<< "   -h       : Display this message and exit." << endl
-	<< "   -V       : Show version information and exit.  This is uppercase V." << endl
-	<< "Input:" << endl
-	<< "   Sequences must be in FastA or FastQ format." << endl
-	<< "Output:" << endl
-	<< "   - The output is a tab-separated table containing the columns:  id, kmer, count.  Id is an internal identifier; it's" << endl
-	<< "     provided for debug only.   The last column can be an approximation in scientific notation for large numbers.  See" << endl
-	<< "     -o." << endl
-	<< "   - The extended output is intended to provide higher precision for large counts, and contains the columns: id, kmer," << endl
-	<< "     count, base, order of magnitude, extra counts. The third column (count) is the approximation in the above format." << endl
-	<< "     The actual count can be calculated more accurately as the product of base (fourth column)  and order of magnitude" << endl
-	<< "     (fourth column), plus the extra counts (fifth column).  In this compilation, the value of order of magnitude is a" << endl
-	<< "     power of " << OMAG_STEP << ".  See -o and -e." << endl
-	;
+  if(msg!=NULL && strlen(msg) != 0) cerr << endl << msg << endl << endl;
+  cerr
+    << "DESCRIPTION"                                                     << endl
+    <<"   Calculates or approximates the composition of nucleotides or"  << endl
+    <<"   polynucleotides in large datasets"                             << endl
+    << endl
+    <<"USAGE"                                                            << endl
+    <<"   nuc_sampler -s sequences.fa [options]"                         << endl
+    <<"   nuc_sampler -h"                                                << endl
+    <<"   nuc_sampler -V"                                                << endl
+    << endl
+    <<"MANDATORY ARGUMENTS"                                              << endl
+    <<"   -s <str> : Path to the (input) file containing the sequences"  << endl
+    << endl
+    <<"ADDITIONAL OPTIONS"                                               << endl
+    <<"   -o <str> : Path to the output file where results will be"      << endl
+    <<"              saved. By default the results are sent to stdout."  << endl
+    <<"              This is the same behavior as using a dash (-)."     << endl
+    <<"              If an empty string is provided, does not produce"   << endl
+    <<"              any output"                                         << endl
+    <<"   -e       : Produce extended output"                            << endl
+    <<"   -f <str> : The format of the sequences. Can be 'fasta' or"     << endl
+    <<"              'fastq'. By default: 'fasta'"                       << endl
+    <<"   -k <int> : Size of the polynucleotides (words) to count."      << endl
+    <<"              By default: 1" << endl
+    <<"   -r <int> : Random generator seed. By default current time"     << endl
+    <<"   -v <int> : Verbose, for debugging purposes. By default 0"      << endl
+    <<"   -x <num> : Probability of taking a sequence into account,"     << endl
+    <<"              regardless of the sequence length. Lower values"    << endl
+    <<"              reduce accuracy but increase speed. Any value"      << endl
+    <<"              lower than 1 produces and approximation of the"     << endl
+    <<"              composition. By default 1"                          << endl
+    <<"   -h       : Display this message and exit"                      << endl
+    <<"   -V       : Show version information and exit"                  << endl
+    << endl
+    <<"INPUT"                                                            << endl
+    <<"   Sequences must be in FastA or FastQ format"                    << endl
+    << endl
+    <<"OUTPUT"                                                           << endl
+    <<"   - The output is a tab-separated table containing the columns:" << endl
+    <<"     1. id: an internal identifier, provided only for debugging"  << endl
+    <<"     2. kmer: the (poly-)nucleotide string"                       << endl
+    <<"     3. count: the total count, which can be an approximation"    << endl
+    <<"        in scientific notation for large numbers"                 << endl
+    <<"   - The extended output is intended to provide higher precision" << endl
+    <<"     for large counts, and contains the following additional"     << endl
+    <<"     columns (using -e):"                                         << endl
+    <<"     4. base: count expressed as times of order of magnitude"     << endl
+    <<"     5. order of magnitude: units of base"                        << endl
+    <<"     6. extra counts: excess counts from base"                    << endl
+    <<"     The actual count can be calculated more accurately as the"   << endl
+    <<"     product of base (fourth column) and order of magnitude"      << endl
+    <<"     (fourth column), plus the extra counts (fifth column)."      << endl
+    <<"     In this compilation, the value of order of magnitude is a"   << endl
+    <<"     power of " << OMAG_STEP                                      << endl
+    << endl;
    exit(1);
 }
 
@@ -205,11 +231,11 @@ void report(count_t *&counts, unsigned int length, char *outfile, bool extended)
 }
 
 int main(int argc, char *argv[]) {
-   cout << "nuc_sampler v1.0" << endl;
-   if(argc<=1) help("");
+   cout << "nuc_sampler v1.1" << endl;
+   if (argc <= 1) help("");
 
    // Vars
-   char		*file, *format=(char *)"fasta", *outfile=(char *)"-", *namFile, *seqFile;
+   char		*file = (char *)"", *format=(char *)"fasta", *outfile=(char *)"-", *namFile, *seqFile;
    double	heur=1.0;
    int		rseed=time(NULL), largest_seq;
    unsigned int	k=1, labels_no, N;
@@ -233,14 +259,17 @@ int main(int argc, char *argv[]) {
       }
    
    // Initialize
-   if(strlen(file)==0) help("");
-   if(strcmp(format, "fasta")!=0 & strcmp(format, "fastq")!=0)
+   if (strlen(file) == 0) help("");
+   if (strcmp(format, "fasta") != 0 & strcmp(format, "fastq") != 0)
       help("Unsupported value for -f option");
-   if(k<=0) help("Bad argument for -k option: it must be a non-zero positive integer");
-   if(heur<=0.0 | heur>1.0) help("Bad argument for -x option: it must be in the range (0, 1]");
-   if(outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0)) remove(outfile);
+   if (k<=0)
+     help("Bad argument for -k option: it must be a non-zero positive integer");
+   if (heur<=0.0 || heur>1.0)
+     help("Bad argument for -x option: it must be in the range (0, 1]");
+   if (outfile && (strlen(outfile)>0) & (strcmp(outfile, "-")!=0))
+     remove(outfile);
    srand(rseed);
-   
+
    // Parse file
    if(V) cerr << "Counting sequences" << endl;
    N = build_index(file, format, namFile, seqFile, largest_seq);
@@ -253,6 +282,10 @@ int main(int argc, char *argv[]) {
    // Run counts
    labels_no = count_polynucleotides(counts, seqFile, k, heur);
    report(counts, labels_no, outfile, extended);
+
+   // Cleanup
+   remove(namFile);
+   remove(seqFile);
 
    return 0;
 }

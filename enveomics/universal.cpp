@@ -23,10 +23,10 @@ bool		OpenLog;
 
 void error(const char *msg, const char *val){
    cerr << "Fatal error:" << endl << msg;
-   if(val!=NULL && strlen(val)>0) cerr << ": " << endl << val;
+   if (val!=NULL && strlen(val) > 0) cerr << ": " << endl << val;
    cerr << endl;
    say("0ss", "Fatal error: ", msg);
-   if(val!=NULL && strlen(val)>0) say("0!ss", ": ", val);
+   if (val!=NULL && strlen(val) > 0) say("0!ss", ": ", val);
    say("0!$");
    exit(1);
 }
@@ -36,20 +36,20 @@ void error(const char *msg){
 }
 
 void error(const char *msg, int val){
-   char valChr[100]; // Is there a number larger than 10^100-1 still informative on error messages?
-   sprintf(valChr, "%d", val);
+   char *valChr = new char[100];
+   snprintf(valChr, 100, "%d", val);
    return error(msg, valChr);
 }
 
 void error(const char *msg, double val){
-   char valChr[100]; // Is there a number longer than 99 characters still informative on error messages?
-   sprintf(valChr, "%.5f", val);
+   char *valChr = new char[100];
+   snprintf(valChr, 100, "%.5f", val);
    return error(msg, valChr);
 }
 
 void error(const char *msg, unsigned int val){
-   char valChr[100]; // Is there a number larger than 10^100-1 still informative on error messages?
-   sprintf(valChr, "%d", val);
+   char *valChr = new char[100];
+   snprintf(valChr, 100, "%d", val);
    return error(msg, valChr);
 }
 
@@ -76,7 +76,7 @@ void close_log(){
    OpenLog = false;
 }
 
-bool log_is_open(){ return OpenLog; }
+bool log_is_open() { return OpenLog; }
 
 void say(const char *format, ...){
    va_list	arguments;
@@ -93,7 +93,8 @@ void say(const char *format, ...){
    if(format[startArg]=='!') startArg++;
    else{
       sArg = new char[LARGEST_STRING];
-      sprintf(sArg, " [% 9.1f] ", clock()/(60.0*CLOCKS_PER_SEC));
+      snprintf(sArg, LARGEST_STRING, " [% 9.1f] ",
+               clock() / (60.0 * CLOCKS_PER_SEC));
       out.append(sArg);
       for(int i=0; i<level; i++) out.append(" ");
    }
@@ -101,26 +102,26 @@ void say(const char *format, ...){
    for(int i=startArg; format[i] != '\0'; i++){
       sArg = new char[LARGEST_STRING];
       // Known types
-      if(format[i]=='f'){
-         sprintf(sArg, "%f", va_arg(arguments, double));
-      }else if(format[i]=='i'){
-         sprintf(sArg, "%d", va_arg(arguments, int));
-      }else if(format[i]=='u'){
-	 sprintf(sArg, "%u", va_arg(arguments, unsigned int));
-      }else if(format[i]=='s'){
+      if(format[i] == 'f') {
+         snprintf(sArg, LARGEST_STRING, "%f", va_arg(arguments, double));
+      } else if (format[i] == 'i') {
+         snprintf(sArg, LARGEST_STRING, "%d", va_arg(arguments, int));
+      } else if (format[i] == 'u') {
+	 snprintf(sArg, LARGEST_STRING, "%u", va_arg(arguments, unsigned int));
+      } else if (format[i] == 's') {
          sArg = va_arg(arguments, char *);
-      }else if(format[i]=='c'){
-         sprintf(sArg, "%c", va_arg(arguments, int));
+      } else if (format[i] == 'c') {
+         snprintf(sArg, LARGEST_STRING, "%c", va_arg(arguments, int));
       
-      // Termination characters
-      }else if(format[i]=='$'){
+      } else if (format[i] == '$') {
+         // Termination characters
          out.append("\n");
 	 goto print;
-      }else if(format[i]=='^' || format[i]=='>'){
-         if(Verbosity==9){
+      } else if (format[i] == '^' || format[i] == '>') {
+         if (Verbosity == 9) {
 	    out.append("\n");
 	    goto print;
-	 }else{
+	 } else {
 	    LogH << out << '\n';
 	    cerr << out;
 	    for(int a=0; a<30; a++) cerr << " ";

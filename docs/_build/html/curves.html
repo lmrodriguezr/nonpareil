@@ -1,18 +1,18 @@
+<!DOCTYPE html>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" data-content_root="./">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>Nonpareil curves &#8212; Nonpareil 3.3.1rc2 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    
+    <script src="_static/documentation_options.js?v=d1d09ded"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="MPI support" href="mpi.html" />
@@ -30,7 +30,8 @@
         <li class="right" >
           <a href="redundancy.html" title="Redundancy"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Nonpareil curves</a></li> 
       </ul>
     </div>  
 
@@ -39,9 +40,9 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="nonpareil-curves">
-<h1>Nonpareil curves<a class="headerlink" href="#nonpareil-curves" title="Permalink to this headline">¶</a></h1>
-<p>The estimation of the <a class="reference internal" href="redundancy.html"><span class="doc">Redundancy</span></a> is at the core of Nonpareil, but it's
+  <section id="nonpareil-curves">
+<h1>Nonpareil curves<a class="headerlink" href="#nonpareil-curves" title="Link to this heading">¶</a></h1>
+<p>The estimation of the <a class="reference internal" href="redundancy.html"><span class="doc">Redundancy</span></a> is at the core of Nonpareil, but it’s
 when those values are transformed into average coverage that they become
 comporable across samples, and become useful for project design and sample
 evaluation.</p>
@@ -49,9 +50,9 @@ evaluation.</p>
 (you can find it in the <code class="docutils literal notranslate"><span class="pre">utils</span></code> folder of Nonpareil). Second, the <code class="docutils literal notranslate"><span class="pre">.npo</span></code>
 file (or <code class="docutils literal notranslate"><span class="pre">-o</span></code> value, if you used this option) generated in the estimation of
 <a class="reference internal" href="redundancy.html"><span class="doc">Redundancy</span></a>.</p>
-<div class="section" id="for-the-impatient">
-<h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Permalink to this headline">¶</a></h2>
-<p>First, load the package. If you don't have it installed yet, you can open <a class="reference external" href="http://www.r-project.org/">R</a> and
+<section id="for-the-impatient">
+<h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Link to this heading">¶</a></h2>
+<p>First, load the package. If you don’t have it installed yet, you can open <a class="reference external" href="http://www.r-project.org/">R</a> and
 execute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">install</span><span class="o">.</span><span class="n">packages</span><span class="p">(</span><span class="s1">&#39;Nonpareil&#39;</span><span class="p">);</span>
 <span class="n">library</span><span class="p">(</span><span class="n">Nonpareil</span><span class="p">);</span>
@@ -73,17 +74,17 @@ execute:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Nonpareil</span><span class="o">.</span><span class="n">curve</span><span class="p">(</span><span class="s1">&#39;output.npo&#39;</span><span class="p">);</span> <span class="c1"># Change output.npo to the actual redundancy file.</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="nonpareil-curve">
-<h2>Nonpareil.curve()<a class="headerlink" href="#nonpareil-curve" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="nonpareil-curve">
+<h2>Nonpareil.curve()<a class="headerlink" href="#nonpareil-curve" title="Link to this heading">¶</a></h2>
 <p>This function can generate a Nonpareil curve from a <code class="docutils literal notranslate"><span class="pre">.npo</span></code> file. See the
 documentation of this function inside <a class="reference external" href="http://www.r-project.org/">R</a> after loading the Nonpareil package:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>?Nonpareil.curve
 </pre></div>
 </div>
-</div>
-<div class="section" id="nonpareil-set">
-<h2>Nonpareil.set()<a class="headerlink" href="#nonpareil-set" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="nonpareil-set">
+<h2>Nonpareil.set()<a class="headerlink" href="#nonpareil-set" title="Link to this heading">¶</a></h2>
 <p>This function can generate a plot with several Nonpareil curves from <code class="docutils literal notranslate"><span class="pre">.npo</span></code>
 files. See the documentation of this function in <a class="reference external" href="http://www.r-project.org/">R</a> after loading the Nonpareil
 package:</p>
@@ -94,12 +95,12 @@ package:</p>
 samples, something like:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># samples.txt</span>
 <span class="n">File</span>        <span class="n">Name</span>    <span class="n">Col</span>
-<span class="n">SRS063417</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Posterior</span> <span class="n">fornix</span>        <span class="s2">&quot;#FFC8C8&quot;</span>
-<span class="n">SRS063287</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Buccal</span> <span class="n">mucosa</span>   <span class="s2">&quot;#FF7878&quot;</span>
-<span class="n">SRS062540</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Tongue</span> <span class="n">dorsum</span>   <span class="s2">&quot;#FF0303&quot;</span>
-<span class="n">SRS016335</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Stool</span>   <span class="s2">&quot;#C8874C&quot;</span>
-<span class="n">SRS015574</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Supragingival</span> <span class="n">plaque</span>    <span class="s2">&quot;#E66478&quot;</span>
-<span class="n">SRS019087</span><span class="o">.</span><span class="mf">1.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Anterior</span> <span class="n">nares</span>  <span class="s2">&quot;#DCDC82&quot;</span>
+<span class="n">SRS063417</span><span class="mf">.1</span><span class="o">.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Posterior</span> <span class="n">fornix</span>        <span class="s2">&quot;#FFC8C8&quot;</span>
+<span class="n">SRS063287</span><span class="mf">.1</span><span class="o">.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Buccal</span> <span class="n">mucosa</span>   <span class="s2">&quot;#FF7878&quot;</span>
+<span class="n">SRS062540</span><span class="mf">.1</span><span class="o">.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Tongue</span> <span class="n">dorsum</span>   <span class="s2">&quot;#FF0303&quot;</span>
+<span class="n">SRS016335</span><span class="mf">.1</span><span class="o">.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Stool</span>   <span class="s2">&quot;#C8874C&quot;</span>
+<span class="n">SRS015574</span><span class="mf">.1</span><span class="o">.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Supragingival</span> <span class="n">plaque</span>    <span class="s2">&quot;#E66478&quot;</span>
+<span class="n">SRS019087</span><span class="mf">.1</span><span class="o">.</span><span class="n">L50</span><span class="o">.</span><span class="n">npo</span> <span class="n">Anterior</span> <span class="n">nares</span>  <span class="s2">&quot;#DCDC82&quot;</span>
 </pre></div>
 </div>
 <p>Note that this table is tab-delimited, because I find it easier to read, but you
@@ -118,17 +119,19 @@ something like this in the <a class="reference external" href="http://www.r-proj
 <span class="n">example</span><span class="p">(</span><span class="n">Nonpareil</span><span class="o">.</span><span class="n">set</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Nonpareil curves</a><ul>
 <li><a class="reference internal" href="#for-the-impatient">For the impatient</a></li>
 <li><a class="reference internal" href="#nonpareil-curve">Nonpareil.curve()</a></li>
@@ -137,12 +140,17 @@ something like this in the <a class="reference external" href="http://www.r-proj
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="redundancy.html"
-                        title="previous chapter">Redundancy</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="mpi.html"
-                        title="next chapter">MPI support</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="redundancy.html"
+                          title="previous chapter">Redundancy</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="mpi.html"
+                          title="next chapter">MPI support</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -150,18 +158,16 @@ something like this in the <a class="reference external" href="http://www.r-proj
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -178,12 +184,13 @@ something like this in the <a class="reference external" href="http://www.r-proj
         <li class="right" >
           <a href="redundancy.html" title="Redundancy"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Nonpareil curves</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2013-2017, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    &#169; Copyright 2013-2017, Luis M Rodriguez-R.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

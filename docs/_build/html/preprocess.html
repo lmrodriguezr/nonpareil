@@ -1,18 +1,18 @@
+<!DOCTYPE html>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" data-content_root="./">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <title>Preprocess the reads &#8212; Nonpareil 3.3.1rc2 documentation</title>
-    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" src="_static/documentation_options.js"></script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
+    
+    <script src="_static/documentation_options.js?v=d1d09ded"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Redundancy" href="redundancy.html" />
@@ -30,7 +30,8 @@
         <li class="right" >
           <a href="installation.html" title="Install Nonpareil"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Preprocess the reads</a></li> 
       </ul>
     </div>  
 
@@ -39,8 +40,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="preprocess-the-reads">
-<h1>Preprocess the reads<a class="headerlink" href="#preprocess-the-reads" title="Permalink to this headline">¶</a></h1>
+  <section id="preprocess-the-reads">
+<h1>Preprocess the reads<a class="headerlink" href="#preprocess-the-reads" title="Link to this heading">¶</a></h1>
 <p>Nonpareil expects that the sequencing error is always well below 5%, so we
 suggest using an expected error cutoff of 1% (<em>i.e.</em>, Q&gt;20, or 1 error in 100
 nucleotides). We recommend to perform this task using <a class="reference external" href="http://solexaqa.sourceforge.net/">SolexaQA</a>.</p>
@@ -59,20 +60,25 @@ them using <a class="reference external" href="https://github.com/lmrodriguezr/e
 <span class="n">FastA</span><span class="o">.</span><span class="n">split</span><span class="o">.</span><span class="n">pl</span> <span class="n">reads</span><span class="o">.</span><span class="n">fasta</span> <span class="n">reads</span> <span class="mi">2</span>
 </pre></div>
 </div>
-</div>
+</section>
 
 
+            <div class="clearer"></div>
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="installation.html"
-                        title="previous chapter">Install Nonpareil</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="redundancy.html"
-                        title="next chapter">Redundancy</a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="installation.html"
+                          title="previous chapter">Install Nonpareil</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="redundancy.html"
+                          title="next chapter">Redundancy</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -80,18 +86,16 @@ them using <a class="reference external" href="https://github.com/lmrodriguezr/e
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
@@ -108,12 +112,13 @@ them using <a class="reference external" href="https://github.com/lmrodriguezr/e
         <li class="right" >
           <a href="installation.html" title="Install Nonpareil"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Preprocess the reads</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2013-2017, Luis M Rodriguez-R.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    &#169; Copyright 2013-2017, Luis M Rodriguez-R.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
     </div>
   </body>
 </html>

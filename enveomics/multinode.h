@@ -26,14 +26,14 @@ void init_multinode(int& argc, char**& argv, int& pid, int& pp);
  */
 void finalize_multinode();
 
-size_t	broadcast_int(size_t value);
-double	broadcast_double(double value);
-char*	broadcast_char(char* value, size_t size);
-char	broadcast_char(char value);
-void	barrier_multinode();
-void	reduce_sum_int(int *send, int *receive, int size);
-void	reduce_sum_int(int send, int receive);
-void	reduce_sum_double(double *send, double *receive, int size);
+void broadcast_int(void* value);
+void broadcast_double(void* value);
+void broadcast_char(void* value, size_t size);
+void broadcast_char(void* value);
+void barrier_multinode();
+void reduce_sum_int(int *send, int *receive, int size);
+void reduce_sum_int(int send, int receive);
+void reduce_sum_double(double *send, double *receive, int size);
 
 #endif
 

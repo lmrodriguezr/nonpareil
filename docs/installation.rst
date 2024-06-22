@@ -39,10 +39,11 @@ Galaxy
 You can install Nonpareil on your own Galaxy instance:
 
 1. Go the Galaxy admin space
-2. Search on the main `Toolshed <https://toolshed.g2.bx.psu.edu/>`_ for the nonpareil repository available under the "Metagenomics" sections
+2. Search on the main `Toolshed <https://toolshed.g2.bx.psu.edu/>`_ for the
+   nonpareil repository available under the "Metagenomics" sections
 3. Install it
 
-  It will automatically install Nonpareil via the conda installation
+It will automatically install Nonpareil via the conda installation
 
 Homebrew
 --------
@@ -52,7 +53,7 @@ You can install Nonpareil using `Homebrew <https://brew.sh>` or
 
 1. Install `Homebrew <https://brew.sh>` if you haven't yet::
 
-    $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 2. Get the `brewsci/bio <https://brewsci.github.io/homebrew-bio/>` tap if you haven't yet::
 
@@ -105,8 +106,10 @@ Compilation
    In either case, you can specify the C++ compiler to be used setting the
    ``cpp`` or ``mpicpp`` variables, respectively. For example::
 
-      make cpp=/usr/local/bin/g++ nonpareil # This compiles nonpareil with /usr/local/bin/g++
-      make mpicpp=/usr/local/bin/mpic++ nonpareil-mpi # This compiles nonpareil-mpi with /usr/local/bin/mpic++
+      # This compiles nonpareil with /usr/local/bin/g++
+      make cpp=/usr/local/bin/g++ nonpareil
+      # This compiles nonpareil-mpi with /usr/local/bin/mpic++
+      make mpicpp=/usr/local/bin/mpic++ nonpareil-mpi
 
 3. **Install**
 

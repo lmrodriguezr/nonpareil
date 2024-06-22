@@ -36,4 +36,4 @@ nonpareil-mpi:
 	$(mpicpp) $(mpiflags) nonpareil_sampling.cpp -c $(CPPFLAGS)
 
 clean:
-	rm *.o
+	rm -f *.o

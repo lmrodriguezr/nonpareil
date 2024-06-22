@@ -79,6 +79,26 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq);
 int reverse_complement(char *&out, char *in);
 int reverse_complement(string &out, string in);
 
+/*
+ * bool has_gz_ext(const char *file);
+ * Description:
+ *   Evaluates if the input file has a .gz extension
+ * Input:
+ *   char *file: The path to the input file
+ * Output:
+ *   Returns true if the file ends in .gz, false otherwise
+ */
+bool has_gz_ext(const char *file);
+
+/*
+ * void unzip_file(char *infile, char *outfile);
+ * Description:
+ *   Unzips infile it into outfile
+ * Input:
+ *   char *infile: The path to the input file
+ *   char *outfile: The path to the output file
+ */
+void gunz_file(const char *infile, const char *outfile);
 
 #ifdef ENVEOMICS_NUC_T_DEFINE
 #define ENVEOMICS_NUC_T

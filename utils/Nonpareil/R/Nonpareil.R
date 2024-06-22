@@ -3,7 +3,7 @@
 #' Nonpareil: Metagenome Coverage Estimation and Projections for 'Nonpareil'.
 #'
 #' Plot, process, and analyze NPO files produced by 'Nonpareil'
-#' \url{http://enve-omics.ce.gatech.edu/nonpareil}.
+#' \url{http://enve-omics.ce.gatech.edu/nonpareil/}.
 #'
 #' @section Citation:
 #' If you use Nonpareil, please cite:

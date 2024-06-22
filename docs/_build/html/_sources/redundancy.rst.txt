@@ -9,10 +9,16 @@ For the impatient
 Even if you're in a hurry, taking a look at :doc:`preprocess` is very important.
 If you already did, you can simply run::
 
-    nonpareil -s reads.fa -T kmer -f fastq -b output # fastq is recommended for kmer algorithm
+    # fastq is recommended for kmer algorithm
+    nonpareil -s reads.fa -T kmer -f fastq -b output
     nonpareil -s reads.fa -T kmer -f fasta -b output
-    nonpareil -s reads.fa -T alignment -f fasta -b output # fasta is recommended for alignment algorithm
+
+    # fasta is recommended for alignment algorithm
+    nonpareil -s reads.fa -T alignment -f fasta -b output
     nonpareil -s reads.fa -T alignment -f fastq -b output
+
+    # gzipped files are also supported (with .gz extension)
+    nonpareil -s reads.fa.gz -T kmer -f fastq -b output
     
 
 Where ``reads.fa`` is the file containing the trimmed single reads, and
@@ -20,9 +26,10 @@ Where ``reads.fa`` is the file containing the trimmed single reads, and
 
 Mandatory options
 -----------------
-   -s <str>   Path to the (input) file containing the sequences.  This is lowercase S.
+   -s <str>   Path to the (input) file containing the sequences.
+              Gzipped files are supported with .gz extension
    -T <str>   nonpareil algorithm. can be 'kmer' or 'alignment'.
-   -f <str>   The format of the sequence. Can be 'fasta' or 'fastq'.
+   -f <str>   The format of the sequence: 'fasta' or 'fastq'
 
 Common options
 --------------

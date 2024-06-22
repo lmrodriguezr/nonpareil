@@ -142,7 +142,7 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
    if(samplepar.portion==samplepar.portion_min){
       header = new char[LARGEST_LINE];
       if(samplepar.type == 1) { // Kernel: Alignment
-        sprintf(header,
+        snprintf(header, LARGEST_LINE,
           "# @impl: Nonpareil\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
           samplepar.np_version,		// @version
           samplepar.max_read_len,	// @maxL
@@ -151,7 +151,7 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
           samplepar.seq_overlap*100.0,	// @overlap
           samplepar.divide);		// @divide
       }else if(samplepar.type == 2) { // Kernel: Kmer
-        sprintf(header,
+        snprintf(header, LARGEST_LINE,
           "# @impl: Nonpareil\n# @ksize: %d\n# @version: %.2f\n# @L: %.3f\n# @AL: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
           samplepar.k,			// @ksize
           samplepar.np_version,		// @version
@@ -204,13 +204,18 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
    label = new char[LARGEST_LABEL];
    text = new char[LARGEST_LINE];
    sep = (char *)"\t";
-   sprintf(label, (samplepar.portion_as_label ? "%.6f" : "%.0f"), samplepar.portion*(samplepar.portion_as_label? 1.0 : samplepar.total_reads ));
-   sprintf(text, "%s%s%.5f%s%.5f%s%.5f%s%.5f%s%.5f",
-   		label, sep, s.avg, sep, s.sd, sep, s.q1, sep, s.q2, sep, s.q3);
-   if(reportSummary==1) {
+   snprintf(label, LARGEST_LINE,
+            (samplepar.portion_as_label ? "%.6f" : "%.0f"),
+            samplepar.portion*(samplepar.portion_as_label? 1.0 : samplepar.total_reads ));
+   snprintf(text, LARGEST_LINE,
+            "%s%s%.5f%s%.5f%s%.5f%s%.5f%s%.5f",
+            label, sep, s.avg, sep, s.sd, sep, s.q1, sep, s.q2, sep, s.q3);
+   if (reportSummary == 1) {
       fprintf(summaryh, "%s%s\n", header, text);
       fclose(summaryh);
-   } else if(reportSummary==2) printf("%s%s\n", header, text);
+   } else if (reportSummary == 2) {
+      printf("%s%s\n", header, text);
+   }
 
    return s;
 }

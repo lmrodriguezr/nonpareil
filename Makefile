@@ -6,7 +6,7 @@
 include globals.mk
 
 enveomics=enveomics/
-universal=$(enveomics)universal.o
+universal=$(enveomics)universal.o -lz
 sqlite=$(enveomics)sqlite.o -lsqlite3
 regex=$(enveomics)regex.o
 go=$(enveomics)go.o $(regex) $(sqlite)
@@ -39,7 +39,7 @@ nuc_sampler:
 
 clean:
 	cd $(enveomics) && $(MAKE) clean
-	rm nonpareil
+	rm -f nonpareil nonpareil-mpi
 install:
 	if [ ! -d $(bindir) ] ; then mkdir -p $(bindir) ; fi
 	if [ ! -d $(mandir) ] ; then mkdir -p $(mandir) ; fi

@@ -81,7 +81,6 @@ size_t count_seqs(char *file){
    return count_seqs(file, dummy1, dummy2);
 }
 
-
 size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut, int &largest_seq, double &avg_seq){
    // Vars
    unsigned int	N=0, nline=0, totlen=0, lastn=0;
@@ -93,15 +92,21 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
    ofstream	seqfileh, namfileh;
 
    // Format
-   if(strcmp(format, "fasta")==0) {start = '>';}
-   else if(strcmp(format, "fastq")==0) {start = '@'; isFastQ=true;}
-   else {error("Unsupported format", format);}
+   if (strcmp(format, "fasta")==0) {
+     start = '>';
+   } else if (strcmp(format, "fastq") == 0) {
+     start = '@';
+     isFastQ=true;
+   } else {
+     error("Unsupported format", format);
+   }
 
    // Files
-   seqFile = new char[strlen(sourceFile)+20];
-   sprintf(seqFile, "%s.enve-seq.%d", sourceFile, getpid());
-   namFile = new char[strlen(sourceFile)+20];
-   sprintf(namFile, "%s.enve-nam.%d", sourceFile, getpid());
+   int fileLen = strlen(sourceFile) + 20;
+   seqFile = new char[fileLen];
+   snprintf(seqFile, fileLen, "%s.enve-seq.%d", sourceFile, getpid());
+   namFile = new char[fileLen];
+   snprintf(namFile, fileLen, "%s.enve-nam.%d", sourceFile, getpid());
    namFileOut = namFile;
    seqFileOut = seqFile;
 
@@ -119,11 +124,11 @@ size_t build_index(char *sourceFile, char* format, char *&namFileOut, char *&seq
 
    // Open file streams
    infileh.open(sourceFile, ios::in);
-   if(!infileh.is_open()) error("Cannot open the file", sourceFile);
+   if (!infileh.is_open()) error("Cannot open the file", sourceFile);
    seqfileh.open(seqFile, ios::out);
-   if(!seqfileh.is_open()) error("Cannot open the file", seqFile);
+   if (!seqfileh.is_open()) error("Cannot open the file", seqFile);
    namfileh.open(namFile, ios::out);
-   if(!namfileh.is_open()) error("Cannot open the file", namFile);
+   if (!namfileh.is_open()) error("Cannot open the file", namFile);
 
    // Run
    avg_seq = 0.0;
@@ -199,7 +204,7 @@ size_t sub_sample_seqs(char *sourceFile, char *destFile, double portion, char *f
    while(filein.good()){
       string line;
       getline(filein, line);
-      if((line[0]==start) | !filein.good()){
+      if ((line[0] == start) || !filein.good()) {
 	 if((entry.size()>0) && (portion>=1 || ((double)rand()/RAND_MAX <= portion))){
 	    n++;
 	    fileout << entry;
@@ -248,7 +253,7 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, ch
    while(filein.good()){
       string line;
       getline(filein, line);
-      if((line[0]==start) | !filein.good()){
+      if ((line[0] == start) || !filein.good()) {
 	 if(entry.size()>0){
 	    i++;
 	    if(i>=from){
@@ -297,6 +302,27 @@ int reverse_complement(string &out, string in){
           'N');
   }
   return len;
+}
+
+bool has_gz_ext(const char *file) {
+  char *ext = new char[4];
+  for (int i = 0; i < 4; i++) ext[i] = *(file + strlen(file) - 3 + i);
+  return(strcmp(ext, ".gz") == 0);
+}
+
+void gunz_file(const char *infile, const char *outfile) {
+  char buf[1024 * 1024 * sizeof(char)];
+  gzFile fi = gzopen(infile, "rb");
+  ofstream fo;
+
+  fo.open(outfile);
+  gzrewind(fi);
+  while (!gzeof(fi)) {
+    gzread(fi, buf, sizeof(buf));
+    fo << buf;
+  }
+  fo.close();
+  gzclose(fi);
 }
 
 #ifdef ENVEOMICS_NUC_T

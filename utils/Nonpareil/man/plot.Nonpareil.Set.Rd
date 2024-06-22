@@ -4,8 +4,14 @@
 \alias{plot.Nonpareil.Set}
 \title{Plot a \code{Nonpareil.Set} object.}
 \usage{
-\method{plot}{Nonpareil.Set}(x, col = NA, labels = NA,
-  main = "Nonpareil Curves", legend.opts = list(), ...)
+\method{plot}{Nonpareil.Set}(
+  x,
+  col = NA,
+  labels = NA,
+  main = "Nonpareil Curves",
+  legend.opts = list(),
+  ...
+)
 }
 \arguments{
 \item{x}{\code{Nonpareil.Set} object to plot.}

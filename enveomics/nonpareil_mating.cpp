@@ -48,15 +48,15 @@ size_t nonpareil_mate(int *&result, char *file, char *q_file,
    // Set subsampling
    //sampleFile = (char *)malloc(LARGEST_PATH * (sizeof *sampleFile));
    sampleFile = new char[LARGEST_PATH];
-   if(processID==0){
-      sprintf(sampleFile, "%s.subsample.%d", q_file, getpid());
+   if (processID==0) {
+      snprintf(sampleFile, LARGEST_PATH, "%s.subsample.%d", q_file, getpid());
       say("3ss$", "Building query set at ", sampleFile);
       qry_seqs = sub_sample_seqs(q_file, sampleFile, matepar.qryportion, (char *)"enveomics-seq");
       say("4sus$", "Query set built with ", qry_seqs, " sequences");
       if(qry_seqs==0) error("Impossible to create the query set.  Is the -X/-x value too small?");
    }
-   sampleFile = broadcast_char(sampleFile, LARGEST_PATH);
-   qry_seqs = broadcast_int(qry_seqs);
+   broadcast_char(sampleFile, LARGEST_PATH);
+   broadcast_int(&qry_seqs);
 
    // Blank results
    result = new int[qry_seqs];
@@ -77,10 +77,10 @@ size_t nonpareil_mate(int *&result, char *file, char *q_file,
       no_seqs_block_sbj = (int)ceil((double)total_seqs/(double)no_blocks_sbj);
       say("6sisi$", "Sbj blocks:", no_blocks_sbj, ", seqs/block:", no_seqs_block_sbj);
    }
-   no_blocks_qry = broadcast_int(no_blocks_qry);
-   no_seqs_block_qry = broadcast_int(no_seqs_block_qry);
-   no_blocks_sbj = broadcast_int(no_blocks_sbj);
-   no_seqs_block_sbj = broadcast_int(no_seqs_block_sbj);
+   broadcast_int(&no_blocks_qry);
+   broadcast_int(&no_seqs_block_qry);
+   broadcast_int(&no_blocks_sbj);
+   broadcast_int(&no_seqs_block_sbj);
 
    // Mating
    if(processID==0) say("3sisis$", "Mating sequences in ", no_blocks_qry, " by ", no_blocks_sbj, " blocks");

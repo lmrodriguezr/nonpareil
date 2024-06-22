@@ -4,13 +4,29 @@
 \alias{plot.Nonpareil.Curve}
 \title{Plot a \code{Nonpareil.Curve} object.}
 \usage{
-\method{plot}{Nonpareil.Curve}(x, col = NA, add = FALSE, new = !add,
-  plot.observed = TRUE, plot.model = TRUE, plot.dispersion = FALSE,
-  plot.diversity = TRUE, xlim = c(1000, 1e+13), ylim = c(1e-06, 1),
+\method{plot}{Nonpareil.Curve}(
+  x,
+  col = NA,
+  add = FALSE,
+  new = !add,
+  plot.observed = TRUE,
+  plot.model = TRUE,
+  plot.dispersion = FALSE,
+  plot.diversity = TRUE,
+  xlim = c(1000, 1e+13),
+  ylim = c(1e-06, 1),
   main = paste("Nonpareil Curve for", x$label),
-  xlab = "Sequencing effort (bp)", ylab = "Estimated Average Coverage",
-  curve.lwd = 2, curve.alpha = 0.4, model.lwd = 1, model.alpha = 1,
-  log = "x", arrow.length = 0.05, arrow.head = arrow.length, ...)
+  xlab = "Sequencing effort (bp)",
+  ylab = "Estimated Average Coverage",
+  curve.lwd = 2,
+  curve.alpha = 0.4,
+  model.lwd = 1,
+  model.alpha = 1,
+  log = "x",
+  arrow.length = 0.05,
+  arrow.head = arrow.length,
+  ...
+)
 }
 \arguments{
 \item{x}{\code{Nonpareil.Curve} object to plot.}

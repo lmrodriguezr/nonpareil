@@ -2,8 +2,8 @@
 % Please edit documentation in R/Nonpareil.R
 \docType{package}
 \name{Nonpareil}
-\alias{Nonpareil}
 \alias{Nonpareil-package}
+\alias{Nonpareil}
 \title{Nonpareil: Metagenome Coverage Estimation and Projections for 'Nonpareil'.}
 \description{
 Plot, process, and analyze NPO files produced by 'Nonpareil'
@@ -27,3 +27,14 @@ sets and why it matters.
 The ISME Journal 8: 2349–2351. DOI: 10.1038/ismej.2014.76.
 }
 
+\seealso{
+Useful links:
+\itemize{
+  \item \url{http://enve-omics.ce.gatech.edu/nonpareil/}
+}
+
+}
+\author{
+\strong{Maintainer}: Luis M. Rodriguez-R \email{lmrodriguezr@gmail.com}
+
+}

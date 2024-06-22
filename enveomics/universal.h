@@ -7,6 +7,7 @@
 #define ENVEOMICS_H
 
 #include <iostream>
+#include <zlib.h>
 #include <string>
 #include <stdarg.h>
 #include <cstring>

@@ -4,8 +4,14 @@
 \alias{Nonpareil.curve.batch}
 \title{Alias of \code{Nonpareil.set}.}
 \usage{
-Nonpareil.curve.batch(files, col = NA, labels = NA, plot = TRUE,
-  plot.opts = list(), ...)
+Nonpareil.curve.batch(
+  files,
+  col = NA,
+  labels = NA,
+  plot = TRUE,
+  plot.opts = list(),
+  ...
+)
 }
 \arguments{
 \item{files}{Vector with the paths to the .npo files.}
