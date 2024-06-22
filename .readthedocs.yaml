@@ -7,3 +7,6 @@ sphinx:
   configuration: docs/conf.py
 formats:
   - pdf
+python:
+  install:
+    - requirements: docs/requirements.txt

@@ -1,50 +1,98 @@
 <!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<html lang="en" data-content_root="./">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redundancy &mdash; Nonpareil 3.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
-    <title>Redundancy &#8212; Nonpareil 3.3.1rc2 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=def86cc0" />
-    
-    <script src="_static/documentation_options.js?v=d1d09ded"></script>
-    <script src="_static/doctools.js?v=9a2dae69"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=c1362a89"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Nonpareil curves" href="curves.html" />
     <link rel="prev" title="Preprocess the reads" href="preprocess.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="curves.html" title="Nonpareil curves"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="preprocess.html" title="Preprocess the reads"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Redundancy</a></li> 
-      </ul>
-    </div>  
+</head>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Nonpareil
+          </a>
+              <div class="version">
+                3.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Install Nonpareil</a></li>
+<li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocess the reads</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Redundancy</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#for-the-impatient">For the impatient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mandatory-options">Mandatory options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#common-options">Common options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-options">Additional options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input">Input</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="curves.html">Nonpareil curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mpi.html">MPI support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="updates.html">Updates history</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Nonpareil</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Redundancy</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/redundancy.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
   <section id="redundancy">
-<h1>Redundancy<a class="headerlink" href="#redundancy" title="Link to this heading">¶</a></h1>
+<h1>Redundancy<a class="headerlink" href="#redundancy" title="Link to this heading"></a></h1>
 <p>If you have large files (&gt;1Gb) and access to a cluster, take a look at <a class="reference internal" href="mpi.html"><span class="doc">MPI support</span></a>.</p>
 <section id="for-the-impatient">
-<h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Link to this heading">¶</a></h2>
+<h2>For the impatient<a class="headerlink" href="#for-the-impatient" title="Link to this heading"></a></h2>
 <p>Even if you’re in a hurry, taking a look at <a class="reference internal" href="preprocess.html"><span class="doc">Preprocess the reads</span></a> is very important.
 If you already did, you can simply run:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># fastq is recommended for kmer algorithm</span>
@@ -63,7 +111,7 @@ If you already did, you can simply run:</p>
 <code class="docutils literal notranslate"><span class="pre">output</span></code> is the prefix of the output files to be created.</p>
 </section>
 <section id="mandatory-options">
-<h2>Mandatory options<a class="headerlink" href="#mandatory-options" title="Link to this heading">¶</a></h2>
+<h2>Mandatory options<a class="headerlink" href="#mandatory-options" title="Link to this heading"></a></h2>
 <blockquote>
 <div><dl class="option-list">
 <dt><kbd><span class="option">-s <var>&lt;str&gt;</var></span></kbd></dt>
@@ -80,7 +128,7 @@ Gzipped files are supported with .gz extension</p>
 </div></blockquote>
 </section>
 <section id="common-options">
-<h2>Common options<a class="headerlink" href="#common-options" title="Link to this heading">¶</a></h2>
+<h2>Common options<a class="headerlink" href="#common-options" title="Link to this heading"></a></h2>
 <blockquote>
 <div><dl class="option-list">
 <dt><kbd><span class="option">-b <var>&lt;str&gt;</var></span></kbd></dt>
@@ -130,7 +178,7 @@ of threads.  By default: 2.</p>
 </div></blockquote>
 </section>
 <section id="additional-options">
-<h2>Additional options<a class="headerlink" href="#additional-options" title="Link to this heading">¶</a></h2>
+<h2>Additional options<a class="headerlink" href="#additional-options" title="Link to this heading"></a></h2>
 <dl>
 <dt><strong>Input/Output</strong></dt><dd><dl class="option-list">
 <dt><kbd><span class="option">-a <var>&lt;str&gt;</var></span></kbd></dt>
@@ -201,11 +249,11 @@ and re-run the analyses.  THIS IS EXPERIMENTAL CODE.</p>
 </dl>
 </section>
 <section id="input">
-<h2>Input<a class="headerlink" href="#input" title="Link to this heading">¶</a></h2>
+<h2>Input<a class="headerlink" href="#input" title="Link to this heading"></a></h2>
 <p>Sequences must be in FastA or FastQ format. See <a class="reference internal" href="preprocess.html"><span class="doc">Preprocess the reads</span></a>.</p>
 </section>
 <section id="output">
-<h2>Output<a class="headerlink" href="#output" title="Link to this heading">¶</a></h2>
+<h2>Output<a class="headerlink" href="#output" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt>Redundancy summary: <code class="docutils literal notranslate"><span class="pre">.npo</span></code> file</dt><dd><p>Tab-delimited file with six columns. The first column indicates the sequencing effort (in number of reads), and the
 remaining columns indicate the summary of the distribution of redundancy (from the replicates, 1,024 by default) at
@@ -234,77 +282,34 @@ estimation.</p>
 </section>
 
 
-            <div class="clearer"></div>
+           </div>
           </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <div>
-    <h3><a href="index.html">Table of Contents</a></h3>
-    <ul>
-<li><a class="reference internal" href="#">Redundancy</a><ul>
-<li><a class="reference internal" href="#for-the-impatient">For the impatient</a></li>
-<li><a class="reference internal" href="#mandatory-options">Mandatory options</a></li>
-<li><a class="reference internal" href="#common-options">Common options</a></li>
-<li><a class="reference internal" href="#additional-options">Additional options</a></li>
-<li><a class="reference internal" href="#input">Input</a></li>
-<li><a class="reference internal" href="#output">Output</a></li>
-</ul>
-</li>
-</ul>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="preprocess.html" class="btn btn-neutral float-left" title="Preprocess the reads" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="curves.html" class="btn btn-neutral float-right" title="Nonpareil curves" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2013-2024, Luis M Rodriguez-R.</p>
   </div>
-  <div>
-    <h4>Previous topic</h4>
-    <p class="topless"><a href="preprocess.html"
-                          title="previous chapter">Preprocess the reads</a></p>
-  </div>
-  <div>
-    <h4>Next topic</h4>
-    <p class="topless"><a href="curves.html"
-                          title="next chapter">Nonpareil curves</a></p>
-  </div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/redundancy.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="curves.html" title="Nonpareil curves"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="preprocess.html" title="Preprocess the reads"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Nonpareil 3.3.1rc2 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Redundancy</a></li> 
-      </ul>
-    </div>
-    <div class="footer" role="contentinfo">
-    &#169; Copyright 2013-2017, Luis M Rodriguez-R.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
-    </div>
-  </body>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>
