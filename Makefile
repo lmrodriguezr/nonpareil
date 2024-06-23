@@ -20,7 +20,7 @@ ldflags=-lpthread -lz
 np_objs=$(universal) $(multinode) $(sequence) $(seqreader) $(reader) $(kmercounter) $(references) $(hash) $(enveomics)nonpareil_mating.o $(enveomics)nonpareil_sampling.o
 
 
-all:	nonpareil
+all:	clean nonpareil nonpareil-mpi test release
 
 enveomics:
 	cd $(enveomics) && $(MAKE) all
@@ -49,8 +49,16 @@ install:
 	cp docs/_build/man/nonpareil.1 $(mandir)/nonpareil.1
 	$(R) CMD INSTALL utils/Nonpareil
 
-test: nonpareil FORCE
+test: nonpareil
 	./test.bash
 
-FORCE:
+release: nonpareil
+	$(eval release=$(shell ./nonpareil -V | perl -pe 's/.*v//'))
+	$(eval version=$(shell echo $(release) | perl -pe 's/\.[^\.]+$$//'))
+	sed -i '' "s/^\(version = \)'.*'$$/\1'$(version)'/" docs/conf.py
+	sed -i '' "s/^\(release = \)'.*'$$/\1'$(release)'/" docs/conf.py
+	sed -i '' "s/^\(copyright = u'2013-\)[0-9]*/\1$(shell date +%Y)/" docs/conf.py
+	cd docs && $(MAKE) man
+
+.PHONY: all clean install test release
 

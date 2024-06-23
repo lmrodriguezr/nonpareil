@@ -9,7 +9,6 @@ for f in fasta fastq ; do
       echo "=======> TESTING $t $f $gz"
       ./nonpareil -T "$t" -s "test/test.${f}${gz}" -f "$f" \
         -b "test/DELETE" -X 50 -v 1
-      exit
       if [[ $t == alignment && -s nonpareil-mpi ]] ; then
         echo "=======> TESTING MPI $t $f $gz"
         mpirun -np 2 \
