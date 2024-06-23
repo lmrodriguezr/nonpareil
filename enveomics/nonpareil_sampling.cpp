@@ -143,7 +143,7 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
       header = new char[LARGEST_LINE];
       if(samplepar.type == 1) { // Kernel: Alignment
         snprintf(header, LARGEST_LINE,
-          "# @impl: Nonpareil\n# @version: %.2f\n# @maxL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+          "# @impl: Nonpareil\n# @version: %s\n# @maxL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
           samplepar.np_version,		// @version
           samplepar.max_read_len,	// @maxL
           samplepar.avg_read_len,	// @L
@@ -152,7 +152,7 @@ sample_t nonpareil_sample_summary(double *&sample_result, int sample_number, cha
           samplepar.divide);		// @divide
       }else if(samplepar.type == 2) { // Kernel: Kmer
         snprintf(header, LARGEST_LINE,
-          "# @impl: Nonpareil\n# @ksize: %d\n# @version: %.2f\n# @L: %.3f\n# @AL: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+          "# @impl: Nonpareil\n# @ksize: %d\n# @version: %s\n# @L: %.3f\n# @AL: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
           samplepar.k,			// @ksize
           samplepar.np_version,		// @version
           samplepar.avg_read_len,	// @L

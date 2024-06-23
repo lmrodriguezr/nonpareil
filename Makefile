@@ -6,7 +6,7 @@
 include globals.mk
 
 enveomics=enveomics/
-universal=$(enveomics)universal.o -lz
+universal=$(enveomics)universal.o
 sqlite=$(enveomics)sqlite.o -lsqlite3
 regex=$(enveomics)regex.o
 go=$(enveomics)go.o $(regex) $(sqlite)
@@ -16,7 +16,7 @@ seqreader=$(enveomics)SeqReader.o
 references=$(enveomics)References.o
 hash=$(enveomics)Hash.o
 kmercounter=$(enveomics)KmerCounter.o
-pthread=-lpthread
+ldflags=-lpthread -lz
 np_objs=$(universal) $(multinode) $(sequence) $(seqreader) $(reader) $(kmercounter) $(references) $(hash) $(enveomics)nonpareil_mating.o $(enveomics)nonpareil_sampling.o
 
 
@@ -27,19 +27,20 @@ enveomics:
 
 nonpareil-mpi:
 	cd $(enveomics) && $(MAKE) $@
-	$(mpicpp) nonpareil.cpp $(np_objs) $(pthread) $(mpiflags) $(CPPFLAGS) -o $@
+	$(mpicpp) nonpareil.cpp $(np_objs) $(ldflags) $(mpiflags) $(CPPFLAGS) -o $@
 
 nonpareil:
 	cd $(enveomics) && $(MAKE) $@
-	$(cpp) nonpareil.cpp $(np_objs) $(pthread) $(CPPFLAGS) -o $@
+	$(cpp) nonpareil.cpp $(np_objs) $(ldflags) $(CPPFLAGS) -o $@
 
 nuc_sampler:
 	cd $(enveomics) && $(MAKE) sequence
-	$(cpp) nuc_sampler.cpp $(universal) $(sequence) $(pthread) $(CPPFLAGS) -o utils/nuc_sampler
+	$(cpp) nuc_sampler.cpp $(universal) $(sequence) $(ldflags) $(CPPFLAGS) -o nuc_sampler
 
 clean:
 	cd $(enveomics) && $(MAKE) clean
-	rm -f nonpareil nonpareil-mpi
+	rm -f test/test.*.enve-* test/test.fast[aq] test/DELETE.np*
+
 install:
 	if [ ! -d $(bindir) ] ; then mkdir -p $(bindir) ; fi
 	if [ ! -d $(mandir) ] ; then mkdir -p $(mandir) ; fi
@@ -47,3 +48,9 @@ install:
 	if [ -e nonpareil-mpi ] ; then install -m 0755 nonpareil-mpi $(bindir)/ ; fi
 	cp docs/_build/man/nonpareil.1 $(mandir)/nonpareil.1
 	$(R) CMD INSTALL utils/Nonpareil
+
+test: nonpareil FORCE
+	./test.bash
+
+FORCE:
+

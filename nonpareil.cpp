@@ -15,7 +15,7 @@
 #include <string>
 
 #define LARGEST_PATH 4096
-#define NP_VERSION 3.500
+#define NP_VERSION "3.5.1"
 
 using namespace std;
 int processID;
@@ -471,7 +471,7 @@ restart_samples:
   size_t dummy=0;
   if (processID == 0) {
     sample_i = sample_after_20 = 0;
-    samplepar.np_version = NP_VERSION;
+    samplepar.np_version = (char *)NP_VERSION;
     samplepar.replicates = n;
     samplepar.mates = &mates;
     samplepar.mates_size = qry_seqs_no;

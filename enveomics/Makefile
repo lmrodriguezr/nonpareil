@@ -34,6 +34,10 @@ nonpareil-mpi:
 	$(mpicpp) $(mpiflags) sequence.cpp -c $(CPPFLAGS)
 	$(mpicpp) $(mpiflags) nonpareil_mating.cpp -c $(CPPFLAGS)
 	$(mpicpp) $(mpiflags) nonpareil_sampling.cpp -c $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) SeqReader.cpp -c $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) References.cpp -c $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) Hash.cpp -c $(CPPFLAGS)
+	$(mpicpp) $(mpiflags) KmerCounter.cpp -c $(CPPFLAGS)
 
 clean:
 	rm -f *.o

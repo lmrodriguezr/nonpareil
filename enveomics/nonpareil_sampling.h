@@ -47,7 +47,7 @@ typedef struct {
  *      sampling is used instead, it should be zero (0.0).
  */
 typedef struct {
-   double	np_version;
+   char*	np_version;
    double	portion;
    double	portion_min;
    double	portion_max;
