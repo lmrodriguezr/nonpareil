@@ -4,7 +4,7 @@ Install Nonpareil
 Nonpareil can be installed using
 `conda <https://bioconda.github.io/recipes/nonpareil/README.html>`_, as a
 `Biocontainer <https://quay.io/repository/biocontainers/nonpareil>`_, with
-`Galaxy <https://galaxyproject.org/>`_, through `Homebrew <https://brew.sh>`
+`Galaxy <https://galaxyproject.org/>`_, through `Homebrew <https://brew.sh>`_
 or via the source code.
 
 Conda installation
