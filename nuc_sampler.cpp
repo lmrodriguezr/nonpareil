@@ -20,7 +20,7 @@
 #define LARGEST_LINE 2048
 #define LARGEST_PATH 2048
 #define OMAG_STEP    1024
-#define VERSION      "1.2.0"
+#define VERSION      "1.3.0"
 
 using namespace std;
 
@@ -74,7 +74,8 @@ void help(const char *msg) {
     <<"              regardless of the sequence length. Lower values"    << endl
     <<"              reduce accuracy but increase speed. Any value"      << endl
     <<"              lower than 1 produces and approximation of the"     << endl
-    <<"              composition. By default 1"                          << endl
+    <<"              relative composition, since reported counts only"   << endl
+    <<"              include observed polynucleotides. By default 1"     << endl
     <<"   -h       : Display this message and exit"                      << endl
     <<"   -V       : Show version information and exit"                  << endl
     <<"   -z       : Include zero-count polynucleotides in the output"   << endl
@@ -158,6 +159,8 @@ unsigned int count_polynucleotides(
   unsigned int labels_no, linelen, label;
   ifstream fileh;
   char     *line, *kmer;
+  float    rn;
+  bool     use = true;
 
   // Kmers and counts initialization
   labels_no = (unsigned int)pow(16, k);
@@ -199,7 +202,13 @@ unsigned int count_polynucleotides(
   if (!fileh.is_open()) error("Error reading file", seqFile);
   while (!fileh.eof()) {
     fileh.getline(line, LARGEST_LINE);
-    if (line[0] != '>') {
+    if (line[0] == '>') {
+      if (heur != 1.0) {
+        rn = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        use = rn < heur;
+      }
+    } else {
+      if (!use) goto next_line;
       linelen = strlen(line);
       if (linelen < k + 1) goto next_line;
       for (int i = 0; i < linelen - k + 1; i++) {
@@ -264,7 +273,7 @@ int main(int argc, char *argv[]) {
 
   // GetOpt
   int     optchr;
-  while ((optchr = getopt (argc, argv, "ef:ho:r:s:v:Vk:z")) != EOF)
+  while ((optchr = getopt (argc, argv, "ef:ho:r:s:v:Vk:x:z")) != EOF)
     switch(optchr) {
       case 'e': extended = true;     break;
       case 'f': format = optarg;     break;
@@ -285,7 +294,7 @@ int main(int argc, char *argv[]) {
     help("Unsupported value for -f option");
   if (k<=0)
     help("Bad argument for -k option: it must be a non-zero positive integer");
-  if (heur<=0.0 || heur>1.0)
+  if (heur <= 0.0 || heur > 1.0)
     help("Bad argument for -x option: it must be in the range (0, 1]");
   if (outfile && (strlen(outfile) > 0) && (strcmp(outfile, "-") != 0))
     remove(outfile);

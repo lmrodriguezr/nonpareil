@@ -103,67 +103,60 @@ FastqReader::FastqReader(ifstream &ifs) : SeqReader(ifs){}
 FastaReader::FastaReader(ifstream &ifs) : SeqReader(ifs){}
 
 size_t FastqReader::readNextSeq(Sequence &out) {
-  if(this->readNext == false) {
-    reset();
-  }
+  if (this->readNext == false) reset();
+
   string temp;
   string header;
   string sequence;
   string qual;
 
-  if(getline(this->ifs,header).eof())
+  if (getline(this->ifs, header).eof())
     return -1;
     // Be careful: this actually returns the largest unsigned integer,
     // not -1, since the function's return type is size_t
 
   char c;
-  if(getline(this->ifs,sequence).good()) {
-    this->ifs.get(c);
-    if(c != '+') error("The file provided does not have the proper fastq format");
-  }
-  else{
-    error("The file provided does not have proper fastq format");
-  }
-  if(!getline(this->ifs,temp).good()) {
-    error("The file you provided does not have the proper fastq format");
-  }
-  if(!getline(this->ifs,qual).good()) {
-    error("The file you provided does not have the proper fastq format");
-  }
 
-  buildFastqSeq(header, sequence, qual,out);
+  if (!getline(this->ifs, sequence).good())
+    error("The file does not have proper fastq format: missing sequence");
+  this->ifs.get(c);
+  if (c != '+')
+    error("The file does not have proper fastq format: wrong separator");
+  if (!getline(this->ifs, temp).good())
+    error("The file does not have proper fastq format: missing separator");
+  if (!getline(this->ifs, qual).good())
+    error("The file does not have proper fastq format: missing quality");
+
+  buildFastqSeq(header, sequence, qual, out);
 
   return 0;
 }
 
-size_t FastaReader:: readNextSeq(Sequence &out) {
-  if(this->readNext == false) {
-    reset();
-  }
+size_t FastaReader::readNextSeq(Sequence &out) {
+  if (this->readNext == false) reset();
 
   string header;
   string sequence;
   string temp;
   char c;
-  if(getline(this->ifs,header).eof())
+  if (getline(this->ifs, header).eof())
     return -1;
     // Be careful: this actually returns the largest unsigned integer,
     // not -1, since the function's return type is size_t
-  while(true) {
-    if (getline(this->ifs,temp).good()) {
-        sequence = sequence + temp;
-        if (!this->ifs.get(c).good()){
-            ifs.seekg(-1,std::ios::cur);
-            break;
-        }
-        if(c == '>'){
-            ifs.seekg(-1,std::ios::cur);
-            break;
-        }
+  while (true) {
+    if (getline(this->ifs, temp).good()) {
+      sequence = sequence + temp;
+      if (!this->ifs.get(c).good()){
         ifs.seekg(-1,std::ios::cur);
-    }
-    else {
-        return -1;
+        break;
+      }
+      if (c == '>'){
+        ifs.seekg(-1,std::ios::cur);
+        break;
+      }
+      ifs.seekg(-1,std::ios::cur);
+    } else {
+      return -1;
     }
   }
 

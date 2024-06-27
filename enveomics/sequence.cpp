@@ -323,14 +323,19 @@ bool has_gz_ext(const char *file) {
 }
 
 void gunz_file(const char *infile, const char *outfile) {
-  char buf[1024 * 1024 * sizeof(char)];
+  char buf[1024 * 1024 + 1];
+  int err, len;
+
   gzFile fi = gzopen(infile, "rb");
   ofstream fo;
 
   fo.open(outfile);
   gzrewind(fi);
   while (!gzeof(fi)) {
-    gzread(fi, buf, sizeof(buf));
+    len = gzread(fi, buf, sizeof(buf) - 1);
+    if (len <  0) error(gzerror(fi, &err));
+    if (len == 0) error("Unexpected end of file while decompressing");
+    buf[len] = '\0';
     fo << buf;
   }
   fo.close();
