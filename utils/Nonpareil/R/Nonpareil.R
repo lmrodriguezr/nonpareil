@@ -502,7 +502,7 @@ Nonpareil.read_metadata <- function(
     x$log.sample <- as.numeric(vals[keys=="divide"]);
   if("logsampling" %in% keys)
     x$log.sample <- as.numeric(vals[keys=="logsampling"]);
-  x$version   <- as.numeric(vals[keys=="version"])
+  x$version   <- as.character(vals[keys=="version"])
   x$L         <- as.numeric(vals[keys=="L"])
   x$R         <- as.numeric(vals[keys=="R"])
   if(x$kernel=="kmer"){

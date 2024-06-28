@@ -3,8 +3,8 @@
 
 using namespace std;
 //remove the global variable
-const double PhredQual [43] =
- {1.0,
+const double PhredQual [43] = {
+  1.0,
   0.794328234724,
   0.63095734448,
   0.501187233627,
@@ -46,7 +46,8 @@ const double PhredQual [43] =
   0.000125892541179,
   0.0001,
   0.0000794328234724,
-  0.000063095734448};
+  0.000063095734448
+};
 
 std::random_device rd;
 
@@ -83,13 +84,15 @@ void buildFastaSeq(string header, string sequence, Sequence &out) {
   out = seq;
 }
 
-SeqReader::SeqReader(ifstream &ifs_) : ifs(ifs_) {
+SeqReader::SeqReader(ifstream &ifs_, unsigned int rseed) : ifs(ifs_) {
+  if (rseed == 0) rseed = rd();
   this->readNext = true;
-  this->gen = std::mt19937_64(rd());
+  this->gen = std::mt19937_64(rseed);
   unsigned long long int end;
   this->ifs.seekg(0,std::ios::end);
   end = this->ifs.tellg();
-  this->distribution = std::uniform_int_distribution<unsigned long long int>(0,end);
+  this->distribution =
+    std::uniform_int_distribution<unsigned long long int>(0, end);
   ifs.seekg(0,std::ios::beg);
 }
 
@@ -99,8 +102,10 @@ void SeqReader::reset() {
   this->readNext = true;
 }
 
-FastqReader::FastqReader(ifstream &ifs) : SeqReader(ifs){}
-FastaReader::FastaReader(ifstream &ifs) : SeqReader(ifs){}
+FastqReader::FastqReader(ifstream &ifs) : SeqReader(ifs) {}
+FastaReader::FastaReader(ifstream &ifs) : SeqReader(ifs) {}
+FastqReader::FastqReader(ifstream &ifs, unsigned int rseed) : SeqReader(ifs, rseed) {}
+FastaReader::FastaReader(ifstream &ifs, unsigned int rseed) : SeqReader(ifs, rseed) {}
 
 size_t FastqReader::readNextSeq(Sequence &out) {
   if (this->readNext == false) reset();
@@ -176,35 +181,29 @@ size_t FastqReader::getRandomSeq(Sequence &out) {
   this->ifs.seekg(pos,std::ios::beg);
   string temp;
   char c;
-  while(true) {
-    while(true) {
-      if(!getline(this->ifs,temp).good()) {
+  while (true) {
+    while (true) {
+      if (!getline(this->ifs, temp).good()) {
         this->ifs.clear();
-        this->ifs.seekg(0,std::ios::beg);
+        this->ifs.seekg(0, std::ios::beg);
         break;
       }
       this->ifs.get(c);
-      if(c == '@') {
-        break;
-      }
+      if (c == '@') break;
     }
 
-    getline(this->ifs,header);
-    if(this->randomHeaders.count(header) == 1)
-      continue;
-    
-    getline(this->ifs,sequence);
+    getline(this->ifs, header);
+    if (this->randomHeaders.count(header) == 1) continue;
 
+    if (!getline(this->ifs, sequence).good()) continue;
     this->ifs.get(c);
-    if(c != '+') {
-      continue;
-    }
-    getline(this->ifs,temp);
-    getline(this->ifs,qual);
+    if (c != '+') continue;
+    if (!getline(this->ifs, temp).good()) continue;
+    if (!getline(this->ifs, qual).good()) continue;
     break;
   }
 
-  buildFastqSeq(header,sequence,qual,out);
+  buildFastqSeq(header, sequence, qual, out);
 
   this->randomHeaders.insert(header);
   return 0;
@@ -213,39 +212,39 @@ size_t FastqReader::getRandomSeq(Sequence &out) {
 size_t FastaReader::getRandomSeq(Sequence &out) {
   string header;
   string sequence;
-
-  unsigned long long int pos;
-  pos = this->distribution(this->gen);
-  this->readNext = false;
-  this->ifs.seekg(pos,std::ios::beg);
   string temp;
-  char c;
-  while(true) {
-    while(true) {
-      if(!getline(this->ifs,temp).good()) {
-        this->ifs.clear();
-        this->ifs.seekg(0,std::ios::beg);
-        break;
-      }
-      this->ifs.get(c);
-      if(c == '>') {
-        break;
-      }
-    }
-    getline(this->ifs, header);
-    if(this->randomHeaders.count(header) == 1)
+  unsigned long long int pos = this->distribution(this->gen);
+
+  this->readNext = false;
+  this->ifs.seekg(pos, std::ios::beg);
+
+  bool inSequence = false;
+  int  rounds = 0;
+
+  while (true) {
+    if (!getline(this->ifs, temp).good()) {
+      // Roll back to the beginning of the file
+      inSequence = false;
+      sequence = (string)"";
+      this->ifs.clear();
+      this->ifs.seekg(0, std::ios::beg);
+      if (rounds++ > 2) error("Cannot find FastA sequences in file");
       continue;
-    
-    while(true) {
-        getline(this->ifs,temp);
-        if(temp[0] == '>')
-            break;
-        sequence = sequence + temp;
-    } 
-    break;
+    }
+
+    if (temp[0] == '>') {
+      if (inSequence) {
+        break;
+      } else {
+        header = temp.substr(1);
+        if (this->randomHeaders.count(header) != 1) inSequence = true;
+      }
+    } else if(inSequence) {
+      sequence = sequence + temp;
+    }
   }
 
-  buildFastaSeq(header,sequence,out);
+  buildFastaSeq(header, sequence, out);
 
   this->randomHeaders.insert(header);
   return 0;

@@ -33,10 +33,10 @@ void References::intializeReferences(FastaReader &fastaReader, bool alt_query) {
   int flag;
   unsigned long long int hashcode;
 
-  while(fastaReader.readNextSeq(temp) != (size_t)(-1)) {
+  while (fastaReader.readNextSeq(temp) != (size_t)(-1)) {
     this->refSize++;
-    if(temp.sequence.length() < this->ksize)
-        error("Reads are required to have a minimum length of kmer size");
+    if (temp.sequence.length() < this->ksize)
+      error("Reads are required to have a minimum length of kmer size");
     kmer = temp.sequence.substr(0,this->ksize);
     flag = getHashCode(kmer, hashcode);
     if(flag == -1) {
@@ -60,37 +60,34 @@ void References::intializeReferences(FastqReader &fastqReader) {
   int flag;
   double kerr;
   unsigned long long int hashcode;
-  size_t i = 0;
   size_t error_seq = 0;
   size_t error_seq_limit = 3 * this->refSize;
-  // deal with shorter reads then kmer length
-  for(i=0;i<this->refSize;i++) {
+  // deal with reads shorter than kmer length
+  for (size_t i = 0; i < this->refSize ; i++) {
     fastqReader.getRandomSeq(temp);
-    //Hashcode for forward kmer
-    if(error_seq > error_seq_limit)
-	error("Sequence file has low quality with many non ACGT bases"); 
-    if(temp.sequence.length() < this->ksize)
+    // Hashcode for forward kmer
+    if (error_seq > error_seq_limit)
+      error("Sequence file has low quality with many non ACGT bases"); 
+    if (temp.sequence.length() < this->ksize)
       error("Reads are required to have a minimum length of kmer size");
-    kmer = temp.sequence.substr(0,this->ksize);
-    flag = getHashCode(kmer,hashcode);
-    if(flag == -1) {
-        i--;
-        error_seq++;
-        continue;
+    kmer = temp.sequence.substr(0, this->ksize);
+    flag = getHashCode(kmer, hashcode);
+    if (flag == -1) {
+      i--;
+      error_seq++;
+      continue;
     }
     refKmerMap[hashcode] = 0;
     refKmers.push_back(hashcode);
 
     //Hashcode reverse complement kmer
     reverse_complement(revkmer, kmer);
-    getHashCode(revkmer,hashcode);
+    getHashCode(revkmer, hashcode);
     refKmerMap[hashcode] = 0;
     refRevComKmers.push_back(hashcode);
     kerr = 1.0;
-    for(size_t j = 0; j < ksize; j++) {
-      kerr = kerr * (1.0 - temp.baseProb[j]);
-    }
-    this->totalErrKmers = this->totalErrKmers + (1-kerr);
+    for (size_t j = 0; j < ksize; j++) kerr = kerr * (1.0 - temp.baseProb[j]);
+    this->totalErrKmers = this->totalErrKmers + 1 - kerr;
   }
 }
 
@@ -102,15 +99,15 @@ void References::intializeReferences(FastaReader &fastaReader) {
   size_t i = 0;
   size_t error_seq = 0;
   size_t error_seq_limit = 3 * this->refSize;
-  for(i=0;i<this->refSize;i++) {
+  for (i = 0; i < this->refSize; i++) {
     fastaReader.getRandomSeq(temp);
-    if(error_seq > error_seq_limit)
-        error("Sequence file has low quality with many non ACGT bases");
+    if (error_seq > error_seq_limit)
+      error("Sequence file has low quality with many non ACGT bases");
     if(temp.sequence.length() < this->ksize)
-        error("Reads are required to have a minimum length of kmer size");
-    kmer = temp.sequence.substr(0,this->ksize);
+      error("Reads are required to have a minimum length of kmer size");
+    kmer = temp.sequence.substr(0, this->ksize);
     flag = getHashCode(kmer, hashcode);
-    if(flag == -1) {
+    if (flag == -1) {
       i--;
       error_seq++;
       continue;

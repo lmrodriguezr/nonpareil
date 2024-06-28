@@ -15,16 +15,16 @@
 #include <string>
 
 #define LARGEST_PATH 4096
-#define NP_VERSION "3.5.2"
+#define NP_VERSION "3.5.3"
 
 using namespace std;
 int processID;
 int processes;
 
-void help(const char *msg){
-  if(processID == 0 && msg != NULL && strlen(msg) != 0)
+void help(const char *msg) {
+  if (processID == 0 && msg != NULL && strlen(msg) != 0)
     cerr << endl << msg << endl << endl;
-  if(processID == 0)
+  if (processID == 0)
     cerr
     <<"DESCRIPTION"                                                      << endl
     <<"  Nonpareil uses the redundancy of the reads in metagenomic"      << endl
@@ -46,7 +46,8 @@ void help(const char *msg){
     <<"  -f <str> : The format of the sequence: 'fasta' or 'fastq'"      << endl
     << endl
     <<"COMMON OPTIONS"                                                   << endl
-    <<"  -b <str> : Path to the prefix for all the output files"         << endl
+    <<"  -b <str> : Path to the prefix for all the output files."        << endl
+    <<"             By default: nonpareil"                               << endl
     <<"  -X <int> : Maximum number of reads to use as query"             << endl
     <<"             By default: 1000 for alignment, 10000 for kmer"      << endl
     <<"  -k <int> : kmer length. By default: 24"                         << endl
@@ -83,10 +84,10 @@ int main(int argc, char *argv[]) {
   if (argc <= 1) help("");
 
   // Vars
-  char  *file = new char[LARGEST_PATH], *inputfile,
-        *format=(char *)"", *nonpareiltype=(char *)"",
-        *alldata, *cntfile, *outfile, *namFile, *seqFile, *baseout,
-        *qfile, *qNamFile, *qSeqFile;
+  char  *file = new char[LARGEST_PATH], *inputfile = (char *)"",
+        *format =(char *)"", *nonpareiltype = (char *)"",
+        *alldata, *cntfile, *outfile, *namFile, *seqFile,
+        *baseout = (char *)"nonpareil", *qfile, *qNamFile, *qSeqFile;
   double
         min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50,
         *sample_result, avg_seq_len=0.0, adj_avg_seq_len, divide=0.7,
@@ -98,8 +99,9 @@ int main(int argc, char *argv[]) {
         q_total_seqs=0, lines_in_ram, hX=0, qry_seqs_no, ram_Kb,
         required_ram_Kb;
   unsigned long long int total_seqs=0;
-  bool  n_as_mismatch=false, portion_label=false, revcom=true, ok,
-        autoadjust=false, alt_query=false, remove_input=false;
+  bool  n_as_mismatch = false, portion_label = false, revcom = true, ok,
+        autoadjust = false, alt_query = false, remove_input = false,
+        rseed_set = false;
   matepar_t matepar;
   samplepar_t samplepar;
 
@@ -134,7 +136,9 @@ int main(int argc, char *argv[]) {
       case 'q':
         qfile = optarg;
         alt_query = true;               break;
-      case 'r': rseed=atoi(optarg);     break;
+      case 'r':
+        rseed = atoi(optarg);
+        rseed_set = true;               break;
       case 'R': ram = (int)atoi(optarg);break;
       case 's': inputfile = optarg;     break;
       case 'S': min_sim=atof(optarg);   break;
@@ -168,13 +172,13 @@ int main(int argc, char *argv[]) {
   if (strlen(format) == 0) help("-f is mandatory");
   if ((strcmp(format, "fasta") != 0) && (strcmp(format, "fastq") != 0))
     help("Unsupported value for -f option");
-  if ((min < 0) | (min > 1))
+  if ((min < 0) || (min > 1))
     help("Bad argument for -m option, accepted range: [0, 1]");
-  if ((max < 0) | (max > 1))
+  if ((max < 0) || (max > 1))
     help("Bad argument for -M option, accepted range: [0, 1]");
-  if ((itv <= 0) | (itv > 1))
+  if ((itv <= 0) || (itv > 1))
     help("Bad argument for -i option, accepted range: (0, 1]");
-  if ((ovl <= 0.0) | (ovl > 1.0))
+  if ((ovl <= 0.0) || (ovl > 1.0))
     help("Bad argument for -L option, accepted range: (0, 100]");
   if (thr <= 0)
     help("Bad argumement for -t option, accepted: positive non-zero integers");
@@ -216,13 +220,12 @@ int main(int argc, char *argv[]) {
     }
   }
   broadcast_int(&rseed);
+  broadcast_bool(&rseed_set);
   barrier_multinode();
   srand(rseed + processID);
 
   // file checking
   int count = 0;
-  int limit = 10 * hX; //metagenome should have 10 times more than query reads
-  if (strcmp(nonpareiltype, "alignment") == 0) limit = hX;
 
   if (has_gz_ext(inputfile)) {
     remove_input = true;
@@ -237,6 +240,9 @@ int main(int argc, char *argv[]) {
   broadcast_char(file, LARGEST_PATH);
 
   if (processID == 0) {
+    int limit = hX + 0;
+    if (strcmp(nonpareiltype, "kmer") == 0) limit = hX * 4 / 3;
+
     Sequence test_temp;
     ifstream testifs((string(file)));
     if (strcmp(format, "fasta") == 0) {
@@ -254,21 +260,20 @@ int main(int argc, char *argv[]) {
     } else {
       error("Unsupported format", format);
     }
+
+    if (count == 0) {
+      error("No reads found, check that the input file exists and is readable");
+    } else if (count <= limit) {
+      hX = count * 3 / 4;
+      say("3si$", "Reducing query reads (-X) to ", hX);
+    }
+
+    if (alldata && (strlen(alldata) > 0)) remove(alldata);
+    if (cntfile && (strlen(cntfile) > 0)) remove(cntfile);
+    if (outfile && (strlen(outfile) > 0) && (strcmp(outfile, "-") != 0))
+      remove(outfile);
   }
   broadcast_int(&count);
-  if (count == 0) {
-    error("No reads found, check that the input file exists and is readable");
-  } else if (count < limit) {
-    say("3sisis$", "Sequence count (", count, ") < limit (", limit, ")");
-    if (strcmp(nonpareiltype, "alignment") == 0)
-      error("Reduce the query reads (-X) to fit total reads", count);
-    else
-      error("Reduce the query reads (-X) to ≤ 10\% of total reads", count);
-  }
-  if(alldata && (strlen(alldata) > 0)) remove(alldata);
-  if(cntfile && (strlen(cntfile) > 0)) remove(cntfile);
-  if(outfile && (strlen(outfile) > 0) && (strcmp(outfile, "-") != 0))
-    remove(outfile);
  
   if (strcmp(nonpareiltype, "kmer") == 0) {
     if (processID != 0) goto restart_samples;
@@ -277,12 +282,12 @@ int main(int argc, char *argv[]) {
         say("1ss$", "WARNING: The kmer kernel implements an error correction ",
           "function only compatible with FastQ");
         ifstream qifs((string(qfile)));
-        say("1ss$", "reading query", file);
-        FastaReader qfastaReader(qifs);
+        say("1ss$", "Reading query", file);
+        FastaReader qfastaReader(qifs, (unsigned int)(rseed_set ? rseed : 0));
         References references = References(qfastaReader, k, alt_query);
-        say("1s$", "Started counting");
+        say("2s$", "Counting kmers");
         ifstream ifs((string(file)));
-        FastaReader fastaReader(ifs);
+        FastaReader fastaReader(ifs, (unsigned int)(rseed_set ? rseed + 1 : 0));
         KmerCounter counter = KmerCounter(references, fastaReader,
           string(cntfile));
         mates = new int[counter.getTotalSeqs()];
@@ -298,11 +303,11 @@ int main(int argc, char *argv[]) {
     } else {
       if(strcmp(format, "fastq") == 0) {
         ifstream ifs((string(file)));
-        say("1ss$", "reading ", file);
-        FastqReader fastqReader(ifs);
-        say("1sus$", "Picking ", hX, " random sequences");
+        say("1ss$", "Reading ", file);
+        FastqReader fastqReader(ifs, (unsigned int)(rseed_set ? rseed : 0));
+        say("2sus$", "Picking ", hX, " random sequences");
         References references = References(fastqReader, hX, k);
-        say("1s$", "Started counting");
+        say("2s$", "Counting kmers");
         KmerCounter counter = KmerCounter(references, fastqReader,
           string(cntfile));
         mates = new int[hX];
@@ -318,11 +323,11 @@ int main(int argc, char *argv[]) {
         say("1ss$","WARNING: The kmer kernel implements an error correction ",
           "function only compatible with FastQ");
         ifstream ifs((string(file)));
-        say("1ss$", "reading ", file);
-        FastaReader fastaReader(ifs);
-        say("1sus$", "Picking ", hX, " random sequences");
+        say("1ss$", "Reading ", file);
+        FastaReader fastaReader(ifs, (unsigned int)(rseed_set ? rseed : 0));
+        say("2sus$", "Picking ", hX, " random sequences");
         References references = References(fastaReader, hX, k);
-        say("1s$", "Started counting");
+        say("2s$", "Counting Kmers");
         KmerCounter counter = KmerCounter(references, fastaReader,
           string(cntfile));
         mates = new int[hX];

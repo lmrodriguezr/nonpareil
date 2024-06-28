@@ -26,6 +26,7 @@ void init_multinode(int& argc, char**& argv, int& pid, int& pp);
  */
 void finalize_multinode();
 
+void broadcast_bool(void* value);
 void broadcast_int(void* value);
 void broadcast_double(void* value);
 void broadcast_char(void* value, size_t size);

@@ -40,7 +40,8 @@ public:
   std::random_device rd;
   std::mt19937_64 gen;
   std::uniform_int_distribution<unsigned long long int> distribution;
-  SeqReader(ifstream &ifs);
+  SeqReader(ifstream &ifs) : SeqReader(ifs, (unsigned int)0) {};
+  SeqReader(ifstream &ifs, unsigned int rseed);
   void reset();
   virtual size_t readNextSeq(Sequence &out) = 0;
   virtual size_t getRandomSeq(Sequence &out) = 0;
@@ -50,6 +51,7 @@ class FastqReader: public SeqReader {
 
 public:
   FastqReader(ifstream &ifs);
+  FastqReader(ifstream &ifs, unsigned int rseed);
   size_t readNextSeq(Sequence &out);
   size_t getRandomSeq(Sequence &out);
 };
@@ -57,6 +59,7 @@ public:
 class FastaReader: public SeqReader {
 public:
   FastaReader(ifstream &ifs);
+  FastaReader(ifstream &ifs, unsigned int rseed);
   size_t readNextSeq(Sequence &out);
   size_t getRandomSeq(Sequence &out);
 };

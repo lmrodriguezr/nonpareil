@@ -39,7 +39,7 @@ nuc_sampler:
 
 clean:
 	cd $(enveomics) && $(MAKE) clean
-	rm -f test/test.*.enve-* test/test.fast[aq] test/DELETE.np*
+	rm -f test/test.*.enve-* test/test.fast[aq] test/DELETE.np* nonpareil.np*
 
 install:
 	if [ ! -d $(bindir) ] ; then mkdir -p $(bindir) ; fi

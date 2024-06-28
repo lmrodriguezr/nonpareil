@@ -12,34 +12,39 @@ extern int processes;
 #ifdef ENVEOMICS_MULTI_NODE
 #include <mpi.h>
 
-void init_multinode(int& argc, char**& argv, int& pid, int& pp){
+void init_multinode(int& argc, char**& argv, int& pid, int& pp) {
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &processes);
   MPI_Comm_rank(MPI_COMM_WORLD, &processID);
 }
-void finalize_multinode(){
+void finalize_multinode() {
   MPI_Finalize();
 }
 
-void barrier_multinode(){
+void barrier_multinode() {
   MPI_Barrier(MPI_COMM_WORLD);
 }
 
-void broadcast_int(void* value){
+void broadcast_bool(void* value) {
+  MPI_Bcast(value, 1, MPI_C_BOOL, 0, MPI_COMM_WORLD);
+  barrier_multinode();
+}
+
+void broadcast_int(void* value) {
   MPI_Bcast(value, 1, MPI_INT, 0, MPI_COMM_WORLD);
   barrier_multinode();
 }
 
-void broadcast_double(void* value){
+void broadcast_double(void* value) {
   MPI_Bcast(value, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   barrier_multinode();
 }
 
-void broadcast_char(void* value, size_t size){
+void broadcast_char(void* value, size_t size) {
   MPI_Bcast(value, size, MPI_CHAR, 0, MPI_COMM_WORLD);
   barrier_multinode();
 }
-void broadcast_char(void* value){
+void broadcast_char(void* value) {
   MPI_Bcast(value, 1, MPI_CHAR, 0, MPI_COMM_WORLD);
   barrier_multinode();
 }
@@ -64,6 +69,7 @@ void init_multinode(int& argc, char**& argv, int& pid, int& pp){
   pp = 1;
 }
 void finalize_multinode() {}
+void broadcast_bool(void* value) {}
 void broadcast_int(void* value) {}
 void broadcast_double(void* value) {}
 void broadcast_char(void* value, size_t size) {}
