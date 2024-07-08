@@ -137,7 +137,6 @@ sample_t nonpareil_sample_summary(
   s.portion = samplepar.portion;
 
   // File handlers
-  say("9s$", "Opening file handlers"); // TODO Delete after debug
   if (alldata && strlen(alldata) > 0) {
     alldatah = fopen(alldata,
           (samplepar.portion == samplepar.portion_min ? "w" : "a+"));
@@ -154,7 +153,6 @@ sample_t nonpareil_sample_summary(
     reportSummary = 2;
   }
 
-  say("9s$", "Writing NPO headers"); // TODO Delete after debug
   if (samplepar.portion == samplepar.portion_min) {
     header = new char[LARGEST_LINE];
     if (samplepar.type == 1) { // Kernel: Alignment
@@ -183,7 +181,6 @@ sample_t nonpareil_sample_summary(
     }
   }
 
-  say("9s$", "Sumarizing distribution"); // TODO Delete after debug
   if (sample_number > 0) {
     // Average & SD
     s.avg = s.sd = x2 = 0.0;
@@ -230,16 +227,19 @@ sample_t nonpareil_sample_summary(
   label = new char[LARGEST_LABEL];
   text = new char[LARGEST_LINE];
   sep = (char *)"\t";
+  say("9s$", "Creating label"); // TODO Delete after debug
   snprintf(
     label, LARGEST_LINE, (samplepar.portion_as_label ? "%.6f" : "%.0f"),
     samplepar.portion * (
       samplepar.portion_as_label ? 1.0 : samplepar.total_reads
     )
   );
+  say("9s$", "Creating cutpoints"); // TODO Delete after debug
   snprintf(
     text, LARGEST_LINE, "%s%s%.5f%s%.5f%s%.5f%s%.5f%s%.5f",
     label, sep, s.avg, sep, s.sd, sep, s.q1, sep, s.q2, sep, s.q3
   );
+  say("9s$", "Creating header"); // TODO Delete after debug
   if (reportSummary == 1) {
     fprintf(summaryh, "%s%s\n", header, text);
     fclose(summaryh);
