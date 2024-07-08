@@ -137,6 +137,7 @@ sample_t nonpareil_sample_summary(
   s.portion = samplepar.portion;
 
   // File handlers
+  say("9s$", "Opening file handlers"); // TODO Delete after debug
   if (alldata && strlen(alldata) > 0) {
     alldatah = fopen(alldata,
           (samplepar.portion == samplepar.portion_min ? "w" : "a+"));
@@ -153,6 +154,7 @@ sample_t nonpareil_sample_summary(
     reportSummary = 2;
   }
 
+  say("9s$", "Writing NPO headers"); // TODO Delete after debug
   if (samplepar.portion == samplepar.portion_min) {
     header = new char[LARGEST_LINE];
     if (samplepar.type == 1) { // Kernel: Alignment
@@ -181,6 +183,7 @@ sample_t nonpareil_sample_summary(
     }
   }
 
+  say("9s$", "Sumarizing distribution"); // TODO Delete after debug
   if (sample_number > 0) {
     // Average & SD
     s.avg = s.sd = x2 = 0.0;
@@ -222,6 +225,7 @@ sample_t nonpareil_sample_summary(
   }
 
   // Report summary
+  say("9s$", "Reporting summary"); // TODO Delete after debug
   if (reportSummary == 0) return s;
   label = new char[LARGEST_LABEL];
   text = new char[LARGEST_LINE];
@@ -243,5 +247,6 @@ sample_t nonpareil_sample_summary(
     printf("%s%s\n", header, text);
   }
 
+  say("9s$", "Returning summary"); // TODO Delete after debug
   return s;
 }
