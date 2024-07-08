@@ -501,16 +501,21 @@ restart_samples:
     say("1s$", "Sub-sampling library");
     while(sample_i < sampling_points){
       if (divide == 0) {
-        samplepar.portion = min + itv*sample_i;
+        samplepar.portion = min + itv * sample_i;
       } else {
-        samplepar.portion = sample_i==0 ? 0 :
-          pow(divide, sampling_points-sample_i-1);
+        samplepar.portion = sample_i == 0 ? 0 :
+          pow(divide, sampling_points - sample_i - 1);
       }
       samplepar.replicates = n;
 
+      say("7sisi$", "Sub-sample: ", sample_i + 1, "/", sampling_points);
       samples_no = nonpareil_sample_portion(sample_result, thr, samplepar);
-      sample_summary[sample_i++] = nonpareil_sample_summary(sample_result,
-        samples_no, alldata, outfile, samplepar);
+      say("8si$", "n = ", samples_no);
+      sample_summary[sample_i++] = nonpareil_sample_summary(
+        sample_result,
+        samples_no, alldata, outfile, samplepar
+      );
+      say("8sf$", "portion = ", sample_summary[sample_i - 1].portion);
       if (samplepar.portion <= 0.2) sample_after_20 = sample_i;
     }
     dummy = 1;
@@ -563,32 +568,32 @@ restart_checkings:
       ok = false;
     }
     // High sequencing depth
-    if(sample_summary[sample_i-1].avg >= 0.95){
-      if(ovl<1.0){
-        if(autoadjust){
-               if(ovl<0.25)  ovl = 0.25;
-          else if(ovl<0.5) ovl = 0.5;
-          else if(ovl<0.75)  ovl = 0.75;
-          else if(ovl<1.0) ovl = 1.0;
-          say("1sf$", "AUTOADJUST: -L ", ovl*100.0);
+    if (sample_summary[sample_i-1].avg >= 0.95) {
+      if (ovl < 1.0) {
+        if (autoadjust) {
+          if      (ovl < 0.25) ovl = 0.25;
+          else if (ovl < 0.50) ovl = 0.50;
+          else if (ovl < 0.75) ovl = 0.75;
+          else if (ovl < 1.00) ovl = 1.00;
+          say("1sf$", "AUTOADJUST: -L ", ovl * 100.0);
           goto restart_mates;
         }
       } else {
-	  say("1ss$",
+        say("1ss$",
             "The overlap (-L) is currently set to the maximum, ",
             "meaning that the actual coverage is probably above 100X");
-	  if(min_sim<1.0) say("1s$",
+        if (min_sim < 1.0) say("1s$",
             "You could increase -S but values other than 0.95 are untested");
-	  error("Sequencing depth above detection limit.");
+        error("Sequencing depth above detection limit.");
       }
       ok = false;
     }
     // Low resolution
-    if(sample_i>5 && sample_summary[5].avg >= 0.95){
+    if (sample_i > 5 && sample_summary[5].avg >= 0.95) {
       say("1ss$",
         "WARNING: The curve reached near-saturation in 6 or less points, ",
         "hence diversity estimations could be unreliable");
-      if(autoadjust){
+      if (autoadjust) {
 	itv *= 0.5;
 	say("1sf$", "AUTOADJUST: -i ", itv);
 	goto restart_samples;
@@ -597,7 +602,7 @@ restart_checkings:
         "currently set at ", itv);
       ok = false;
     }
-    if(ok) say("1s$", "Everything seems correct");
+    if (ok) say("1s$", "Everything seems correct");
     dummy = 2;
   }
   broadcast_int(&dummy);
