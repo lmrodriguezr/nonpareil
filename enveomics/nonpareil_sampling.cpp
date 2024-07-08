@@ -226,14 +226,12 @@ sample_t nonpareil_sample_summary(
   label = new char[LARGEST_LABEL];
   text = new char[LARGEST_LINE];
   sep = (char *)"\t";
-  say("9s$", "Creating label"); // TODO Delete after debug
   snprintf(
-    label, LARGEST_LINE, (samplepar.portion_as_label ? "%.6f" : "%.0f"),
+    label, LARGEST_LABEL, (samplepar.portion_as_label ? "%.6f" : "%.0f"),
     samplepar.portion * (double)(
       samplepar.portion_as_label ? 1.0 : samplepar.total_reads
     )
   );
-  say("9s$", "Creating cutpoints"); // TODO Delete after debug
   snprintf(
     text, LARGEST_LINE, "%s%s%.5f%s%.5f%s%.5f%s%.5f%s%.5f",
     label, sep, s.avg, sep, s.sd, sep, s.q1, sep, s.q2, sep, s.q3
