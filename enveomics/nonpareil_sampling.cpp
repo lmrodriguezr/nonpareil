@@ -222,7 +222,6 @@ sample_t nonpareil_sample_summary(
   }
 
   // Report summary
-  say("9s$", "Reporting summary"); // TODO Delete after debug
   if (reportSummary == 0) return s;
   label = new char[LARGEST_LABEL];
   text = new char[LARGEST_LINE];
@@ -230,7 +229,7 @@ sample_t nonpareil_sample_summary(
   say("9s$", "Creating label"); // TODO Delete after debug
   snprintf(
     label, LARGEST_LINE, (samplepar.portion_as_label ? "%.6f" : "%.0f"),
-    samplepar.portion * (
+    samplepar.portion * (double)(
       samplepar.portion_as_label ? 1.0 : samplepar.total_reads
     )
   );
@@ -239,7 +238,6 @@ sample_t nonpareil_sample_summary(
     text, LARGEST_LINE, "%s%s%.5f%s%.5f%s%.5f%s%.5f%s%.5f",
     label, sep, s.avg, sep, s.sd, sep, s.q1, sep, s.q2, sep, s.q3
   );
-  say("9s$", "Creating header"); // TODO Delete after debug
   if (reportSummary == 1) {
     fprintf(summaryh, "%s%s\n", header, text);
     fclose(summaryh);
@@ -247,6 +245,5 @@ sample_t nonpareil_sample_summary(
     printf("%s%s\n", header, text);
   }
 
-  say("9s$", "Returning summary"); // TODO Delete after debug
   return s;
 }
