@@ -408,7 +408,7 @@ int main(int argc, char *argv[]) {
 
 
 restart_vars:
-  say("9sis$", "Worker ", processID, " @start_vars.");
+  say("9sis$", "Worker ", processID, " @start_vars");
   if (processID == 0) {
     // Re-wire query portion
     if (qry_portion != 0) hX = (size_t)total_seqs*qry_portion;
@@ -423,15 +423,19 @@ restart_vars:
       error("The amount of memory allowed is too small, increase -R to over ",
         (double)required_ram_Kb/1024);
     lines_in_ram = (ram_Kb - required_ram_Kb)/(largest_seq + 3);
-    if(lines_in_ram > UINT_MAX/1024){
-      say("1sfs$", "WARNING: Unable to represent RAM in bits, lowering to ",
-        (double)UINT_MAX/(1024*1024), "Mb");
+    if (lines_in_ram > UINT_MAX / 1024) {
+      say(
+        "1sfs$", "WARNING: Unable to represent RAM in bits, lowering to ",
+        (double)UINT_MAX / (1024 * 1024), "Mb"
+      );
       lines_in_ram = UINT_MAX;
-    }else lines_in_ram *= 1024; // <- Rounding down to the Kibi.
-      say("3sfsisfs$",
-        "Sequences to store in ", (double)(ram_Kb - required_ram_Kb)/1024,
-        "Mb free: ", lines_in_ram, " (", (double)lines_in_ram*100.0/total_seqs,
-        "%)");
+    } else lines_in_ram *= 1024; // <- Rounding down to the Kibi.
+    say(
+      "3sfsisfs$",
+      "Sequences to store in ", (double)(ram_Kb - required_ram_Kb) / 1024,
+      "Mb free: ", lines_in_ram, " (",
+      (double)lines_in_ram * 100.0 / total_seqs, "\%)"
+    );
   }
   broadcast_int(&hX);
   broadcast_double(&qry_portion);
@@ -442,7 +446,7 @@ restart_vars:
 
   // Run comparisons
 restart_mates:
-  say("9sis$", "Worker ", processID, " @start_mates.");
+  say("9sis$", "Worker ", processID, " @start_mates");
   matepar.overlap = ovl;
   matepar.similarity = min_sim;
   matepar.qryportion = qry_portion;
@@ -469,9 +473,10 @@ restart_mates:
 
   // Sampling
 restart_samples:
-  say("9sis$", "Worker ", processID, " @start_samples.");
-  sampling_points = (divide==0) ? ((int)ceil((max-min)/itv)+1) :
-    ((int)ceil( (log(2) - log(total_seqs))/log(divide) )+2);
+  say("9sis$", "Worker ", processID, " @start_samples");
+  sampling_points = (divide == 0) ?
+    ((int)ceil((max - min) / itv) + 1) :
+    ((int)ceil((log(2) - log(total_seqs)) / log(divide)) + 2);
   sample_t sample_summary[sampling_points];
   size_t dummy=0;
   if (processID == 0) {
@@ -526,17 +531,19 @@ restart_samples:
 
   // Check results
 restart_checkings:
-  say("9sis$", "Worker ", processID, " @start_checkings.");
-  if(processID==0){
+  say("9sis$", "Worker ", processID, " @start_checkings");
+  if (processID == 0) {
     say("1s>", "Evaluating consistency");
     ok = true;
     // Low sequencing depth
-    if(sample_after_20<=sample_i && sample_summary[sample_after_20].q2==0.0){
-      say("1ss$",
-        "WARNING: The estimation at 20% has median zero, ",
-        "possibly reflecting inaccurate estimations");
-      if(qry_portion<1.0 && hX<3000){
-        if(autoadjust){
+    if (sample_after_20 <= sample_i &&
+          sample_summary[sample_after_20].q2 == 0.0) {
+      say(
+        "1ss$", "WARNING: The estimation at 20\% has median zero, ",
+        "possibly reflecting inaccurate estimations"
+      );
+      if (qry_portion < 1.0 && hX < 3000){
+        if (autoadjust) {
           hX = 0;
           qry_portion *= 2.0;
           if(qry_portion >= 1.0) qry_portion = 1.0;
@@ -544,62 +551,79 @@ restart_checkings:
           goto restart_vars;
         } else say("1sf$",
             "To increase the sensitivity increase -X, currently set at ", hX);
-      } else if(ovl > 0.25) {
-        if(autoadjust){
-               if(ovl>1.0)  ovl = 1.0;// This should never happen
-          else if(ovl>0.75) ovl = 0.75;
-          else if(ovl>0.5)  ovl = 0.5;
-          else if(ovl>0.25) ovl = 0.25;
+      } else if (ovl > 0.25) {
+        if (autoadjust){
+          if      (ovl > 1.00) ovl = 1.00; // <- This should never happen
+          else if (ovl > 0.75) ovl = 0.75;
+          else if (ovl > 0.50) ovl = 0.50;
+          else if (ovl > 0.25) ovl = 0.25;
           else error("Impossible to reduce -L further, sequencing depth under detection level");
-          say("1sf$", "AUTOADJUST: -L ", ovl*100);
+          say("1sf$", "AUTOADJUST: -L ", ovl * 100);
           goto restart_mates;
-        } else say("1sf$",
-            "To increase sensitivity, decrease -L, currently set at ", ovl*100);
+        } else {
+          say(
+            "1sf$", "To increase sensitivity, decrease -L, currently set at ",
+            ovl * 100
+          );
+        }
       } else {
-        say("1ss$",
+        say(
+          "1ss$",
           "The portion used as query (-x) is currently set to the maximum, ",
-          "and the overlap (-L) is set to the minimum");
-        say("1s$",
-          "The dataset is probably too small for reliable estimations");
-        if(min_sim>0.75) say("1s$",
-          "You could decrease the -S but values other than 0.95 are untested");
+          "and the overlap (-L) is set to the minimum"
+        );
+        say(
+          "1s$", "The dataset is probably too small for reliable estimations"
+        );
+        if (min_sim > 0.75)
+          say(
+            "1s$",
+            "You could decrease -S but values other than 0.95 are untested"
+          );
         error("Sequencing depth under detection limit.");
       }
       ok = false;
     }
+
     // High sequencing depth
-    if (sample_summary[sample_i-1].avg >= 0.95) {
-      if (ovl < 1.0) {
-        if (autoadjust) {
-          if      (ovl < 0.25) ovl = 0.25;
-          else if (ovl < 0.50) ovl = 0.50;
-          else if (ovl < 0.75) ovl = 0.75;
-          else if (ovl < 1.00) ovl = 1.00;
-          say("1sf$", "AUTOADJUST: -L ", ovl * 100.0);
-          goto restart_mates;
-        }
-      } else {
-        say("1ss$",
-            "The overlap (-L) is currently set to the maximum, ",
-            "meaning that the actual coverage is probably above 100X");
-        if (min_sim < 1.0) say("1s$",
-            "You could increase -S but values other than 0.95 are untested");
-        error("Sequencing depth above detection limit.");
-      }
-      ok = false;
-    }
+    if (sample_summary[sample_i-1].avg >= 0.95)
+      say(
+        "1sss$", "WARNING: The coverage of this dataset is very high, and the ",
+        "precise value might be slighly off. Not to be worried, this simply ",
+        "means that your dataset too good to need heuristic estimates!"
+      );
+
     // Low resolution
     if (sample_i > 5 && sample_summary[5].avg >= 0.95) {
-      say("1ss$",
-        "WARNING: The curve reached near-saturation in 6 or less points, ",
-        "hence diversity estimations could be unreliable");
+      say(
+        "1ss$",
+        "WARNING: The curve reached near-saturation in 6 or fewer points, ",
+        "hence diversity estimations could be unreliable"
+      );
       if (autoadjust) {
-	itv *= 0.5;
-	say("1sf$", "AUTOADJUST: -i ", itv);
+	if (divide == 0) {
+          itv *= 0.5;
+          say("1sf$", "AUTOADJUST: -i ", itv);
+        } else {
+          divide = (double)(1.0 - ((1.0 - divide) / 2));
+          say("1sf$", "AUTOADJUST: -d ", divide);
+        }
 	goto restart_samples;
-      } else say("1ssf$",
-        "To increase the resolution of the curve increase the -i parameter, ",
-        "currently set at ", itv);
+      } else {
+	if (divide == 0) {
+          say(
+            "1ssf$",
+            "To increase the resolution of the curve increase -i, ",
+            "currently set at ", itv
+          );
+        } else {
+          say(
+            "1ssf$",
+            "To increase the resolution of the curve increase -d, ",
+            "currently set at ", divide
+          );
+        }
+      }
       ok = false;
     }
     if (ok) say("1s$", "Everything seems correct");
@@ -610,7 +634,7 @@ restart_checkings:
   goto exit;
 
 exit:
-  say("9sis$", "Worker ", processID, " @exit.");
+  say("9sis$", "Worker ", processID, " @exit");
   // Clean temporals
   if (processID == 0) {
     if (remove_input) remove(file);
