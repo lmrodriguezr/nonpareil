@@ -504,7 +504,7 @@ restart_samples:
     }
 
     say("1s$", "Sub-sampling library");
-    while(sample_i < sampling_points){
+    while (sample_i < sampling_points) {
       if (divide == 0) {
         samplepar.portion = min + itv * sample_i;
       } else {
@@ -513,14 +513,13 @@ restart_samples:
       }
       samplepar.replicates = n;
 
-      say("7sisi$", "Sub-sample: ", sample_i + 1, "/", sampling_points);
       samples_no = nonpareil_sample_portion(sample_result, thr, samplepar);
-      say("8si$", "n = ", samples_no);
+      say("9si$", "n = ", samples_no);
       sample_summary[sample_i++] = nonpareil_sample_summary(
         sample_result,
         samples_no, alldata, outfile, samplepar
       );
-      say("8sf$", "portion = ", sample_summary[sample_i - 1].portion);
+      say("9sf$", "portion = ", sample_summary[sample_i - 1].portion);
       if (samplepar.portion <= 0.2) sample_after_20 = sample_i;
     }
     dummy = 1;
