@@ -7,3 +7,4 @@ enveomics/*.o
 /Nonpareil.Rcheck*
 /*.np?
 .DS_Store
+*.swp
