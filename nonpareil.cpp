@@ -585,12 +585,16 @@ restart_checkings:
     }
 
     // High sequencing depth
-    if (sample_summary[sample_i-1].avg >= 0.95)
+    if (sample_summary[sample_i-1].avg >= 0.95) {
       say(
-        "1sss$", "WARNING: The coverage of this dataset is very high, and the ",
-        "precise value might be slighly off. Not to be worried, this simply ",
-        "means that your dataset too good to need heuristic estimates!"
+        "1ss$", "The coverage of this dataset is very high, and the ",
+        "precise value might be slighly off"
       );
+      say(
+        "1ss$", "Not to be worried, this simply means that your dataset is ",
+        "too good to need heuristic estimates!"
+      );
+    }
 
     // Low resolution
     if (sample_i > 5 && sample_summary[5].avg >= 0.95) {
