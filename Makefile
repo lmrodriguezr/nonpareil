@@ -59,6 +59,8 @@ release: nonpareil
 	sed -i '' "s/^\(release = \)'.*'$$/\1'$(release)'/" docs/conf.py
 	sed -i '' "s/^\(copyright = u'2013-\)[0-9]*/\1$(shell date +%Y)/" docs/conf.py
 	cd docs && $(MAKE) man
+	cp nonpareil binaries/MacOSX_Intel/nonpareil-$(release)
+	cp nonpareil-mpi binaries/MacOSX_Intel/nonpareil-mpi-$(release)
 
 .PHONY: all clean install test release
 
