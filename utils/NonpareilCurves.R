@@ -20,6 +20,10 @@ optopt <- list(
     help = "Labels to be used for the samples"
   ),
   list(
+    opt_str = "--star", metavar = "FLOAT",
+    help = "Target coverage (in %), by default: 95"
+  ),
+  list(
     opt_str = "--json", metavar = "FILE",
     help = paste0("Output file, Nonpareil curve processed data in JSON format",
              ifelse(can_json, "",
@@ -48,6 +52,11 @@ optopt <- list(
   list(
     opt_str = "--col", metavar = "COL1,COL2,...",
     help = "Colors to be used for the Nonpareil curves (if --pdf)"
+  ),
+  list(
+    opt_str = "--dispersion", metavar = "STRING",
+    help = paste0("Plot dispersion around the curves (if --pdf)",
+           "\n                One of: sd, ci95, ci90, ci50, iq")
   ),
   list(
     opt_str = "--no-observed", action = "store_true",
@@ -122,6 +131,7 @@ cat("Parsing Redundancy Files\n")
 args <- list(opt[["files"]], plot = FALSE)
 if (opt[["do.col"]])    args$col    <- strsplit(opt[["col"]], ",")[[1]]
 if (opt[["do.labels"]]) args$labels <- strsplit(opt[["labels"]], ",")[[1]]
+if (opt[["do.star"]])   args$star   <- as.numeric(opt[["star"]])
 nps <- do.call(Nonpareil::Nonpareil.set, args)
 if (opt[["do.json"]] && !can_json)
   stop("Requested JSON output but missing 'jsonlite' package")
@@ -147,8 +157,9 @@ if (opt[["do.pdf"]]) {
   }
   do.call(pdf, args)
   args <- list(nps)
-  if (opt[["do.no-observed"]]) args$plot.observed <- FALSE
-  if (opt[["do.no-model"]]) args$plot.model <- FALSE
+  if (opt[["do.no-observed"]]) args$plot.observed   <- FALSE
+  if (opt[["do.no-model"]])    args$plot.model      <- FALSE
+  if (opt[["do.dispersion"]])  args$plot.dispersion <- opt[["dispersion"]]
   if (opt[["do.xlim"]])
     args$xlim <- as.numeric(strsplit(opt[["xlim"]], ",")[[1]])
   do.call(plot, args)
