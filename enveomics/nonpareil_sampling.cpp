@@ -28,7 +28,7 @@ using namespace std;
 int nonpareil_sample_portion(
       double *&result, int threads, samplepar_t samplepar) {
   // Vars
-  if(samplepar.replicates<threads) threads = samplepar.replicates;
+  if (samplepar.replicates < threads) threads = samplepar.replicates;
   samplejob_t     samplejob[threads];
   pthread_t       thread[threads];
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -158,7 +158,7 @@ sample_t nonpareil_sample_summary(
     if (samplepar.type == 1) { // Kernel: Alignment
       snprintf(
         header, LARGEST_LINE,
-        "# @impl: Nonpareil\n# @version: %s\n# @maxL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+        "# @impl: Nonpareil\n# @kernel: alignment\n# @version: %s\n# @maxL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
         samplepar.np_version,       // @version
         samplepar.max_read_len,     // @maxL
         samplepar.avg_read_len,     // @L
@@ -169,11 +169,22 @@ sample_t nonpareil_sample_summary(
     } else if (samplepar.type == 2) { // Kernel: Kmer
       snprintf(
         header, LARGEST_LINE,
-        "# @impl: Nonpareil\n# @ksize: %d\n# @version: %s\n# @L: %.3f\n# @AL: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+        "# @impl: Nonpareil\n# @kernel: kmer\n# @ksize: %d\n# @version: %s\n# @L: %.3f\n# @AL: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
         samplepar.k,                // @ksize
         samplepar.np_version,       // @version
         samplepar.avg_read_len,     // @L
         samplepar.adj_avg_read_len, // @AL
+        samplepar.total_reads,      // @R
+        samplepar.seq_overlap * 100.0, // @overlap
+        samplepar.divide            // @divide
+      );
+    } else if (samplepar.type == 3) { // Kernel: Usearch
+      snprintf(
+        header, LARGEST_LINE,
+        "# @impl: Nonpareil\n# @kernel: usearch\n# @version: %s\n# @minL: %d\n# @L: %.3f\n# @R: %llu\n# @overlap: %.2f\n# @divide: %.2f\n",
+        samplepar.np_version,       // @version
+        samplepar.min_read_len,     // @minL
+        samplepar.avg_read_len,     // @L
         samplepar.total_reads,      // @R
         samplepar.seq_overlap * 100.0, // @overlap
         samplepar.divide            // @divide

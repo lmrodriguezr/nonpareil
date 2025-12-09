@@ -8,6 +8,7 @@
 #include <fstream>
 #include <string>
 #include <bitset>
+#include <filesystem>
 #include <stdio.h>
 #include <sys/types.h>
 
@@ -85,7 +86,7 @@ size_t count_seqs(char *file) {
 
 size_t build_index(
       char *sourceFile, char *format, char *&namFileOut, char *&seqFileOut,
-      int &largest_seq, double &avg_seq) {
+      int &largest_seq, double &avg_seq, int len_min) {
   // Vars
   unsigned int N = 0, nline = 0, totlen = 0, lastn = 0;
   int      maxlen = 0;
@@ -108,9 +109,9 @@ size_t build_index(
   // Files
   int fileLen = strlen(sourceFile) + 20;
   seqFile = new char[fileLen];
-  snprintf(seqFile, fileLen, "%s.enve-seq.%d", sourceFile, getpid());
+  snprintf(seqFile, fileLen, "%s.enve-seq", sourceFile);
   namFile = new char[fileLen];
-  snprintf(namFile, fileLen, "%s.enve-nam.%d", sourceFile, getpid());
+  snprintf(namFile, fileLen, "%s.enve-nam", sourceFile);
   namFileOut = namFile;
   seqFileOut = seqFile;
 
@@ -140,7 +141,7 @@ size_t build_index(
     string line;
     getline(infileh, line);
     if ((isFastQ && (nline % 4 == 0)) || (!isFastQ && (line[0] == start))) {
-      if (seq.length() > 0) {
+      if (seq.length() >= len_min) {
         namfileh << ">" << ++N << endl << name << endl;
         seqfileh << ">" <<   N << endl <<  seq << endl;
         if (seq.length() > (size_t) maxlen) maxlen = seq.length();
@@ -160,7 +161,7 @@ size_t build_index(
     }
     nline++;
   }
-  if (seq.length() > 0) {
+  if (seq.length() >= len_min) {
     namfileh << ">" << ++N << endl << name << endl;
     seqfileh << ">" <<   N << endl <<  seq << endl;
     if (seq.length() > (size_t) maxlen) maxlen = seq.length();
@@ -173,8 +174,16 @@ size_t build_index(
   namfileh.close();
 
   largest_seq = maxlen;
-  avg_seq = ((avg_seq / N) * lastn ) + ((double) totlen / N);
+  avg_seq = ((avg_seq / N) * lastn) + ((double) totlen / N);
   return N;
+}
+
+size_t build_index(
+      char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut,
+      int &largest_seq, double &avg_seq) {
+  return build_index(
+    sourceFile, format, namFileOut, seqFileOut, largest_seq, avg_seq, (int) 1
+  );
 }
 
 size_t build_index(
@@ -197,122 +206,149 @@ size_t build_index(
 
 size_t sub_sample_seqs(
       char *sourceFile, char *destFile, double portion, char *format) {
-   ifstream	filein;
-   ofstream	fileout;
-   char		start;
-   size_t	n=0;
-   string	entry;
+  ifstream filein;
+  ofstream fileout;
+  char     start;
+  size_t   n = 0;
+  string   entry;
 
-   if(strcmp(format, "fasta")==0) {start = '>';}
-   else if(strcmp(format, "enveomics-seq")==0) {start = '>';}
-   else if(strcmp(format, "fastq")==0) {start = '@';}
-   else {error("Unsupported format", format);}
+  if (strcmp(format, "fasta") == 0) { start = '>'; }
+  else if (strcmp(format, "enveomics-seq") == 0) { start = '>'; }
+  else if (strcmp(format, "fastq") == 0) { start = '@'; }
+  else { error("Unsupported format", format); }
 
-   filein.open(sourceFile, ios::in);
-   if(!filein.is_open()) error("Impossible to open the input file", sourceFile);
-   fileout.open(destFile, ios::out);
-   if(!fileout.is_open()) error("Impossible to open the output file", destFile);
+  filein.open(sourceFile, ios::in);
+  if (!filein.is_open()) error("Impossible to open the input file", sourceFile);
+  fileout.open(destFile, ios::out);
+  if (fileout.fail()) error("Open output failure", destFile);
+  if (!fileout.is_open()) error("Impossible to open the output file", destFile);
 
-   while(filein.good()){
-      string line;
-      getline(filein, line);
-      if ((line[0] == start) || !filein.good()) {
-	 if((entry.size()>0) && (portion>=1 || ((double)rand()/RAND_MAX <= portion))){
-	    n++;
-	    fileout << entry;
-	 }
-         entry = (string)"";
+  while (filein.good()) {
+    string line;
+    getline(filein, line);
+    if ((line.size() > 0 && line[0] == start) || !filein.good()) {
+      if ((entry.size() > 0) &&
+            (portion >= 1 || ((double) rand() / RAND_MAX <= portion))) {
+        n++;
+        fileout << entry;
+        if (fileout.fail()) error("Write to output file failed", destFile);
       }
+      entry = (string)"";
+    }
+    if (filein.good()) {
       entry.append(line);
-      entry.append((char *)"\n");
-   }
+      entry.append((char *) "\n");
+    }
+  }
 
-   fileout.close();
-   filein.close();
+  // Write the last entry if it exists
+  if ((entry.size() > 0) &&
+        (portion >= 1 || ((double) rand() / RAND_MAX <= portion))) {
+    n++;
+    fileout << entry;
+    if (fileout.fail()) error("Write to output file failed", destFile);
+  }
 
-   return n;
+  fileout.flush();
+  if (fileout.fail()) error("Flush to output file failed", destFile);
+  fileout.close();
+  if (fileout.fail()) error("Close of output file failed", destFile);
+  filein.close();
+
+  // Verify file was created
+  ifstream verify_file(destFile);
+  if (!verify_file.good())
+    error("Output file was not created after sub_sample_seqs", destFile);
+  verify_file.close();
+
+  return n;
 }
 
-size_t sub_sample_seqs(char *sourceFile, char *destFile, double portion){
-   return sub_sample_seqs(sourceFile, destFile, portion, (char *)"fasta");
+size_t sub_sample_seqs(char *sourceFile, char *destFile, double portion) {
+  return sub_sample_seqs(sourceFile, destFile, portion, (char *)"fasta");
 }
 
-int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq, char *format){
-   //  Vars
-   ifstream	filein;
-   char		start;
-   int		n=0, i=0;
-   string	entry;
+int get_seqs(
+      char **&seqs, char *file, int from, int number, int largest_seq,
+      char *format) {
+  //  Vars
+  ifstream filein;
+  char     start;
+  int      n = 0, i = 0;
+  string   entry;
 
-   // Init
-   if(strcmp(format, "fasta")==0) {start = '>';}
-   else if(strcmp(format, "enveomics-seq")==0) {start = '>';}
-   else {error("Unsupported format", format);}
+  // Init
+  if (strcmp(format, "fasta") == 0) { start = '>'; }
+  else if (strcmp(format, "enveomics-seq") == 0) { start = '>'; }
+  else { error("Unsupported format", format); }
 
-   // Open file
-   filein.open(file, ios::in);
-   if(!filein.is_open()) error("Impossible to open the input file", file);
+  // Open file
+  filein.open(file, ios::in);
+  if (!filein.is_open()) error("Impossible to open the input file", file);
 
-   // Memory allocation
-   seqs = new char*[number];
-   if(!seqs) error("Impossible to allocate memory for that many sequences", number);
-   for(size_t a=0; a<(size_t)number; a++){
-      seqs[a] = new char[largest_seq+1];
-      if(!seqs[a]) error("Impossible to allocate memory for another sequence", (unsigned int)a);
-   }
+  // Memory allocation
+  seqs = new char*[number];
+  if (!seqs)
+    error("Impossible to allocate memory for that many sequences", number);
+  for (size_t a = 0; a < (size_t)number; a++) {
+      seqs[a] = new char[largest_seq + 1];
+      if (!seqs[a])
+        error("Impossible to allocate memory for another sequence",
+              (unsigned int)a);
+  }
 
-   // Read the file
-   while(filein.good()){
-      string line;
-      getline(filein, line);
-      if ((line[0] == start) || !filein.good()) {
-	 if(entry.size()>0){
-	    i++;
-	    if(i>=from){
-	       if(entry.length() > (size_t)largest_seq) error("Found a sequences largest than expected", (int)entry.length());
-	       for(size_t a=0; a<=entry.length(); a++) seqs[n][a] = entry[a];
-	       n++;
-	       if(n >= number) break;
-	    }
-	 }
-	 entry = (string)"";
-      }else{
-         entry.append(line);
-         //entry.append((char *)"\n");
+  // Read the file
+  while (filein.good()) {
+    string line;
+    getline(filein, line);
+    if ((line[0] == start) || !filein.good()) {
+      if (entry.size() > 0) {
+        i++;
+        if (i >= from) {
+          if (entry.length() > (size_t)largest_seq)
+            error("Found a sequences largest than expected",
+                  (int)entry.length());
+          for (size_t a = 0; a <= entry.length(); a++) seqs[n][a] = entry[a];
+          n++;
+          if (n >= number) break;
+        }
       }
-   }
+      entry = (string)"";
+    } else {
+      entry.append(line);
+    }
+  }
 
-   // Finalize
-   filein.close();
-   return n;
+  // Finalize
+  filein.close();
+  return n;
 }
 
-int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq){
-   return get_seqs(seqs, file, from, number, largest_seq, (char *)"fasta");
+int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq) {
+  return get_seqs(seqs, file, from, number, largest_seq, (char *)"fasta");
 }
 
-int reverse_complement(char *&out, char *in){
-   int	len = strlen(in);
-   for(int i=len; i>0; i--)
-      out[len-i] = in[i]=='A'?'T':
-		   in[i]=='C'?'G':
-		   in[i]=='G'?'C':
-		   in[i]=='T'?'A':
-			      'N';
-   out[len]=(char)NULL;
-   return len;
+int reverse_complement(char *&out, char *in) {
+  int len = strlen(in);
+  for (int i = len; i > 0; i--)
+    out[len - i] = in[i] == 'A' ? 'T' :
+		   in[i] == 'C' ? 'G' :
+		   in[i] == 'G' ? 'C' :
+		   in[i] == 'T' ? 'A' :
+			          'N';
+  out[len] = (char)NULL;
+  return len;
 }
 
-int reverse_complement(string &out, string in){
+int reverse_complement(string &out, string in) {
   int len = in.length();
   out = "";
-  for(int i = len-1; i >= 0; i--) {
-    out.push_back(in[i]=='A'?'T':
-     in[i]=='C'?'G':
-     in[i]=='G'?'C':
-     in[i]=='T'?'A':
-          'N');
-  }
+  for (int i = len - 1; i >= 0; i--)
+    out.push_back(in[i] == 'A' ? 'T' :
+                  in[i] == 'C' ? 'G' :
+                  in[i] == 'G' ? 'C' :
+                  in[i] == 'T' ? 'A' :
+                                 'N');
   return len;
 }
 
@@ -378,8 +414,8 @@ int nucseqtoa(char *&charseq, nucseq_t nucseq) {
   return nucseq.len;
 }
 
-int reverse_complement(nucseq_t &out, nucseq_t in){ 
-  for (size_t i = in.len; i > 0; i--) out.seq[in.len-i] = (~in.seq[i]);
+int reverse_complement(nucseq_t &out, nucseq_t in) { 
+  for (size_t i = in.len; i > 0; i--) out.seq[in.len - i] = (~in.seq[i]);
   out.len = in.len;
   return in.len;
 }

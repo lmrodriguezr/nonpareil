@@ -35,15 +35,21 @@ typedef struct {
  *   - `double portion_min`: Minimum portion in the run
  *   - `double portion_max`: Maximum portion in the run
  *   - `double portion_itv`: Interval of portions in the run
+ *   - `double seq_overlap`: TODO-DOC
  *   - `int replicates`: Number of replicates to generate
  *   - `int **mates`: Reference to the int array containing the matting results
  *   - `int mates_size`: Number of elements in the array referenced by mates
  *   - `int total_reads`: Total number of reads in the dataset
+ *   - `int max_read_len`: TODO-DOC
+ *   - `int k`: TODO-DOC
+ *   - `int type`: Nonpareil algorithm: 1 for alignment, 2 for kmer, 3 for
+ *     usearch
  *   - `double avg_read_len`: Average read length (in bp)
  *   - `bool portion_as_label`: True if the label column of the summary file
  *     must be filled with the portion, instead of the number of reads
  *   - `double divide`: Division factor for "logarithmic" sampling. If linear
  *     sampling is used instead, it should be zero (0.0)
+ *   - `int min_read_len`: Minimum length to consider a read
  */
 typedef struct {
   char*  np_version;
@@ -63,6 +69,7 @@ typedef struct {
   double adj_avg_read_len;
   bool   portion_as_label;
   double divide;
+  int    min_read_len;
 } samplepar_t;
 
 /**

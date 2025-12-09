@@ -13,6 +13,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <climits>
+#include <filesystem>
 
 using namespace std;
 
@@ -23,11 +24,13 @@ using namespace std;
  * void error(const char *msg, unsigned int val);
  * void error(const char *msg, double val);
  * void error(const char *msg, string val);
+ *
  * Description:
- *   Produces an error message and terminates the program.
+ *   Produces an error message and terminates the program
  * Input:
- *   const char *msg: The error message.
- *   mix val (optional): A value to be reported accompannying the error message.
+ *   - `const char *msg`: The error message
+ *   - `mix val` (optional): A value to be reported accompannying the error
+ *     message
  */
 void error(const char *msg);
 void error(const char *msg, const char *val);
@@ -38,74 +41,99 @@ void error(const char *msg, string val);
 
 /**
  * void set_verbosity(int v);
+ *
  * Description:
- *   Globally sets the verbosity level.  The higher the verbosity level, the noisier the
- *   program.  Some hallmarks in the verbosity:
- *    o 0: no output.
- *    o 1: only basic output.
- *    o 4: most important information is shown.
- *    o 7: all the information.
- *    o 9: debugging data is shown.
+ *   Globally sets the verbosity level.  The higher the verbosity level, the
+ *   noisier the program.  Some hallmarks in the verbosity:
+ *   - 0: no output
+ *   - 1: only basic output
+ *   - 4: most important information is shown
+ *   - 7: all the information
+ *   - 9: debugging data is shown
  * Input:
- *   int v: The new verbosity level.
+ *   - `int v`: The new verbosity level
  */
 void set_verbosity(int v);
 
 /**
  * int get_verbosity();
+ *
  * Description:
- *   Returns the globally set verbosity level.
+ *   Returns the globally set verbosity level
  * Output:
- *   int: The current verbosity level.
+ *   `int`: The current verbosity level
  */
 int get_verbosity();
 
 /**
  * void open_log(char *logfile);
+ *
  * Description:
- *   Opens a log file to save all the messages passed via say().
+ *   Opens a log file to save all the messages passed via say()
  * Input:
- *   char *logfile: Path to the log file to be created.
+ *   - `char *logfile`: Path to the log file to be created
  */
 void open_log(char *logfile);
 
 /**
  * void close_log();
+ *
  * Description:
- *   Closes the log file, if open.
+ *   Closes the log file, if open
  */
 void close_log();
 
 /**
  * bool log_is_open();
+ *
  * Description:
- *   Asserts whether the log is open or not.
+ *   Asserts whether the log is open or not
  * Output:
- *   bool: Is it open?
+ *   `bool`: Is it open?
  */
 bool log_is_open();
 
 /**
  * void say(const char *format, ...);
+ *
  * Description:
- *   Says something (prints to the stderr).
+ *   Says something (prints to the stderr)
  * Input:
- *   const char *format:  A string describing the following parameters.  The format must be:
- *      /([0-9])(\!?)([siuf]*)([$^]?)/.  The elements captured by the regexp parenthesis are:
- *        o A digit determining the minimum level of verbosity at which this message must be printed.
- *        o A bang (optional).  If passed, indicates that the string must be printed "as is", without the
- *          time prefix.  This is useful if you want to print a message without carriage return, to be
- *          completed in a further call of say().
- *        o Zero or more characters indicating the type of arguments (in the same order as passed).  Supported
- *          types are:  int (i), size_t (u), double (f), char (c) and char* (s).
- *        o A finalization character (optional).  If the finalization character is '$', a carriage return is
- *          printed at the end.  If the finalization character is '^', the pointer in the terminal is moved to the
- *          left.  The '^' basically means that say() must print some spaces (to whipe out the line) and a '\r'
- *          character.  If the finalization character is '>', some spaces and a carriage return are printed.  This
- *          is useful to clean the line (with some closure message) after one or more messages finished with '^'.
- *          NOTE: If the verbosity is 9, all the termination characters are interpreted as '$'.
+ *   - `const char *format`: A string describing the following parameters.
+ *      The format must be: `/([0-9])(\!?)([siuf]*)([$^]?)/`.  The elements
+ *      captured by the regexp parenthesis are:
+ *      - A digit determining the minimum level of verbosity at which this
+ *        message must be printed
+ *      - A bang (optional).  If passed, indicates that the string must be
+ *        printed "as is", without the time prefix.  This is useful if you want
+ *        to print a message without carriage return, to be completed in a
+ *        further call of `say()`
+ *      - Zero or more characters indicating the type of arguments (in the same
+ *        order as passed).  Supported types are:  `int` (`i`), `size_t` (`u`),
+ *        `double` (`f`), `char` (`c`) and `char*` (`s`)
+ *      - A finalization character (optional).  If the finalization character is
+ *        `$`, a carriage return is printed at the end.  If the finalization
+ *        character is `^`, the pointer in the terminal is moved to the left.
+ *        The `^` basically means that `say()` must print some spaces (to whipe
+ *        out the line) and a `\r` character.  If the finalization character is
+ *        `>`, some spaces and a carriage return are printed.  This is useful to
+ *        clean the line (with some closure message) after one or more messages
+ *        finished with `^`.
+ *        NOTE: If the verbosity is 9, all the termination characters are
+ *        interpreted as `$`
  */
 void say(const char *format, ...);
+
+/*
+ * std::filesystem::path tmp_dir();
+ *
+ * Description:
+ *   Creates (or recycles) a temporary directory for the current run
+ * Output:
+ *   `std::filesystem::path`: A path to the temporary directory to use in this
+ *   run
+ */
+std::filesystem::path tmp_dir();
 
 #endif
 
