@@ -1,6 +1,7 @@
 // nonpareil - Calculation of nonpareil curves
 // @author Luis M. Rodriguez-R <lmrodriguezr at gmail dot com>
 // @author Santosh Kumar G.
+// @author Borja Aldeguer Riquelme
 // @license Artistic-2.0
 
 #include <math.h>
@@ -15,7 +16,7 @@
 #include <string>
 
 #define LARGEST_PATH 4096
-#define NP_VERSION "3.5.5"
+#define NP_VERSION "4.0.0"
 
 using namespace std;
 int processID;
@@ -32,33 +33,47 @@ void help(const char *msg) {
     <<"  amount of sequences that will be required to achieve 'nearly"   << endl
     <<"  complete coverage'."                                            << endl
     << endl
-    <<"USAGE"                                                            << endl
+    <<"USAGE EXAMPLES"                                                   << endl
+    <<"  ## SHORT-READ EXAMPLES ---------------------------------------" << endl
+    <<"  # Slower alignment-based nonpareil with FastA input"            << endl
     <<"  nonpareil -s sequences.fa -T alignment -b output [options]"     << endl
+    <<"  # Faster kmer-based nonpareil with FastQ input"                 << endl
     <<"  nonpareil -s sequences.fq -T kmer -f fastq -b output [options]" << endl
+    <<"  # Same, but with gzipped input (automatically detected)"        << endl
     <<"  nonpareil -s seqs.fq.gz -T kmer -f fastq -b output [options]"   << endl
-    <<"  nonpareil -h"                                                   << endl
-    <<"  nonpareil -V"                                                   << endl
+    <<"  ## LONG-READ EXAMPLES ----------------------------------------" << endl
+    <<"  # Usearch-based nonpareil with FastA input"                     << endl
+    <<"  nonpareil -s seqs.fa -T usearch -f fasta -b output [options]"   << endl
+    <<"  ## GENERAL INFORMATION ABOUT NONPAREIL -----------------------" << endl
+    <<"  nonpareil -h # This help message"                               << endl
+    <<"  nonpareil -V # Current version of Nonpareil"                    << endl
+    <<"  nonpareil -B # Bibliography, how to cite Nonpareil"             << endl
     << endl
     <<"MANDATORY ARGUMENTS"                                              << endl
-    <<"  -s <str> : Path to the (input) file containing the sequences."  << endl
+    <<"  -s <str> : Path to the (input) file containing the sequences"   << endl
     <<"             Gzipped files are supported with .gz extension"      << endl
-    <<"  -T <str> : Nonpareil algorithm, 'kmer' or 'alignment' accepted" << endl
+    <<"  -T <str> : Nonpareil algorithm, 'kmer', 'usearch', or "         << endl
+    <<"             'alignment' accepted"                                << endl
     <<"  -f <str> : The format of the sequence: 'fasta' or 'fastq'"      << endl
     << endl
     <<"COMMON OPTIONS"                                                   << endl
-    <<"  -b <str> : Path to the prefix for all the output files."        << endl
+    <<"  -b <str> : Path to the prefix for all the output files"         << endl
     <<"             By default: nonpareil"                               << endl
     <<"  -X <int> : Maximum number of reads to use as query"             << endl
-    <<"             By default: 1000 for alignment, 10000 for kmer"      << endl
-    <<"  -k <int> : kmer length. By default: 24"                         << endl
-    <<"  -n <int> : Number of sub-samples to generate per point."        << endl
+    <<"             By default: 1000 for alignment, 10000 for kmer and"  << endl
+    <<"             usearch"                                             << endl
+    <<"  -k <int> : kmer length (for -T kmer). By default: 24"           << endl
+    <<"  -n <int> : Number of sub-samples to generate per point"         << endl
     <<"             If it is not a multiple of the number of threads"    << endl
-    <<"             (-t), it is rounded to the next (upper) multiple."   << endl
+    <<"             (-t), it is rounded to the next (upper) multiple"    << endl
     <<"             By default: 1024"                                    << endl
     <<"  -L <num> : Minimum overlapping percentage of the aligned region"<< endl
     <<"             on the largest sequence. The similarity (see -S) is" << endl
     <<"             evaluated for the aligned region only."              << endl
     <<"             By default: 50"                                      << endl
+    <<"  -p <int> : Minimum read length (base pairs)."                   << endl
+    <<"             By default: 50 for kmer and alignment, 1000 for"     << endl
+    <<"             usearch"                                             << endl
     <<"  -R <int> : Maximum RAM usage in Mib. Ideally this value should" << endl
     <<"             be larger than the sequences to analyze (discarding" << endl
     <<"             non-sequence elements like headers or quality). This"<< endl
@@ -69,10 +84,36 @@ void help(const char *msg) {
     <<"  -r <int> : Random seed to make runs reproducible. Currently"    << endl
     <<"             only implemented when -T alignment"                  << endl
     <<"  -V       : Show version information and exit"                   << endl
+    <<"  -B       : Show bibliography (citation) entries and exit"       << endl
     <<"  -h       : Display this message and exit"                       << endl
     << endl
     <<"See all supported arguments and additional documentation at"      << endl
     <<"http://nonpareil.readthedocs.org or with `man nonpareil`"         << endl
+    << endl;
+  finalize_multinode();
+  if (processID == 0) { exit(1); } else { exit(0); }
+}
+
+void bibliography() {
+  if (processID == 0)
+    cerr << endl
+    <<"If you use Nonpareil, please consider citing the relevant"        << endl
+    <<"manuscripts:"                                                     << endl
+    << endl
+    <<"Original Nonpareil paper:"                                        << endl
+    <<"- Rodriguez-R LM & Konstantinidis KT. 2014. Nonpareil: A"         << endl
+    <<"  Redundancy-Based Approach to Assess the Level of Coverage in"   << endl
+    <<"  Metagenomic Datasets. Bioinformatics 30(5): 629-635."           << endl
+    <<"  DOI: 10.1093/bioinformatics/btt584."                            << endl
+    <<"Kmer algorithm and Nd sequence diversity index:"                  << endl
+    <<"- Rodriguez-R LM, Gunturu S, Tiedje JM, Cole JR, Konstantinidis"  << endl
+    <<"  KT. 2018. Nonpareil 3: Fast Estimation of Metagenomic Coverage" << endl
+    <<"  and Sequence Diversity. mSystems 3(3)."                         << endl
+    <<"  DOI: 10.1128/msystems.00039-18."                                << endl
+    <<"Discussion on coverage and comparative metagenomics:"             << endl
+    <<"- Rodriguez-R LM & Konstantinidis KT. 2014. Estimating Coverage"  << endl
+    <<"  in Metagenomic Data Sets and Why it Matters. ISME J 8:"         << endl
+    <<"  2349-2351. DOI: 10.1038/ismej.2014.76."                         << endl
     << endl;
   finalize_multinode();
   if (processID == 0) { exit(1); } else { exit(0); }
@@ -85,89 +126,101 @@ int main(int argc, char *argv[]) {
 
   // Vars
   char  *file = new char[LARGEST_PATH], *inputfile = (char *)"",
-        *format =(char *)"", *nonpareiltype = (char *)"",
+        *format = (char *)"", *nonpareiltype = (char *)"",
         *alldata, *cntfile, *outfile, *namFile, *seqFile,
         *baseout = (char *)"nonpareil", *qfile, *qNamFile, *qSeqFile;
   double
-        min=0.0, max=1.0, itv=0.01, qry_portion=0, min_sim=0.95, ovl=0.50,
-        *sample_result, avg_seq_len=0.0, adj_avg_seq_len, divide=0.7,
-        q_avg_seq_len=0.0;
-  int   v=7, largest_seq=0, rseed=time(NULL), n=1024, k=24, thr=2, ram=1024,
-        *mates, samples_no, sample_i, sample_after_20, sampling_points,
-        q_largest_seq=0;
+        min = 0.0, max = 1.0, itv = 0.01, qry_portion = 0, min_sim = 0.95,
+        ovl = 0.50, *sample_result, avg_seq_len = 0.0, adj_avg_seq_len,
+        divide = 0.7, q_avg_seq_len = 0.0;
+  int   v = 7, largest_seq = 0, rseed = time(NULL), n = 1024, k = 24, thr = 2,
+        ram = 1024, *mates, samples_no, sample_i, sample_after_20,
+        sampling_points, q_largest_seq = 0, len_min = 0;
   unsigned int
-        q_total_seqs=0, lines_in_ram, hX=0, qry_seqs_no, ram_Kb,
+        q_total_seqs = 0, lines_in_ram, hX = 0, qry_seqs_no, ram_Kb,
         required_ram_Kb;
-  unsigned long long int total_seqs=0;
+  unsigned long long int total_seqs = 0;
   bool  n_as_mismatch = false, portion_label = false, revcom = true, ok,
-        autoadjust = false, alt_query = false, remove_input = false,
-        rseed_set = false;
+        autoadjust = false, alt_query = false, rseed_set = false;
   matepar_t matepar;
   samplepar_t samplepar;
 
-  alldata = (char *)"";
-  cntfile = (char *)"";
-  outfile = (char *)"-";
+  alldata = (char *) "";
+  cntfile = (char *) "";
+  outfile = (char *) "-";
 
 
   // GetOpt
   int   optchr;
-  while ((optchr = getopt (argc, argv,
-          "Aa:b:cC:d:f:Fhi:k:l:L:m:M:n:No:q:r:R:s:S:t:T:v:Vx:X:")) != EOF) {
+  // Available letters left: DeEgGHIjJKOQyYzZ
+  while ((optchr = getopt(
+          argc, argv,
+          "a:Ab:BcC:d:f:Fhi:k:l:L:m:M:n:No:p:q:r:R:s:S:t:T:v:Vx:X:"
+        )) != EOF) {
     switch (optchr) {
-      case 'a': alldata = optarg;       break;
-      case 'A': autoadjust = true;      break;
-      case 'b': baseout = optarg;       break;
-      case 'c': revcom = false;         break;
-      case 'C': cntfile = optarg;       break;
-      case 'd': divide = atof(optarg);  break;
-      case 'f': format = optarg;        break;
-      case 'F': portion_label = true;   break;
-      case 'h': help("");               break;
-      case 'i': itv = atof(optarg);     break;
-      case 'k': k = atoi(optarg);       break;
-      case 'l': open_log(optarg);       break;
-      case 'L': ovl=atof(optarg)/100.0; break;
-      case 'm': min = atof(optarg);     break;
-      case 'M': max = atof(optarg);     break;
-      case 'n': n = atoi(optarg);       break;
-      case 'N': n_as_mismatch=true;     break;
-      case 'o': outfile = optarg;       break;
+      case 'a': alldata = optarg;           break;
+      case 'A': autoadjust = true;          break;
+      case 'b': baseout = optarg;           break;
+      case 'B': bibliography();             break;
+      case 'c': revcom = false;             break;
+      case 'C': cntfile = optarg;           break;
+      case 'd': divide = atof(optarg);      break;
+      case 'f': format = optarg;            break;
+      case 'F': portion_label = true;       break;
+      case 'h': help("");                   break;
+      case 'i': itv = atof(optarg);         break;
+      case 'k': k = atoi(optarg);           break;
+      case 'l': open_log(optarg);           break;
+      case 'L': ovl = atof(optarg) / 100.0; break;
+      case 'm': min = atof(optarg);         break;
+      case 'M': max = atof(optarg);         break;
+      case 'n': n = atoi(optarg);           break;
+      case 'N': n_as_mismatch = true;       break;
+      case 'o': outfile = optarg;           break;
+      case 'p': len_min = atoi(optarg);     break;
       case 'q':
         qfile = optarg;
-        alt_query = true;               break;
+        alt_query = true;                   break;
       case 'r':
         rseed = atoi(optarg);
-        rseed_set = true;               break;
-      case 'R': ram = (int)atoi(optarg);break;
-      case 's': inputfile = optarg;     break;
-      case 'S': min_sim=atof(optarg);   break;
-      case 't': thr = atoi(optarg);     break;
-      case 'T': nonpareiltype = optarg; break;
-      case 'v': v = atoi(optarg);       break;
-      case 'V':
-        finalize_multinode(); return 0;
-      case 'x':
-        qry_portion = atof(optarg);     break;
-      case 'X': hX = atoi(optarg);      break;
-      default:
-        help("Unrecognized flag");      break;
+        rseed_set = true;                   break;
+      case 'R': ram = (int) atoi(optarg);   break;
+      case 's': inputfile = optarg;         break;
+      case 'S': min_sim = atof(optarg);     break;
+      case 't': thr = atoi(optarg);         break;
+      case 'T': nonpareiltype = optarg;     break;
+      case 'v': v = atoi(optarg);           break;
+      case 'V': finalize_multinode(); return 0;
+      case 'x': qry_portion = atof(optarg); break;
+      case 'X': hX = atoi(optarg);          break;
+      default: help("Unrecognized flag");   break;
     }
   }
+
   // Set number of reads to use as query
   if (hX != 0) {
     // User-provided, do nothing
-  } else if (strcmp(nonpareiltype,"kmer") == 0) {
-    hX = 10000;
-  } else if(strcmp(nonpareiltype,"alignment") == 0) {
+  } else if (strcmp(nonpareiltype, "alignment") == 0) {
     hX = 1000;
+  } else {
+    hX = 10000;
+  }
+
+  // Set minimum read length
+  if (len_min != 0) {
+    // User-provided, do nothing
+  } else if (strcmp(nonpareiltype, "usearch") == 0) {
+    len_min = 1000;
+  } else {
+    len_min = 50;
   }
 
   set_verbosity(v);
   if (strlen(nonpareiltype) == 0) help("-T is mandatory");
   if (strcmp(nonpareiltype, "kmer") != 0 &&
-      strcmp(nonpareiltype, "alignment") != 0)
-    help("Bad argument for -T option, accepted values are kmer or alignment");
+      strcmp(nonpareiltype, "alignment") != 0 &&
+      strcmp(nonpareiltype, "usearch") != 0)
+    help("Bad argument for -T, accepted: kmer, usearch, or alignment");
   if (strlen(inputfile) == 0) help("-s is mandatory");
   if (strlen(format) == 0) help("-f is mandatory");
   if ((strcmp(format, "fasta") != 0) && (strcmp(format, "fastq") != 0))
@@ -225,12 +278,14 @@ int main(int argc, char *argv[]) {
   srand(rseed + processID);
 
   // file checking
+  // TODO
+  // - Sequence lengths should be included here! (`len_min`)
   int count = 0;
 
   if (has_gz_ext(inputfile)) {
-    remove_input = true;
     if (processID == 0) {
-      snprintf(file, LARGEST_PATH, "%s.enve-tmp.%d", inputfile, getpid());
+      std::filesystem::path tmp_path = tmp_dir();
+      snprintf(file, LARGEST_PATH, "%s/input_seq", tmp_path.c_str());
       gunz_file(inputfile, file);
       say("2sss$", "The file ", file, " was created");
     }
@@ -264,7 +319,8 @@ int main(int argc, char *argv[]) {
     if (count == 0) {
       error("No reads found, check that the input file exists and is readable");
     } else if (count <= limit) {
-      hX = count * 3 / 4;
+      hX = count;
+      if (strcmp(nonpareiltype, "kmer") == 0) hX *= 3 / 4;
       say("3si$", "Reducing query reads (-X) to ", hX);
     }
 
@@ -347,21 +403,23 @@ int main(int argc, char *argv[]) {
   barrier_multinode();
 
   // Parse file
-  if(processID == 0) say("1s$", "Counting sequences");
+  if (processID == 0) say("1s$", "Counting sequences");
   namFile = (char *)malloc(LARGEST_PATH * (sizeof *namFile));
   seqFile = (char *)malloc(LARGEST_PATH * (sizeof *seqFile));
-  if(processID == 0){
-    total_seqs = build_index(file, format, namFile, seqFile, largest_seq,
-      avg_seq_len);
-    if(largest_seq < 1)
+  if (processID == 0) {
+    total_seqs = build_index(
+      file, format, namFile, seqFile, largest_seq,
+      avg_seq_len, len_min
+    );
+    if (largest_seq < 1)
       error("Empty sequences or internal error. Largest sequence: ",
-        largest_seq);
+            largest_seq);
     say("2sss$", "The file ", seqFile, " was just created");
     say("4sis$", "Longest sequence has ", largest_seq, " characters");
     say("4sfs$", "Average read length is ", avg_seq_len, " bp");
-    if(total_seqs==0)
+    if (total_seqs == 0)
       error("No input sequences.  Before re-running please delete the file ",
-        seqFile);
+            seqFile);
     say("1sus$", "Reading file with ", total_seqs, " sequences");
     say("9s$", "Broadcasting");
   }
@@ -377,23 +435,25 @@ int main(int argc, char *argv[]) {
   qSeqFile = (char *)malloc(LARGEST_PATH * (sizeof *qSeqFile));
   if (processID == 0) {
     say("1s$", "Counting query sequences");
-    if(alt_query){
-      q_total_seqs = build_index(qfile, format, qNamFile, qSeqFile,
-        q_largest_seq, q_avg_seq_len);
-      if(q_largest_seq<1)
+    if (alt_query) {
+      q_total_seqs = build_index(
+        qfile, format, qNamFile, qSeqFile,
+        q_largest_seq, q_avg_seq_len, len_min
+      );
+      if (q_largest_seq < 1)
         error("No input sequences or internal error.  Largest sequence: ",
-          q_largest_seq);
+              q_largest_seq);
       say("2sss$", "The file ", qSeqFile, " was just created");
       say("4sis$", "Longest query sequence has ", q_largest_seq, " characters");
       say("4sfs$", "Average query read length is ", q_avg_seq_len, " bp");
-      if(q_total_seqs==0)
+      if (q_total_seqs == 0)
         error("No input sequences.  Before re-running please delete the file ",
-          qSeqFile);
+              qSeqFile);
       say("1sus$", "Reading query file with ", q_total_seqs, " sequences");
-    }else{
-      q_total_seqs=0;
-      qNamFile=(char *)"";
-      qSeqFile=(char *)"";
+    } else {
+      q_total_seqs = 0;
+      qNamFile = (char *)"";
+      qSeqFile = (char *)"";
       q_largest_seq = 0;
       q_avg_seq_len = 0.0;
     }
@@ -411,22 +471,22 @@ restart_vars:
   say("9sis$", "Worker ", processID, " @start_vars");
   if (processID == 0) {
     // Re-wire query portion
-    if (qry_portion != 0) hX = (size_t)total_seqs*qry_portion;
-    qry_portion = (double)hX/(alt_query ? q_total_seqs : total_seqs);
+    if (qry_portion != 0) hX = (size_t) total_seqs * qry_portion;
+    qry_portion = (double) hX / (alt_query ? q_total_seqs : total_seqs);
 
     // Prepare memory arguments
-    if((size_t)ram > UINT_MAX/1024)
+    if ((size_t) ram > UINT_MAX / 1024)
       error("The memory to allocate is too large, reduce -R", ram);
     ram_Kb = ram * 1024;
-    required_ram_Kb = 2 * (int)hX * sizeof(int) * thr / 1024 + 2048;
-    if(ram_Kb < required_ram_Kb)
+    required_ram_Kb = 2 * (int) hX * sizeof(int) * thr / 1024 + 2048;
+    if (ram_Kb < required_ram_Kb)
       error("The amount of memory allowed is too small, increase -R to over ",
-        (double)required_ram_Kb/1024);
-    lines_in_ram = (ram_Kb - required_ram_Kb)/(largest_seq + 3);
+        (double) required_ram_Kb / 1024);
+    lines_in_ram = (ram_Kb - required_ram_Kb) / (largest_seq + 3);
     if (lines_in_ram > UINT_MAX / 1024) {
       say(
         "1sfs$", "WARNING: Unable to represent RAM in bits, lowering to ",
-        (double)UINT_MAX / (1024 * 1024), "Mb"
+        (double) UINT_MAX / (1024 * 1024), "Mb"
       );
       lines_in_ram = UINT_MAX;
     } else lines_in_ram *= 1024; // <- Rounding down to the Kibi.
@@ -453,18 +513,31 @@ restart_mates:
   matepar.revcom = revcom;
   matepar.n_as_mismatch = n_as_mismatch;
   matepar.k = k;
+
+  if (strcmp(nonpareiltype, "alignment") == 0) {
+    matepar.type = 1;
+  } else if (strcmp(nonpareiltype, "kmer") == 0) {
+    matepar.type = 2;
+  } else {
+    matepar.type = 3;
+  }
+
   if (processID == 0)
     say("1sfsis$", "Querying library with ", qry_portion,
         " times the total size (", hX," seqs)");
   if (alt_query) {
-    qry_seqs_no = nonpareil_mate(mates, seqFile, qSeqFile, thr, lines_in_ram,
-      total_seqs, largest_seq, q_largest_seq, matepar);
+    qry_seqs_no = nonpareil_mate(
+      mates, seqFile, qSeqFile, thr, lines_in_ram, total_seqs, largest_seq,
+      q_largest_seq, matepar
+    );
   } else {
-    qry_seqs_no = nonpareil_mate(mates, seqFile, thr, lines_in_ram, total_seqs,
-      largest_seq, matepar);
+    qry_seqs_no = nonpareil_mate(
+      mates, seqFile, thr, lines_in_ram, total_seqs, largest_seq, matepar
+    );
   }
+
   if (processID == 0) {
-    if (alt_query) for (size_t a=0; a<qry_seqs_no; a++) mates[a]++;
+    if (alt_query) for (size_t a = 0; a < qry_seqs_no; a++) mates[a]++;
       // <- Accounts for the lack of self-matches
     if (cntfile && (strlen(cntfile) > 0))
       nonpareil_save_mates(mates, qry_seqs_no, cntfile);
@@ -494,13 +567,14 @@ restart_samples:
     samplepar.avg_read_len = avg_seq_len;
     samplepar.portion_as_label = portion_label;
     samplepar.divide = divide;
+    samplepar.min_read_len = len_min;
 
-    if (strcmp(nonpareiltype, "kmer") != 0) {
-      samplepar.type = 1;
-    } else {
+    if (strcmp(nonpareiltype, "kmer") == 0) {
       samplepar.k = k;
       samplepar.adj_avg_read_len = adj_avg_seq_len;
-      samplepar.type = 2; //kmer
+      samplepar.type = 2;
+    } else {
+      samplepar.type = matepar.type;
     }
 
     say("1s$", "Sub-sampling library");
@@ -640,9 +714,11 @@ exit:
   say("9sis$", "Worker ", processID, " @exit");
   // Clean temporals
   if (processID == 0) {
-    if (remove_input) remove(file);
-    remove(namFile);
-    remove(seqFile);
+    try {
+      std::filesystem::remove_all(tmp_dir());
+    } catch (const std::exception &e) {
+      say("2ss$", "Warning: failed to remove temp directory: ", e.what());
+    }
     close_log();
   }
   barrier_multinode();

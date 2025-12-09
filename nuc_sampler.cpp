@@ -303,7 +303,8 @@ int main(int argc, char *argv[]) {
   // Check if gzipped
   if (has_gz_ext(inputfile)) {
     remove_input = true;
-    snprintf(file, LARGEST_PATH, "%s.enve-tmp.%d", inputfile, getpid());
+    std::filesystem::path tmp_path = tmp_dir();
+    snprintf(file, LARGEST_PATH, "%s/input_seq", tmp_path.c_str());
     gunz_file(inputfile, file);
   } else {
     snprintf(file, LARGEST_PATH, "%s", inputfile);
