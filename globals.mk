@@ -2,7 +2,7 @@
 
 cpp=g++
 mpicpp=mpic++
-CPPFLAGS=-Wall -std=c++11
+CPPFLAGS=-Wall -std=c++17
 mpiflags=-DENVEOMICS_MULTI_NODE
 
 R=R

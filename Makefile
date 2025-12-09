@@ -1,6 +1,5 @@
 
 # Makefile for Nonpareil
-# @update Dec 16 2013
 # @author Luis M. Rodriguez-R <lmrodriguez at gmail dot com>
 
 include globals.mk
