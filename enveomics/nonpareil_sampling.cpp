@@ -23,8 +23,6 @@
 #define LARGEST_LABEL 128
 #define LARGEST_LINE  2048
 
-using namespace std;
-
 int nonpareil_sample_portion(
       double *&result, int threads, samplepar_t samplepar) {
   // Vars
@@ -127,7 +125,7 @@ sample_t nonpareil_sample_summary(
       char *outfile, samplepar_t samplepar) {
   // Vars
   double   x2 = 0;
-  vector<double> dataPoints;
+  std::vector<double> dataPoints;
   FILE     *alldatah, *summaryh;
   bool     reportAllData = false;
   int      reportSummary = 0;
@@ -210,13 +208,13 @@ sample_t nonpareil_sample_summary(
     s.sd   = sqrt(x2 - pow(s.avg, 2.0));
 
     // Quartiles
-    vector<double>::iterator firstDatum = dataPoints.begin();
-    vector<double>::iterator lastDatum = dataPoints.end();
-    vector<double>::iterator q1Datum =
+    std::vector<double>::iterator firstDatum = dataPoints.begin();
+    std::vector<double>::iterator lastDatum = dataPoints.end();
+    std::vector<double>::iterator q1Datum =
           firstDatum + (lastDatum - firstDatum) / 4;
-    vector<double>::iterator q2Datum =
+    std::vector<double>::iterator q2Datum =
           firstDatum + (lastDatum - firstDatum) / 2;
-    vector<double>::iterator q3Datum =
+    std::vector<double>::iterator q3Datum =
           firstDatum + (lastDatum - firstDatum) * 3 / 4;
     nth_element(firstDatum, q1Datum, lastDatum);
     nth_element(firstDatum, q2Datum, lastDatum);

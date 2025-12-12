@@ -23,8 +23,6 @@ extern int processes;
 
 #define LARGEST_PATH 4096
 
-using namespace std;
-
 size_t nonpareil_mate(
     int *&result, char *file, int threads, unsigned int lines_in_ram,
     unsigned int total_seqs, unsigned int largest_seq, matepar_t matepar) {
@@ -129,7 +127,7 @@ size_t nonpareil_mate(
         if (line.size() == 0) continue;
 
         // Split the line by tabs
-        vector<string> fields;
+        std::vector<string> fields;
         string token;
         stringstream ss(line);
         while (getline(ss, token, '\t')) fields.push_back(token);
