@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <pthread.h>
-#include <vector>
 #include <algorithm>
 
 #include "universal.h"

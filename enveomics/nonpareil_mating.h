@@ -7,6 +7,7 @@
 #define ENVEOMICS_NONPAREIL_MATING_H
 
 #include <fstream>
+#include <vector>
 
 /**
  * typedef matepar_t;

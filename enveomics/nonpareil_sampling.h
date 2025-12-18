@@ -5,6 +5,8 @@
 #ifndef ENVEOMICS_NONPAREIL_SAMPLING_H
 #define ENVEOMICS_NONPAREIL_SAMPLING_H
 
+#include <vector>
+
 /**
  * typedef sample_t;
  * Description:
