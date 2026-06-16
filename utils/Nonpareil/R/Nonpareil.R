@@ -698,7 +698,11 @@ Nonpareil.kappa_to_coverage <- function(
   #' @return
   #' A numeric vector.
   if (x$kernel == "usearch") {
-    return(-1.961 * kappa ^ 2.653 + 2.493 * kappa)
+    # This method is quite insensitive to overlap, so we use here an
+    # approximation that has been tested with overlaps of:
+    # 10%, 25%, 50%, 75%, and 90%
+    common_factor <- 9.616634
+    return(pgamma(exp(kappa), common_factor, 1 + common_factor))
   } else {
     return(kappa ^ Nonpareil.coverage_factor(x))
   }

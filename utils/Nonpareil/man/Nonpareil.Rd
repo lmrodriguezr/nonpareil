@@ -37,4 +37,9 @@ Useful links:
 \author{
 \strong{Maintainer}: Luis M. Rodriguez-R \email{lmrodriguezr@gmail.com}
 
+Authors:
+\itemize{
+  \item Luis M. Rodriguez-R \email{lmrodriguezr@gmail.com}
+}
+
 }
