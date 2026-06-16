@@ -364,8 +364,9 @@ int main(int argc, char *argv[]) {
         say("2sus$", "Picking ", hX, " random sequences");
         References references = References(fastqReader, hX, k);
         say("2s$", "Counting kmers");
-        KmerCounter counter = KmerCounter(references, fastqReader,
-          string(cntfile));
+        KmerCounter counter = KmerCounter(
+          references, fastqReader, string(cntfile)
+        );
         mates = new int[hX];
         counter.getCounts(mates);
         avg_seq_len = counter.getAvgLen();

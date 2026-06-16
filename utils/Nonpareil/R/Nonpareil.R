@@ -51,7 +51,7 @@ setClass("Nonpareil.Curve",
   R = 'numeric',
   #' @slot LR Effective sequencing effort used.
   LR = 'numeric',
-  #' @slot overlap Minimum read overlap.
+  #' @slot overlap Minimum read overlap (in percentage).
   overlap = 'numeric',
   #' @slot ksize K-mer size (for kmer kernel only).
   ksize = 'numeric',
@@ -288,61 +288,79 @@ plot.Nonpareil.Curve <- function(
       #' @param ...
       #' Additional graphical parameters.
       ...
-      ){
-  if(!inherits(x, "Nonpareil.Curve"))
+      ) {
+  if (!inherits(x, "Nonpareil.Curve"))
     stop("'x' must inherit from class `Nonpareil.Curve`")
 
   # Create empty canvas
-  if(new){
+  if (new) {
     plot(
       1, type = "n", xlim = xlim, ylim = ylim, bty = "l",
       xlab = xlab, ylab = ylab, main = main,
       xaxs = "i", yaxs = "i", log = log, ...
     )
-    abline(h = c(1, x$star/100), lty = 2, col = "red")
-    abline(v = 10^seq(0, 15, by = 3), lty = 2, col = "gray80")
+    abline(h = c(1, x$star / 100), lty = 2, col = "red")
+    abline(v = 10 ^ seq(0, 15, by = 3), lty = 2, col = "gray80")
   }
 
   # Dispersion
-  if(plot.dispersion!=FALSE){
-    if(plot.dispersion == "sd"){
-      err.y <- c(x$y.cov+x$y.sd, rev(x$y.cov-x$y.sd))
-    }else if(plot.dispersion == "ci95"){
-      err.y <- c(x$y.cov+x$y.sd*1.9, rev(x$y.cov-x$y.sd*1.9))
-    }else if(plot.dispersion == "ci90"){
-      err.y <- c(x$y.cov+x$y.sd*1.64, rev(x$y.cov-x$y.sd*1.64))
-    }else if(plot.dispersion == "ci50"){
-      err.y <- c(x$y.cov+x$y.sd*.67, rev(x$y.cov-x$y.sd*.67))
-    }else if(plot.dispersion == "iq"){
+  if (plot.dispersion != FALSE) {
+    if (plot.dispersion == "sd") {
+      err.y <- c(x$y.cov + x$y.sd, rev(x$y.cov - x$y.sd))
+    } else if (plot.dispersion == "ci95") {
+      err.y <- c(x$y.cov + x$y.sd * 1.9, rev(x$y.cov - x$y.sd * 1.9))
+    } else if (plot.dispersion == "ci90") {
+      err.y <- c(x$y.cov + x$y.sd * 1.64, rev(x$y.cov - x$y.sd * 1.64))
+    } else if (plot.dispersion == "ci50") {
+      err.y <- c(x$y.cov + x$y.sd * 0.67, rev(x$y.cov - x$y.sd * 0.67))
+    } else if (plot.dispersion == "iq") {
       err.y <- c(x$y.p25, rev(x$y.p75))
     }
-    polygon(c(x$x.adj, rev(x$x.adj)), border=NA,
-      ifelse(err.y<=ylim[1]*0.1, ylim[1]*0.1, err.y), col=Nonpareil.col(x, .2))
+    polygon(
+      c(x$x.adj, rev(x$x.adj)), border=NA,
+      ifelse(err.y <= ylim[1] * 0.1, ylim[1] * 0.1, err.y),
+      col=Nonpareil.col(x, 0.2)
+    )
   }
 
   # Rarefied coverage
-  if(plot.observed){
-    lines(x$x.adj, x$y.cov, col=Nonpareil.col(x, curve.alpha), lwd=curve.lwd);
+  if (plot.observed) {
+    lines(
+      x$x.adj, x$y.cov,
+      col = Nonpareil.col(x, curve.alpha),
+      lwd = curve.lwd
+    )
   }
 
   # Model
-  if(x$has.model & plot.model){
+  if (x$has.model & plot.model) {
     model.lty <- ifelse(plot.observed, 2, 1)
-    model.x   <- exp(seq(log(xlim[1]), log(xlim[2]), length.out=1e3));
-    model.y   <- predict(x, lr=model.x);
-    lines(model.x, model.y, col=Nonpareil.col(x, model.alpha), lty=model.lty,
-          lwd=model.lwd)
-    if(!plot.observed){
-      points(x$LR, predict(x), col=Nonpareil.col(x, 1.0), pch=21, bg="white")
+    model.x   <- exp(seq(log(xlim[1]), log(xlim[2]), length.out = 1e3))
+    model.y   <- predict(x, lr = model.x)
+    lines(
+      model.x, model.y,
+      col = Nonpareil.col(x, model.alpha),
+      lty = model.lty, lwd = model.lwd
+    )
+    if (!plot.observed) {
+      points(
+        x$LR, predict(x),
+        col = Nonpareil.col(x, 1.0),
+        pch = 21, bg = "white"
+      )
     }
   }
 
-  if(x$has.model & plot.diversity & x$diversity>0){
-    arrows(x0=exp(x$diversity), length=arrow.head,
-          y1=ifelse(log=='y' | log=='xy' | log=='yx',
-            ylim[1]*(ylim[2]/ylim[1])**arrow.length,
-            ylim[1] + diff(ylim)*arrow.length),
-          y0=ylim[1], col=Nonpareil.col(x, model.alpha));
+  if (x$has.model & plot.diversity & x$diversity > 0) {
+    arrows(
+      x0 = exp(x$diversity), length=arrow.head,
+      y1 = ifelse(
+        log == "y" | log == "xy" | log == "yx",
+        ylim[1] * (ylim[2] / ylim[1]) ** arrow.length,
+        ylim[1] + diff(ylim) * arrow.length
+      ),
+      y0 = ylim[1], col = Nonpareil.col(x, model.alpha)
+    );
   }
 
   #' @return
@@ -359,8 +377,8 @@ summary.Nonpareil.Set <- function(
       #' @param ...
       #' Additional parameters ignored.
       ...
-      ){
-  if(!inherits(object, "Nonpareil.Set"))
+      ) {
+  if (!inherits(object, "Nonpareil.Set"))
     stop("'object' must inherit from class `Nonpareil.Set`")
   y <- rbind(sapply(object$np.curves, "summary"))
   colnames(y) <- sapply(object$np.curves, function(n) n$label)
@@ -380,10 +398,10 @@ summary.Nonpareil.Curve <- function(
       #' @param ...
       #' Additional parameters ignored.
       ...
-      ){
-  if(!inherits(object, "Nonpareil.Curve"))
+      ) {
+  if (!inherits(object, "Nonpareil.Curve"))
     stop("'object' must inherit from class `Nonpareil.Curve`")
-  n <- c("kappa","C","LR","modelR","LRstar","diversity")
+  n <- c("kappa", "C", "LR", "modelR", "LRstar", "diversity")
   y <- sapply(n, function(v) attr(object,v))
   names(y) <- n
 
@@ -414,15 +432,15 @@ print.Nonpareil.Set <- function(
       #' @param ...
       #' Additional parameters ignored.
       ...
-      ){
-  if(!inherits(x, "Nonpareil.Set"))
+      ) {
+  if (!inherits(x, "Nonpareil.Set"))
     stop("'x' must inherit from class `Nonpareil.Set`")
   y <- summary(x)
   cat("===[ Nonpareil.Set ]===================================\n")
   cat("Collection of", length(x$np.curves), "Nonpareil curves.\n")
   print(y)
   cat("-------------------------------------------------------\n")
-  cat("call:",as.character(x$call),"\n")
+  cat("call:",as.character(x$call), "\n")
   cat("-------------------------------------------------------\n")
 
   #' @return
@@ -440,7 +458,7 @@ print.Nonpareil.Curve <- function(
       #' @param ...
       #' Additional parameters ignored.
       ...
-      ){
+      ) {
   if(!inherits(x, "Nonpareil.Curve"))
     stop("'x' must inherit from class `Nonpareil.Curve`")
   y <- summary(x)
@@ -449,7 +467,7 @@ print.Nonpareil.Curve <- function(
   cat("===[ Nonpareil.Curve ]=================================\n")
   print(yp)
   cat("-------------------------------------------------------\n")
-  cat("call:",as.character(x$call),"\n")
+  cat("call:",as.character(x$call), "\n")
   cat("-------------------------------------------------------\n")
 
   #' @return
@@ -469,7 +487,7 @@ predict.Nonpareil.Curve <- function(
       #' @param ...
       #' Additional parameters ignored.
       ...
-      ){
+      ) {
   if(!inherits(object, "Nonpareil.Curve"))
     stop("'object' must inherit from class `Nonpareil.Curve`")
   if(!object$has.model)
@@ -487,30 +505,36 @@ Nonpareil.read_metadata <- function(
       #' @param x
       #' \code{Nonpareil.Curve} object.
       x
-      ){
+      ) {
   # Load key-values and defaults
   meta_data <- gsub('^# @', "", grep("^# @", readLines(x$file), value = TRUE))
   keys <- gsub(': .*', "", meta_data)
   vals <- gsub('.*: ', "", meta_data)
-  x$kernel <- "alignment"
   x$log.sample <- 0
 
   # Set metadata
-  if("ksize" %in% keys && vals[keys=="ksize"]>0 && vals[keys=="ksize"]<1001)
-    x$kernel <- "kmer";
+  if ("kernel" %in% keys) x$kernel <- vals[keys == "kernel"]
+  if (!x$kernel %in% c("alignment", "kmer", "usearch")) {
+    x$kernel <- "alignment"
+    if ("ksize" %in% keys &&
+        vals[keys == "ksize"] > 0 &&
+        vals[keys == "ksize"] < 1001)
+      x$kernel <- "kmer";
+  }
   if("divide" %in% keys)
-    x$log.sample <- as.numeric(vals[keys=="divide"]);
+    x$log.sample <- as.numeric(vals[keys == "divide"]);
   if("logsampling" %in% keys)
-    x$log.sample <- as.numeric(vals[keys=="logsampling"]);
-  x$version   <- as.character(vals[keys=="version"])
-  x$L         <- as.numeric(vals[keys=="L"])
-  x$R         <- as.numeric(vals[keys=="R"])
-  if(x$kernel=="kmer"){
+    x$log.sample <- as.numeric(vals[keys == "logsampling"]);
+  x$version   <- as.character(vals[keys == "version"])
+  x$L         <- as.numeric(vals[keys == "L"])
+  x$R         <- as.numeric(vals[keys == "R"])
+
+  if(x$kernel == "kmer"){
     x$overlap <- 50
-    x$ksize   <- as.numeric(vals[keys=="ksize"])
-    x$AL      <- as.numeric(vals[keys=="AL"])
-  }else{
-    x$overlap <- as.numeric(vals[keys=="overlap"])
+    x$ksize   <- as.numeric(vals[keys == "ksize"])
+    x$AL      <- as.numeric(vals[keys == "AL"])
+  } else { # alignment or usearch
+    x$overlap <- as.numeric(vals[keys == "overlap"])
     x$AL      <- x$L
   }
   x$LR <- exp(log(x$R) + log(x$L));
@@ -526,28 +550,28 @@ Nonpareil.read_data <- function(
       #' @param correction.factor
       #' Logical; see \code{Nonpareil.curve} for details.
       correction.factor
-      ){
+      ) {
   # Read input
-  a <- read.table(x$file, sep="\t", header=FALSE)
-  a <- a[order(a[,1]),]
-  x$x.obs <- a[,1]
-  x$y.red <- a[,2]
-  x$kappa <- tail(x$y.red, n=1)
+  a <- read.table(x$file, sep = "\t", header = FALSE)
+  a <- a[order(a[, 1]), ]
+  x$x.obs <- a[, 1]
+  x$y.red <- a[, 2]
+  x$kappa <- tail(x$y.red, n = 1)
 
   # Estimate coverage
-  cor.f   <- 1.0;
-  if(correction.factor) cor.f <- Nonpareil.coverage_factor(x)
-  for(i in 2:6) a[, i] <- a[, i]^cor.f;
+  if (correction.factor)
+    for (i in 2:6)
+      a[, i] <- Nonpareil.kappa_to_coverage(x, a[, i])
   x$y.cov <- a[, 2]
   x$y.sd  <- a[, 3]
   x$y.p25 <- a[, 4]
   x$y.p50 <- a[, 5]
   x$y.p75 <- a[, 6]
-  x$C <- tail(x$y.cov, n=1)
+  x$C <- tail(x$y.cov, n = 1)
 
   # Adjust sequencing effort
   x$x.adj <- exp(
-    max(log(x$x.obs)) + (x$C^0.27)*(log(x$x.obs) - max(log(x$x.obs)))
+    max(log(x$x.obs)) + (x$C ^ 0.27) * (log(x$x.obs) - max(log(x$x.obs)))
   )
   # Obsolete corrections {
   #   x$x.adj <- exp(log(x$x.adj)*0.61 + 10)
@@ -557,27 +581,27 @@ Nonpareil.read_data <- function(
 
   # Check consistency
   x$consistent <- TRUE
-  twenty.pc = which.max(x$x.adj[x$x.adj <= 0.5*tail(x$x.adj, n=1)]);
-  if(length(twenty.pc) == 0) twenty.pc = length(x$x.adj)
-  if(x$y.p50[twenty.pc] == 0){
+  twenty.pc = which.max(x$x.adj[x$x.adj <= 0.5 * tail(x$x.adj, n = 1)])
+  if (length(twenty.pc) == 0) twenty.pc = length(x$x.adj)
+  if (x$y.p50[twenty.pc] == 0) {
     x$consistent <- FALSE
     x$warnings <- c(x$warnings,
         paste("Median of the curve is zero at 50% of the reads, check",
         "parameters and re-run (e.g., decrease -L in nonpareil -T alignment)."))
   }
-  if(x$kappa <= 1e-5){
+  if (x$kappa <= 1e-5) {
     x$consistent <- FALSE
     x$warnings <- c(x$warnings,
         paste("Redundancy curve too low, check parameters and re-run",
         "(e.g., decrease -L in nonpareil -T alignment)."))
   }
-  if(x$y.cov[2] >= 1-1e-5){
+  if (x$y.cov[2] >= 1 - 1e-5) {
     x$consistent <- FALSE
     x$warnings <- c(x$warnings,
         paste("Curve too steep, check parameters and re-run",
         "(e.g., increase value of -d in nonpareil)."))
   }
-  if(sum(x$y.cov>0 & x$y.cov<0.9) <= 10){
+  if (sum(x$y.cov > 0 & x$y.cov < 0.9) <= 10) {
     x$consistent <- FALSE
     x$warnings <- c(x$warnings,
         paste("Insufficient resolution below 90% coverage, check",
@@ -595,46 +619,55 @@ Nonpareil.fit_model <- function(
       #' @param weights.exp
       #' Numeric; see \code{Nonpareil.curve} for details.
       weights.exp
-      ){
-  if(!inherits(np, "Nonpareil.Curve"))
+      ) {
+  if (!inherits(np, "Nonpareil.Curve"))
     stop("'np' must inherit from class `Nonpareil.Curve`")
 
   # Prepare data
-  sel <- np$y.cov>0 & np$y.cov<0.9
-  data <- list(x=np$x.adj[ sel ], y=np$y.cov[ sel ])
-  if(is.na(weights.exp[1])){
-    if(np$log.sample==0){ weights.exp <- c(-1.1,-1.2,-0.9,-1.3,-1) }
-    else{ weights.exp <- c(0,1,-1,1.3,-1.1,1.5,-1.5,3,-3) }
+  sel <- np$y.cov > 0 & np$y.cov < 0.9
+  data <- list(x = np$x.adj[sel], y = np$y.cov[sel])
+  if (is.na(weights.exp[1])) {
+    if (np$log.sample == 0) {
+      weights.exp <- c(-1.1, -1.2, -0.9, -1.3, -1)
+    } else {
+      weights.exp <- c(0, 1, -1, 1.3, -1.1, 1.5, -1.5, 3, -3)
+    }
   }
 
   # Find the first weight with proper fit
   np$has.model <- FALSE
   weights.i <- 0
-  while(!np$has.model & !is.na(weights.exp[weights.i+1])){
-    weights.i <- weights.i+1
+  while (!np$has.model & !is.na(weights.exp[weights.i + 1])) {
+    weights.i <- weights.i + 1
     suppressWarnings(
-      model <- nls(y ~ Nonpareil.f(x, a, b), data=data,
-            weights=(np$y.sd[sel]^weights.exp[weights.i]),
-            start=list(a=1, b=0.1), lower=c(a=0, b=0), algorithm="port",
-             control=nls.control(
-                   minFactor=1e-25000, tol=1e-15, maxiter=1024, warnOnly=TRUE))
+      model <- nls(
+        y ~ Nonpareil.f(x, a, b),
+        data    = data,
+        weights = np$y.sd[sel] ^ weights.exp[weights.i],
+        start   = list(a=1, b=0.1), lower=c(a=0, b=0), algorithm="port",
+        control = nls.control(
+          minFactor = 1e-25000, tol = 1e-15, maxiter = 1024, warnOnly = TRUE
+        )
+      )
     )
-    tryCatch({ is.conv <- summary(model)$convInfo$isConv },
-          error=function(e){ is.conv <- FALSE })
-    if(is.conv){
+    tryCatch(
+      { is.conv <- summary(model)$convInfo$isConv },
+      error = function(e) { is.conv <- FALSE }
+    )
+    if (is.conv) {
       np$model <- model
       np$has.model <- TRUE
     }
   }
 
   # Estimate diversity and projections
-  if(np$has.model){
+  if (np$has.model) {
     pa <- coef(np$model)[1]
     pb <- coef(np$model)[2]
-    if(pa > 1) np$diversity <- (pa-1)/pb
-    np$LRstar <- Nonpareil.antif(np$star/100, pa, pb)
-    np$modelR <- cor(data$y, predict(np, lr=data$x))
-  }else{
+    if(pa > 1) np$diversity <- (pa - 1) / pb
+    np$LRstar <- Nonpareil.antif(np$star / 100, pa, pb)
+    np$modelR <- cor(data$y, predict(np, lr = data$x))
+  } else {
     np$warnings <- c(np$warnings,
           "Model didn't converge. Try modifying the values of weights.exp.")
   }
@@ -647,10 +680,28 @@ Nonpareil.coverage_factor <- function(
       #' @param x
       #' \code{Nonpareil.Curve} object.
       x
-      ){
+      ) {
   #' @return
   #' A numeric scalar.
   return(1 - exp(2.23E-2 * x$overlap - 3.5698))
+}
+
+#' Transform values of kappa (redundancy) into coverage (internal function).
+Nonpareil.kappa_to_coverage <- function(
+      #' @param x
+      #' \code{Nonpareil.Curve} object.
+      x,
+      #' @param kappa
+      #' Values of kappa to use as basis for coverage estimates
+      kappa
+      ) {
+  #' @return
+  #' A numeric vector.
+  if (x$kernel == "usearch") {
+    return(-1.961 * kappa ^ 2.653 + 2.493 * kappa)
+  } else {
+    return(kappa ^ Nonpareil.coverage_factor(x))
+  }
 }
 
 #' Returns the color of the curve.

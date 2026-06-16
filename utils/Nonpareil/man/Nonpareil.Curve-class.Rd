@@ -30,7 +30,7 @@ A single Nonpareil curve. This object can be produced by
 
 \item{\code{LR}}{Effective sequencing effort used.}
 
-\item{\code{overlap}}{Minimum read overlap.}
+\item{\code{overlap}}{Minimum read overlap (in percentage).}
 
 \item{\code{ksize}}{K-mer size (for kmer kernel only).}
 

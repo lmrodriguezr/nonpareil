@@ -8,7 +8,7 @@ for f in fasta fastq ; do
     for gz in "" .gz ; do
       echo "=======> TESTING $t $f $gz"
       ./nonpareil -T "$t" -s "test/test.${f}${gz}" -f "$f" \
-        -b "test/DELETE" -X 50 -v 1
+        -b "test/DELETE" -X 50 -v 10
       if [[ $t == alignment && -s nonpareil-mpi ]] ; then
         echo "=======> TESTING MPI $t $f $gz"
         mpirun -np 2 \
