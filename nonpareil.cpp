@@ -137,8 +137,8 @@ int main(int argc, char *argv[]) {
         ram = 1024, *mates, samples_no, sample_i, sample_after_20,
         sampling_points, q_largest_seq = 0, len_min = 0;
   unsigned int
-        q_total_seqs = 0, lines_in_ram, hX = 0, qry_seqs_no, ram_Kb,
-        required_ram_Kb;
+        q_total_seqs = 0, lines_in_ram, hX = 0, hashsize = 0,
+        qry_seqs_no, ram_Kb, required_ram_Kb;
   unsigned long long int total_seqs = 0;
   bool  n_as_mismatch = false, portion_label = false, revcom = true, ok,
         autoadjust = false, alt_query = false, rseed_set = false;
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
   // Available letters left: DeEgGHIjJKOQyYzZ
   while ((optchr = getopt(
           argc, argv,
-          "a:Ab:BcC:d:f:Fhi:k:l:L:m:M:n:No:p:q:r:R:s:S:t:T:v:Vx:X:"
+          "a:Ab:BcC:d:f:FhH:i:k:l:L:m:M:n:No:p:q:r:R:s:S:t:T:v:Vx:X:"
         )) != EOF) {
     switch (optchr) {
       case 'a': alldata = optarg;           break;
@@ -168,6 +168,7 @@ int main(int argc, char *argv[]) {
       case 'f': format = optarg;            break;
       case 'F': portion_label = true;       break;
       case 'h': help("");                   break;
+      case 'H': hashsize = atoi(optarg);    break;
       case 'i': itv = atof(optarg);         break;
       case 'k': k = atoi(optarg);           break;
       case 'l': open_log(optarg);           break;
@@ -514,6 +515,7 @@ restart_mates:
   matepar.revcom = revcom;
   matepar.n_as_mismatch = n_as_mismatch;
   matepar.k = k;
+  matepar.hashsize = hashsize;
 
   if (strcmp(nonpareiltype, "alignment") == 0) {
     matepar.type = 1;

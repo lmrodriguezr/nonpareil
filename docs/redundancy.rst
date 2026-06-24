@@ -107,6 +107,8 @@ Additional options
    -c         Do not use reverse-complement.  This is useful for single stranded
               sequences data (like RNA). Only applies to ``-T alignment``.  This
               is a lowercase C
+   -H <num>   Hash size. The number of slots to use in the read indexing step.
+              Only applies to ``-T usearch``
    -N         Treat Ns as mismatches.  By default, Ns (unknown nucleotides)
               match any nucleotide (even another N).  Only applies to
               ``-T alignment``

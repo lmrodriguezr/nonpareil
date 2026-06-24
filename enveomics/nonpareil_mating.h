@@ -25,6 +25,8 @@
  *   - `int k`: TODO-DOC
  *   - `int type`: Nonpareil algorithm: 1 for alignment, 2 for kmer, 3 for
  *      usearch
+ *   - `int hashsize`: For usearch (type 3), this parameter controls the number
+ *     of slots in the database hash (-slots in the usearch indexing options)
  */
 typedef struct {
   double overlap;
@@ -34,6 +36,7 @@ typedef struct {
   bool   n_as_mismatch;
   int    k;
   int    type;
+  int    hashsize;
 } matepar_t;
 
 /**
