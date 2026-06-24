@@ -108,7 +108,9 @@ Additional options
               sequences data (like RNA). Only applies to ``-T alignment``.  This
               is a lowercase C
    -H <num>   Hash size. The number of slots to use in the read indexing step.
-              Only applies to ``-T usearch``
+              Ideally, this should be 1.5-2 times the total number of reads. By
+              default: 0, meaning that slots are set by usearch. Only applies to
+              ``-T usearch``
    -N         Treat Ns as mismatches.  By default, Ns (unknown nucleotides)
               match any nucleotide (even another N).  Only applies to
               ``-T alignment``

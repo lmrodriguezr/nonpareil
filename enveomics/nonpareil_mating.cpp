@@ -80,13 +80,14 @@ size_t nonpareil_mate(
       if (matepar.hashsize == 0){
         snprintf(
           usearch_cmd1, LARGEST_PATH,
-          "usearch -makeudb_usearch '%s' -output '%s.db' > %s.log 2>&1",
+          "usearch -makeudb_usearch '%s' -output '%s.db' -mmap > %s.log 2>&1",
           file, tmp_base, tmp_base
         );
       } else {
         snprintf(
           usearch_cmd1, LARGEST_PATH,
-          "usearch -makeudb_usearch '%s' -output '%s.db' -slots %i > %s.log 2>&1",
+          "usearch -makeudb_usearch '%s' -output '%s.db' -mmap -slots %i \
+            > %s.log 2>&1",
           file, tmp_base, matepar.hashsize, tmp_base
         );
       }
@@ -102,11 +103,13 @@ size_t nonpareil_mate(
       snprintf(
         usearch_cmd2, LARGEST_PATH,
         "usearch -usearch_local '%s' -db '%s.db' -userout '%s' -threads '%d' \
-          -evalue 0.00001 -id 0.9 -userfields '%s' -strand both >> %s.log 2>&1",
-        sampleFile, tmp_base, tmp_base, threads, "query+target+qcov+tcov", tmp_base
+          -evalue 0.00001 -id 0.9 -userfields '%s' -strand both -mmap \
+          >> %s.log 2>&1",
+        sampleFile, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
         // Esteban's original implementation had this, but we don't really need
         // all those fields:
-        // "query+target+id+alnlen+mism+opens+qlo+qhi+tlo+thi+evalue+bits+ql+tl",
+        // "query+target+id+alnlen+mism+opens+qlo+qhi+tlo+thi+evalue+bits+ql+tl"
+        tmp_base
       );
       say("3ss$", "CMD: ", usearch_cmd2);
       int ret2 = system(usearch_cmd2);
