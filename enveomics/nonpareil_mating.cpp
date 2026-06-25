@@ -64,124 +64,39 @@ size_t nonpareil_mate(
   result = new int[qry_seqs];
   for (size_t a = 0; a < qry_seqs; a++) result[a] = 0;
 
-  // If `-T usearch`, we don't need to design blocks, we can just delegate the
-  // search
-  // TODO
-  // - We could use the block infrastructure to make use of MPI, but for now
-  //   only `processID == 0` will be doing any work.
-  if (matepar.type == 3) {
-    if (processID == 0) {
-      char *tmp_base, *usearch_cmd1, *usearch_cmd2;
-      tmp_base = new char[LARGEST_PATH];
-      snprintf(tmp_base, LARGEST_PATH, "%s/usearch", tmp_dir().c_str());
-
-      // Index the USearch DB
-      usearch_cmd1 = new char[LARGEST_PATH];
-      size_t slots = matepar.hashsize;
-      if (slots == 0) slots = (size_t)(total_seqs * 2);
-      snprintf(
-        usearch_cmd1, LARGEST_PATH,
-        "usearch -makeudb_usearch '%s' -output '%s.db' -slots %i \
-          > %s.log 2>&1",
-        file, tmp_base, slots, tmp_base
-      );
-      say("3ss$", "CMD: ", usearch_cmd1);
-      int ret1 = system(usearch_cmd1);
-      if (ret1 != 0) error(
-        "usearch 'makeudb' failed with return code",
-        (char*)std::to_string(ret1).c_str()
-      );
-
-      // Run USearch Local search
-      usearch_cmd2 = new char[LARGEST_PATH];
-      snprintf(
-        usearch_cmd2, LARGEST_PATH,
-        "usearch -usearch_local '%s' -db '%s.db' -userout '%s' -threads '%d' \
-          -evalue 0.00001 -id 0.9 -userfields '%s' -strand both -mmap \
-          >> %s.log 2>&1",
-        sampleFile, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
-        // Esteban's original implementation had this, but we don't really need
-        // all those fields:
-        // "query+target+id+alnlen+mism+opens+qlo+qhi+tlo+thi+evalue+bits+ql+tl"
-        tmp_base
-      );
-      say("3ss$", "CMD: ", usearch_cmd2);
-      int ret2 = system(usearch_cmd2);
-      if (ret2 != 0) error(
-        "usearch 'local' failed with return code",
-        (char*)std::to_string(ret2).c_str()
-      );
-
-      // Parse the output
-      // *NOTE* I'm assuming that all the hits of a given query are contiguous in the
-      // output file (even if they're not sorted, which they're not).  This is a strong
-      // assumption, since each violation causes a result splitting and might skew the
-      // results or cause a failure if the result array is exceeded.  I have tested
-      // multiple files and this is typically true (i.e., I have not seen violations of this
-      // assumption in practice) but it could be the source of future bugs.
-      // If this causes issues, an alternative would be to do `results[qid - 1]++;` instead of
-      // using the `res_n` counter, but we would need to make sure that the sequences in the
-      // subsample are named consecutively and without gaps.
-      ifstream filein;
-      long qid_prev = 0, res_n = 0;
-      filein.open(tmp_base, ios::in);
-      if (!filein.is_open()) error("Impossible to open the input file", file);
-      while (filein.good()) {
-        string line;
-        getline(filein, line);
-        if (line.size() == 0) continue;
-
-        // Split the line by tabs
-        std::vector<string> fields;
-        string token;
-        stringstream ss(line);
-        while (getline(ss, token, '\t')) fields.push_back(token);
-        if (fields.size() < 4) continue; // not enough columns
-
-        try {
-          long qid = stol(fields[0]);
-          // Not really needed: long tid = stol(fields[1]);
-          double qcov = stod(fields[2]);
-          double tcov = stod(fields[3]);
-
-          if (qid <= 0 || qcov < matepar.overlap || tcov < matepar.overlap) continue;
-          if (qid != qid_prev) { qid_prev = qid; res_n++; }
-          if ((size_t) res_n > qry_seqs) {
-            say("2sss$", "Warning: parsed query id out of range:", fields[0].c_str(), " - ignored");
-            continue;
-          }
-
-          result[res_n - 1]++;
-        } catch (const exception &e) {
-          // Parsing error - skip line
-          continue;
-        }
-      }
-      filein.close();
-    }
-    barrier_multinode();
-    return qry_seqs;
-  }
-
   // Design blocks
   if (processID == 0){
     say("5sis$", "Designing the blocks scheme for ", total_seqs, " sequences");
 
-    no_blocks_qry = (int)ceil(
-      (double)qry_seqs * 2 / (double)lines_in_ram
-    ); // Maximum half of the available slots
-    if (no_blocks_qry == 0) no_blocks_qry = 1; // <-- Because of float precision
+    if (matepar.type == 3) {
+      no_blocks_qry = (int)ceil(
+        (double)qry_seqs * 4 / (double)lines_in_ram
+      ); // Maximum a quarter of the available slots because of usearch indexing
+      if (no_blocks_qry == 0) no_blocks_qry = 1; // <-- Because of float precision
+      no_blocks_qry = (int)ceil(
+        (double)no_blocks_qry / (double)processes
+      ) * processes;
+    } else {
+      no_blocks_qry = (int)ceil(
+        (double)qry_seqs * 2 / (double)lines_in_ram
+      ); // Maximum half of the available slots
+      if (no_blocks_qry == 0) no_blocks_qry = 1; // <-- Because of float precision
+    }
     no_seqs_block_qry = (int)ceil((double)qry_seqs / (double)no_blocks_qry);
     say("6sisi$",
         "Qry blocks:", no_blocks_qry, ", seqs/block:", no_seqs_block_qry);
 
-    no_blocks_sbj = (int)ceil(
-      (double)total_seqs / (double)(lines_in_ram - no_seqs_block_qry)
-    );
-    if (no_blocks_sbj == 0) no_blocks_sbj = 1; // <-- Because of float precision
-    no_blocks_sbj = (int)ceil(
-      (double)no_blocks_sbj / (double)processes
-    ) * processes;
+    if (matepar.type == 3) {
+      no_blocks_sbj = 1;
+    } else {
+      no_blocks_sbj = (int)ceil(
+        (double)total_seqs / (double)(lines_in_ram - no_seqs_block_qry)
+      );
+      if (no_blocks_sbj == 0) no_blocks_sbj = 1; // <-- Because of float precision
+      no_blocks_sbj = (int)ceil(
+        (double)no_blocks_sbj / (double)processes
+      ) * processes;
+    }
     no_seqs_block_sbj = (int)ceil((double)total_seqs / (double)no_blocks_sbj);
     say("6sisi$",
         "Sbj blocks:", no_blocks_sbj, ", seqs/block:", no_seqs_block_sbj);
@@ -204,43 +119,162 @@ size_t nonpareil_mate(
       ((double)no_seqs_block_qry / 1024) *
         q_largest_seq * (sizeof **blockA) / 1024
     );
-    if (processID == 0)
-      say("5sisi$",
-          "Allocating ~", tmp_ram, " Mib in RAM for block qry:", i + 1);
-    size_blockA = get_seqs(
-      blockA, sampleFile, i * no_seqs_block_qry + 1, no_seqs_block_qry,
-      q_largest_seq, (char *)"enveomics-seq"
-    );
-    if (size_blockA == 0) error("Impossible to get the i-th query block", i);
+    if (matepar.type == 3) {
+      if (i % processes == processID) {
+        char     *tmp_base, *usearch_cmd1, *usearch_cmd2, *pathA;
+        size_t   slots;
+        ofstream fhA;
 
-    // Sequences in block B (sbj)
-    for (int j = 0; j < no_blocks_sbj; j++) {
-      if (j % processes == processID) {
-        tmp_ram = (int)(
-          ((double)no_seqs_block_sbj / 1024) *
-            largest_seq * (sizeof **blockB) / 1024
-        );
         if (processID == 0)
           say("5sisi$",
-              "Allocating ~", tmp_ram, " Mib in RAM for block sbj:", j + 1);
-        size_blockB = get_seqs(
-          blockB, file, j * no_seqs_block_sbj + 1, no_seqs_block_sbj,
-          largest_seq, (char *)"enveomics-seq"
+              "Allocating ~", tmp_ram, " Mib in RAM for block qry:", i + 1);
+        size_blockA = get_seqs(
+          blockA, sampleFile, i * no_seqs_block_qry + 1, no_seqs_block_qry,
+          q_largest_seq, (char *)"enveomics-seq"
         );
-        if (size_blockB == 0)
-          error("Impossible to get the i-th subject block", j);
 
-        // Mate
-        if (processID == 0)
-          say("4sisi$",
-              "Computing block ", (i + 1) * (j + 1),
-              "/", no_blocks_qry * no_blocks_sbj);
-        nonpareil_count_mates_block(
-          result, result_i, blockA, blockB, size_blockA, size_blockB, threads,
-          matepar
+        // Temporals
+        tmp_base = new char[LARGEST_PATH];
+        snprintf(tmp_base, LARGEST_PATH, "%s/usearch-%i", tmp_dir().c_str(), i);
+        snprintf(pathA, LARGEST_PATH, "%s.qry.fasta", tmp_base, i);
+        fhA.open(pathA, ios::out);
+        if (fhA.fail()) error("Open output failure", pathA);
+        if (!fhA.is_open()) error("Impossible to open the output file", pathA);
+        for (size_t a = 0; a < size_blockA; a++) {
+          fhA << ">" << a << endl << blockA[a] << endl ;
+          if (fhA.fail()) error("Write to output file failed", pathA);
+        }
+        fhA.close();
+
+        // Index the USearch DB
+        usearch_cmd1 = new char[LARGEST_PATH];
+        slots = matepar.hashsize;
+        if (slots == 0) slots = (size_t)(total_seqs * 2);
+        snprintf(
+          usearch_cmd1, LARGEST_PATH,
+          "usearch -makeudb_usearch '%s' -output '%s.db' -slots %i \
+            > %s.log 2>&1",
+          pathA, tmp_base, slots, tmp_base
         );
-        for (int a = 0; a < size_blockB; a++) delete [] blockB[a];
-        delete[] blockB;
+        say("3ss$", "CMD: ", usearch_cmd1);
+        int ret1 = system(usearch_cmd1);
+        if (ret1 != 0) error(
+          "usearch 'makeudb' failed with return code",
+          (char*)std::to_string(ret1).c_str()
+        );
+
+        // Run USearch Local search
+        usearch_cmd2 = new char[LARGEST_PATH];
+        snprintf(
+          usearch_cmd2, LARGEST_PATH,
+          "usearch -usearch_local '%s' -db '%s.db' -userout '%s' -threads '%d' \
+            -evalue 0.00001 -id 0.9 -userfields '%s' -strand both \
+            >> %s.log 2>&1",
+          sampleFile, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
+          // Esteban's original implementation had this, but we don't really need
+          // all those fields:
+          // "query+target+id+alnlen+mism+opens+qlo+qhi+tlo+thi+evalue+bits+ql+tl"
+          tmp_base
+        );
+        say("3ss$", "CMD: ", usearch_cmd2);
+        int ret2 = system(usearch_cmd2);
+        if (ret2 != 0) error(
+          "usearch 'local' failed with return code",
+          (char*)std::to_string(ret2).c_str()
+        );
+
+        // Parse the output
+        // *NOTE* I'm assuming that all the hits of a given query are contiguous in the
+        // output file (even if they're not sorted, which they're not).  This is a strong
+        // assumption, since each violation causes a result splitting and might skew the
+        // results or cause a failure if the result array is exceeded.  I have tested
+        // multiple files and this is typically true (i.e., I have not seen violations of this
+        // assumption in practice) but it could be the source of future bugs.
+        // If this causes issues, an alternative would be to do `results[qid - 1]++;` instead of
+        // using the `res_n` counter, but we would need to make sure that the sequences in the
+        // subsample are named consecutively and without gaps.
+        ifstream filein;
+        long qid_prev = 0, res_n = 0;
+        filein.open(tmp_base, ios::in);
+        if (!filein.is_open()) error("Impossible to open the input file", file);
+        while (filein.good()) {
+          string line;
+          getline(filein, line);
+          if (line.size() == 0) continue;
+
+          // Split the line by tabs
+          std::vector<string> fields;
+          string token;
+          stringstream ss(line);
+          while (getline(ss, token, '\t')) fields.push_back(token);
+          if (fields.size() < 4) continue; // not enough columns
+
+          try {
+            long qid = stol(fields[0]);
+            // Not really needed: long tid = stol(fields[1]);
+            double qcov = stod(fields[2]);
+            double tcov = stod(fields[3]);
+
+            if (qid <= 0 || qcov < matepar.overlap || tcov < matepar.overlap) continue;
+            if (qid != qid_prev) { qid_prev = qid; res_n++; }
+            if ((size_t) res_n > qry_seqs) {
+              say("2sss$",
+                "Warning: parsed query id out of range:", fields[0].c_str(),
+                " - ignored"
+              );
+              continue;
+            }
+
+            result[res_n - 1]++;
+          } catch (const exception &e) {
+            // Parsing error - skip line
+            continue;
+          }
+        }
+        filein.close();
+        // TODO
+        // I now need to make sure that the results are actually in the right
+        // place so they can be summed-up properly!
+      }
+    } else {
+      if (processID == 0)
+        say("5sisi$",
+            "Allocating ~", tmp_ram, " Mib in RAM for block qry:", i + 1);
+      size_blockA = get_seqs(
+        blockA, sampleFile, i * no_seqs_block_qry + 1, no_seqs_block_qry,
+        q_largest_seq, (char *)"enveomics-seq"
+      );
+      if (size_blockA == 0) error("Impossible to get the i-th query block", i);
+
+      // Sequences in block B (sbj)
+      for (int j = 0; j < no_blocks_sbj; j++) {
+        if (j % processes == processID) {
+          tmp_ram = (int)(
+            ((double)no_seqs_block_sbj / 1024) *
+              largest_seq * (sizeof **blockB) / 1024
+          );
+          if (processID == 0)
+            say("5sisi$",
+                "Allocating ~", tmp_ram, " Mib in RAM for block sbj:", j + 1);
+          size_blockB = get_seqs(
+            blockB, file, j * no_seqs_block_sbj + 1, no_seqs_block_sbj,
+            largest_seq, (char *)"enveomics-seq"
+          );
+          if (size_blockB == 0)
+            error("Impossible to get the i-th subject block", j);
+
+          // Mate
+          if (processID == 0)
+            say("4sisi$",
+                "Computing block ", (i + 1) * (j + 1),
+                "/", no_blocks_qry * no_blocks_sbj);
+          nonpareil_count_mates_block(
+            result, result_i, blockA, blockB, size_blockA, size_blockB, threads,
+            matepar
+          );
+          for (int a = 0; a < size_blockB; a++) delete [] blockB[a];
+          delete[] blockB;
+        }
       }
     }
     result_i += size_blockA;
