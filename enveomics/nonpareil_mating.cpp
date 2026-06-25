@@ -77,20 +77,14 @@ size_t nonpareil_mate(
 
       // Index the USearch DB
       usearch_cmd1 = new char[LARGEST_PATH];
-      if (matepar.hashsize == 0){
-        snprintf(
-          usearch_cmd1, LARGEST_PATH,
-          "usearch -makeudb_usearch '%s' -output '%s.db' -mmap > %s.log 2>&1",
-          file, tmp_base, tmp_base
-        );
-      } else {
-        snprintf(
-          usearch_cmd1, LARGEST_PATH,
-          "usearch -makeudb_usearch '%s' -output '%s.db' -mmap -slots %i \
-            > %s.log 2>&1",
-          file, tmp_base, matepar.hashsize, tmp_base
-        );
-      }
+      size_t slots = matepar.hashsize;
+      if (slots == 0) slots = (size_t)(total_seqs * 2);
+      snprintf(
+        usearch_cmd1, LARGEST_PATH,
+        "usearch -makeudb_usearch '%s' -output '%s.db' -slots %i \
+          > %s.log 2>&1",
+        file, tmp_base, slots, tmp_base
+      );
       say("3ss$", "CMD: ", usearch_cmd1);
       int ret1 = system(usearch_cmd1);
       if (ret1 != 0) error(
