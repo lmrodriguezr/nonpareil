@@ -230,7 +230,8 @@ size_t sub_sample_seqs(
       if ((entry.size() > 0) &&
             (portion >= 1 || ((double) rand() / RAND_MAX <= portion))) {
         n++;
-        fileout << entry;
+        entry[0] = ' ';
+        fileout << start << n << entry; // <- rename them
         if (fileout.fail()) error("Write to output file failed", destFile);
       }
       entry = (string)"";

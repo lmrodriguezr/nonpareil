@@ -76,6 +76,8 @@ size_t nonpareil_mate(
       snprintf(tmp_base, LARGEST_PATH, "%s/usearch", tmp_dir().c_str());
 
       // Index the USearch DB
+      // *NOTE* The "query" and "target" are flipped because the database was
+      // consuming too much RAM for large datasets
       usearch_cmd1 = new char[LARGEST_PATH];
       size_t slots = matepar.hashsize;
       if (slots == 0) slots = (size_t)(total_seqs * 2);
@@ -83,7 +85,7 @@ size_t nonpareil_mate(
         usearch_cmd1, LARGEST_PATH,
         "usearch -makeudb_usearch '%s' -output '%s.db' -slots %i \
           > %s.log 2>&1",
-        file, tmp_base, slots, tmp_base
+        sampleFile, tmp_base, slots, tmp_base
       );
       say("3ss$", "CMD: ", usearch_cmd1);
       int ret1 = system(usearch_cmd1);
@@ -99,7 +101,7 @@ size_t nonpareil_mate(
         "usearch -usearch_local '%s' -db '%s.db' -userout '%s' -threads '%d' \
           -evalue 0.00001 -id 0.9 -userfields '%s' -strand both -mmap \
           >> %s.log 2>&1",
-        sampleFile, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
+        file, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
         // Esteban's original implementation had this, but we don't really need
         // all those fields:
         // "query+target+id+alnlen+mism+opens+qlo+qhi+tlo+thi+evalue+bits+ql+tl"
@@ -113,17 +115,8 @@ size_t nonpareil_mate(
       );
 
       // Parse the output
-      // *NOTE* I'm assuming that all the hits of a given query are contiguous in the
-      // output file (even if they're not sorted, which they're not).  This is a strong
-      // assumption, since each violation causes a result splitting and might skew the
-      // results or cause a failure if the result array is exceeded.  I have tested
-      // multiple files and this is typically true (i.e., I have not seen violations of this
-      // assumption in practice) but it could be the source of future bugs.
-      // If this causes issues, an alternative would be to do `results[qid - 1]++;` instead of
-      // using the `res_n` counter, but we would need to make sure that the sequences in the
-      // subsample are named consecutively and without gaps.
       ifstream filein;
-      long qid_prev = 0, res_n = 0;
+      long tid_prev = 0, res_n = 0;
       filein.open(tmp_base, ios::in);
       if (!filein.is_open()) error("Impossible to open the input file", file);
       while (filein.good()) {
@@ -139,19 +132,21 @@ size_t nonpareil_mate(
         if (fields.size() < 4) continue; // not enough columns
 
         try {
-          long qid = stol(fields[0]);
-          // Not really needed: long tid = stol(fields[1]);
+          int    tid  = stoi(fields[1]); // <- This is the "query"
           double qcov = stod(fields[2]);
           double tcov = stod(fields[3]);
 
-          if (qid <= 0 || qcov < matepar.overlap || tcov < matepar.overlap) continue;
-          if (qid != qid_prev) { qid_prev = qid; res_n++; }
-          if ((size_t) res_n > qry_seqs) {
-            say("2sss$", "Warning: parsed query id out of range:", fields[0].c_str(), " - ignored");
+          if (tid <= 0 ||
+              qcov < matepar.overlap ||
+              tcov < matepar.overlap) continue;
+          if ((size_t) tid > qry_seqs) {
+            say("2sss$",
+                "Warning: parsed query id out of range:",
+                fields[0].c_str(), " - ignored");
             continue;
           }
 
-          result[res_n - 1]++;
+          result[tid - 1]++;
         } catch (const exception &e) {
           // Parsing error - skip line
           continue;
