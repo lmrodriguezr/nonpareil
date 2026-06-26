@@ -100,17 +100,19 @@ void bibliography() {
     <<"If you use Nonpareil, please consider citing the relevant"        << endl
     <<"manuscripts:"                                                     << endl
     << endl
-    <<"Original Nonpareil paper:"                                        << endl
+    <<"# Original Nonpareil paper"                                       << endl
     <<"- Rodriguez-R LM & Konstantinidis KT. 2014. Nonpareil: A"         << endl
     <<"  Redundancy-Based Approach to Assess the Level of Coverage in"   << endl
     <<"  Metagenomic Datasets. Bioinformatics 30(5): 629-635."           << endl
     <<"  DOI: 10.1093/bioinformatics/btt584."                            << endl
-    <<"Kmer algorithm and Nd sequence diversity index:"                  << endl
+    << endl
+    <<"# Kmer algorithm and Nd sequence diversity index"                 << endl
     <<"- Rodriguez-R LM, Gunturu S, Tiedje JM, Cole JR, Konstantinidis"  << endl
     <<"  KT. 2018. Nonpareil 3: Fast Estimation of Metagenomic Coverage" << endl
     <<"  and Sequence Diversity. mSystems 3(3)."                         << endl
     <<"  DOI: 10.1128/msystems.00039-18."                                << endl
-    <<"Discussion on coverage and comparative metagenomics:"             << endl
+    << endl
+    <<"# Discussion on coverage and comparative metagenomics"            << endl
     <<"- Rodriguez-R LM & Konstantinidis KT. 2014. Estimating Coverage"  << endl
     <<"  in Metagenomic Data Sets and Why it Matters. ISME J 8:"         << endl
     <<"  2349-2351. DOI: 10.1038/ismej.2014.76."                         << endl

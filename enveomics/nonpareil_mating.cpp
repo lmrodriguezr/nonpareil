@@ -99,7 +99,7 @@ size_t nonpareil_mate(
       snprintf(
         usearch_cmd2, LARGEST_PATH,
         "usearch -usearch_local '%s' -db '%s.db' -userout '%s' -threads '%d' \
-          -evalue 0.00001 -id 0.9 -userfields '%s' -strand both -mmap \
+          -evalue 0.00001 -id 0.9 -userfields '%s' -strand both \
           >> %s.log 2>&1",
         file, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
         // Esteban's original implementation had this, but we don't really need
