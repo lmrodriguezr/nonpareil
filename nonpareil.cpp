@@ -413,7 +413,7 @@ int main(int argc, char *argv[]) {
   if (processID == 0) {
     total_seqs = build_index(
       file, format, namFile, seqFile, largest_seq,
-      avg_seq_len, len_min
+      avg_seq_len, len_min, false
     );
     if (largest_seq < 1)
       error("Empty sequences or internal error. Largest sequence: ",
@@ -442,7 +442,7 @@ int main(int argc, char *argv[]) {
     if (alt_query) {
       q_total_seqs = build_index(
         qfile, format, qNamFile, qSeqFile,
-        q_largest_seq, q_avg_seq_len, len_min
+        q_largest_seq, q_avg_seq_len, len_min, false
       );
       if (q_largest_seq < 1)
         error("No input sequences or internal error.  Largest sequence: ",

@@ -35,7 +35,7 @@ size_t count_seqs(char *file);
 /**
  * size_t build_index(
  *       char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut
- *       [, int &largest_seq[, double &avg_seq[, int len_min]]]);
+ *       [, int &largest_seq[, double &avg_seq[, int len_min[, bool do_nam]]]]);
  * Description:
  *   Builds an index (enveomics-seq format) for the input file.
  * Input:
@@ -50,7 +50,13 @@ size_t count_seqs(char *file);
  *   - `double &avg_seq` (optional): If passed, saves the average sequence
  *     length here
  *   - `int len_min` (optional): If passed, minimum read length, by default: 1.
+ *   - `bool do_nam` (optional): If true (default), saves the original sequence
+ *     names in a dedicated fasta-like file. If `false`, the file will still be
+ *     created and the path set on `namFileOut`, but it will be an empty file
  */
+size_t build_index(
+      char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut,
+      int &largest_seq, double &avg_seq, int len_min, bool do_nam);
 size_t build_index(
       char *sourceFile, char* format, char *&namFileOut, char *&seqFileOut,
       int &largest_seq, double &avg_seq, int len_min);

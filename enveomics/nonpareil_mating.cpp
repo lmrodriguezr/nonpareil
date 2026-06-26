@@ -29,7 +29,8 @@ extern int processes;
  *       size_t qry_seqs, unsigned int total_seqs, matepar_t matepar);
  * Description:
  *   Performs the USearch-specific mating steps (indexing, searching, parsing).
- *   Assumes `result` is already allocated and `sampleFile` is the subsampled query file.
+ *   Assumes `result` is already allocated and `sampleFile` is the subsampled
+ *   query file.
  * Input:
  *   - `int *&result`: Pre-allocated array for results (size = qry_seqs).
  *   - `char *file`: Path to the subject sequences file.
@@ -107,7 +108,8 @@ size_t nonpareil_mate_usearch(
         double qcov = stod(fields[2]);
         double tcov = stod(fields[3]);
 
-        if (tid <= 0 || qcov < matepar.overlap || tcov < matepar.overlap) continue;
+        if (tid <= 0 || qcov < matepar.overlap || tcov < matepar.overlap)
+          continue;
         if ((size_t) tid > qry_seqs) {
           say("2sss$",
               "Warning: parsed query id out of range:",

@@ -86,7 +86,7 @@ size_t count_seqs(char *file) {
 
 size_t build_index(
       char *sourceFile, char *format, char *&namFileOut, char *&seqFileOut,
-      int &largest_seq, double &avg_seq, int len_min) {
+      int &largest_seq, double &avg_seq, int len_min, bool do_nam) {
   // Vars
   unsigned int N = 0, nline = 0, totlen = 0, lastn = 0;
   int      maxlen = 0;
@@ -142,7 +142,8 @@ size_t build_index(
     getline(infileh, line);
     if ((isFastQ && (nline % 4 == 0)) || (!isFastQ && (line[0] == start))) {
       if (seq.length() >= len_min) {
-        namfileh << ">" << ++N << endl << name << endl;
+        N++;
+        if (do_nam) namfileh << ">" << N << endl << name << endl;
         seqfileh << ">" <<   N << endl <<  seq << endl;
         if (seq.length() > (size_t) maxlen) maxlen = seq.length();
         totlen += seq.length();
@@ -162,7 +163,8 @@ size_t build_index(
     nline++;
   }
   if (seq.length() >= len_min) {
-    namfileh << ">" << ++N << endl << name << endl;
+    N++;
+    if (do_nam) namfileh << ">" << N << endl << name << endl;
     seqfileh << ">" <<   N << endl <<  seq << endl;
     if (seq.length() > (size_t) maxlen) maxlen = seq.length();
     totlen += seq.length();
@@ -176,6 +178,15 @@ size_t build_index(
   largest_seq = maxlen;
   avg_seq = ((avg_seq / N) * lastn) + ((double) totlen / N);
   return N;
+}
+
+size_t build_index(
+      char *sourceFile, char *format, char *&namFileOut, char *&seqFileOut,
+      int &largest_seq, double &avg_seq, int len_min) {
+  return build_index(
+    sourceFile, format, namFileOut, seqFileOut, largest_seq, avg_seq, len_min,
+    true
+  );
 }
 
 size_t build_index(
