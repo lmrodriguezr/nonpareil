@@ -116,6 +116,25 @@ size_t nonpareil_mate(
       unsigned int largest_seq, unsigned int q_largest_seq, matepar_t matepar);
 
 /**
+ * size_t nonpareil_mate_usearch(
+ *       int *&result, char *file, char *sampleFile, int threads,
+ *       matepar_t matepar);
+ * Description:
+ *   Performs the USearch-specific mating steps (indexing, searching, parsing).
+ *   Assumes `result` is already allocated and `sampleFile` is the subsampled query file.
+ * Input:
+ *   - `int *&result`: Pre-allocated array for results (size = qry_seqs).
+ *   - `char *file`: Path to the subject sequences file.
+ *   - `char *sampleFile`: Path to the subsampled query sequences file.
+ *   - `int threads`: Number of threads to use.
+ *   - `matepar_t matepar`: Parameters for mating (must have type == 3).
+ * Output:
+ *   `size_t`: Number of query sequences processed (qry_seqs).
+ */
+size_t nonpareil_mate_usearch(
+      int *&result, char *file, char *sampleFile, int threads, matepar_t matepar);
+
+/**
  * void nonpareil_count_mates_block(
  *       int *&result, int from_in_result, char **&blockA, char **&blockB,
  *       int sizeBlockA, int sizeBlockB, int threads, matepar_t matepar);
