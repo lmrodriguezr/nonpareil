@@ -23,6 +23,110 @@ extern int processes;
 
 #define LARGEST_PATH 4096
 
+/**
+ * size_t nonpareil_mate_usearch(
+ *       int *&result, char *file, char *sampleFile, int threads,
+ *       size_t qry_seqs, unsigned int total_seqs, matepar_t matepar);
+ * Description:
+ *   Performs the USearch-specific mating steps (indexing, searching, parsing).
+ *   Assumes `result` is already allocated and `sampleFile` is the subsampled query file.
+ * Input:
+ *   - `int *&result`: Pre-allocated array for results (size = qry_seqs).
+ *   - `char *file`: Path to the subject sequences file.
+ *   - `char *sampleFile`: Path to the subsampled query sequences file.
+ *   - `int threads`: Number of threads to use.
+ *   - `size_t qry_seqs`: Number of query sequences.
+ *   - `unsigned int total_seqs`: Total number of subject sequences.
+ *   - `matepar_t matepar`: Parameters for mating (must have type == 3).
+ * Output:
+ *   `size_t`: Number of query sequences processed (qry_seqs).
+ */
+size_t nonpareil_mate_usearch(
+      int *&result, char *file, char *sampleFile, int threads,
+      size_t qry_seqs, unsigned int total_seqs, matepar_t matepar) {
+  if (processID == 0) {
+    char *tmp_base, *usearch_cmd1, *usearch_cmd2;
+    tmp_base = new char[LARGEST_PATH];
+    snprintf(tmp_base, LARGEST_PATH, "%s/usearch", tmp_dir().c_str());
+
+    // Index the USearch DB
+    // *NOTE* The "query" and "target" are flipped because the database was
+    // consuming too much RAM for large datasets
+    usearch_cmd1 = new char[LARGEST_PATH];
+    size_t slots = matepar.hashsize;
+    if (slots == 0) slots = (size_t)(total_seqs * 2);
+    snprintf(
+      usearch_cmd1, LARGEST_PATH,
+      "usearch -makeudb_usearch '%s' -output '%s.db' -slots %i \
+        > %s.log 2>&1",
+      sampleFile, tmp_base, slots, tmp_base
+    );
+    say("3ss$", "CMD: ", usearch_cmd1);
+    int ret1 = system(usearch_cmd1);
+    if (ret1 != 0) error(
+      "usearch 'makeudb' failed with return code",
+      (char*)std::to_string(ret1).c_str()
+    );
+
+    // Run USearch Local search
+    usearch_cmd2 = new char[LARGEST_PATH];
+    snprintf(
+      usearch_cmd2, LARGEST_PATH,
+      "usearch -usearch_local '%s' -db '%s.db' -userout '%s' -threads '%d' \
+        -evalue 0.00001 -id 0.9 -userfields '%s' -strand both \
+        >> %s.log 2>&1",
+      file, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
+      tmp_base
+    );
+    say("3ss$", "CMD: ", usearch_cmd2);
+    int ret2 = system(usearch_cmd2);
+    if (ret2 != 0) error(
+      "usearch 'local' failed with return code",
+      (char*)std::to_string(ret2).c_str()
+    );
+
+    // Parse the output
+    ifstream filein;
+    long tid_prev = 0;
+    filein.open(tmp_base, ios::in);
+    if (!filein.is_open()) error("Impossible to open the input file", file);
+    while (filein.good()) {
+      string line;
+      getline(filein, line);
+      if (line.size() == 0) continue;
+
+      // Split the line by tabs
+      std::vector<string> fields;
+      string token;
+      stringstream ss(line);
+      while (getline(ss, token, '\t')) fields.push_back(token);
+      if (fields.size() < 4) continue; // not enough columns
+
+      try {
+        int tid = stoi(fields[1]); // <- This is the "query"
+        double qcov = stod(fields[2]);
+        double tcov = stod(fields[3]);
+
+        if (tid <= 0 || qcov < matepar.overlap || tcov < matepar.overlap) continue;
+        if ((size_t) tid > qry_seqs) {
+          say("2sss$",
+              "Warning: parsed query id out of range:",
+              fields[0].c_str(), " - ignored");
+          continue;
+        }
+
+        result[tid - 1]++;
+      } catch (const exception &e) {
+        // Parsing error - skip line
+        continue;
+      }
+    }
+    filein.close();
+  }
+  barrier_multinode();
+  return qry_seqs;
+}
+
 size_t nonpareil_mate(
     int *&result, char *file, int threads, unsigned int lines_in_ram,
     unsigned int total_seqs, unsigned int largest_seq, matepar_t matepar) {
@@ -64,98 +168,11 @@ size_t nonpareil_mate(
   result = new int[qry_seqs];
   for (size_t a = 0; a < qry_seqs; a++) result[a] = 0;
 
-  // If `-T usearch`, we don't need to design blocks, we can just delegate the
-  // search
-  // TODO
-  // - We could use the block infrastructure to make use of MPI, but for now
-  //   only `processID == 0` will be doing any work.
+  // If `-T usearch`, delegate to the specialized function
   if (matepar.type == 3) {
-    if (processID == 0) {
-      char *tmp_base, *usearch_cmd1, *usearch_cmd2;
-      tmp_base = new char[LARGEST_PATH];
-      snprintf(tmp_base, LARGEST_PATH, "%s/usearch", tmp_dir().c_str());
-
-      // Index the USearch DB
-      // *NOTE* The "query" and "target" are flipped because the database was
-      // consuming too much RAM for large datasets
-      usearch_cmd1 = new char[LARGEST_PATH];
-      size_t slots = matepar.hashsize;
-      if (slots == 0) slots = (size_t)(total_seqs * 2);
-      snprintf(
-        usearch_cmd1, LARGEST_PATH,
-        "usearch -makeudb_usearch '%s' -output '%s.db' -slots %i \
-          > %s.log 2>&1",
-        sampleFile, tmp_base, slots, tmp_base
-      );
-      say("3ss$", "CMD: ", usearch_cmd1);
-      int ret1 = system(usearch_cmd1);
-      if (ret1 != 0) error(
-        "usearch 'makeudb' failed with return code",
-        (char*)std::to_string(ret1).c_str()
-      );
-
-      // Run USearch Local search
-      usearch_cmd2 = new char[LARGEST_PATH];
-      snprintf(
-        usearch_cmd2, LARGEST_PATH,
-        "usearch -usearch_local '%s' -db '%s.db' -userout '%s' -threads '%d' \
-          -evalue 0.00001 -id 0.9 -userfields '%s' -strand both \
-          >> %s.log 2>&1",
-        file, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
-        // Esteban's original implementation had this, but we don't really need
-        // all those fields:
-        // "query+target+id+alnlen+mism+opens+qlo+qhi+tlo+thi+evalue+bits+ql+tl"
-        tmp_base
-      );
-      say("3ss$", "CMD: ", usearch_cmd2);
-      int ret2 = system(usearch_cmd2);
-      if (ret2 != 0) error(
-        "usearch 'local' failed with return code",
-        (char*)std::to_string(ret2).c_str()
-      );
-
-      // Parse the output
-      ifstream filein;
-      long tid_prev = 0, res_n = 0;
-      filein.open(tmp_base, ios::in);
-      if (!filein.is_open()) error("Impossible to open the input file", file);
-      while (filein.good()) {
-        string line;
-        getline(filein, line);
-        if (line.size() == 0) continue;
-
-        // Split the line by tabs
-        std::vector<string> fields;
-        string token;
-        stringstream ss(line);
-        while (getline(ss, token, '\t')) fields.push_back(token);
-        if (fields.size() < 4) continue; // not enough columns
-
-        try {
-          int    tid  = stoi(fields[1]); // <- This is the "query"
-          double qcov = stod(fields[2]);
-          double tcov = stod(fields[3]);
-
-          if (tid <= 0 ||
-              qcov < matepar.overlap ||
-              tcov < matepar.overlap) continue;
-          if ((size_t) tid > qry_seqs) {
-            say("2sss$",
-                "Warning: parsed query id out of range:",
-                fields[0].c_str(), " - ignored");
-            continue;
-          }
-
-          result[tid - 1]++;
-        } catch (const exception &e) {
-          // Parsing error - skip line
-          continue;
-        }
-      }
-      filein.close();
-    }
-    barrier_multinode();
-    return qry_seqs;
+    return nonpareil_mate_usearch(
+      result, file, sampleFile, threads, qry_seqs, total_seqs, matepar
+    );
   }
 
   // Design blocks
@@ -350,7 +367,7 @@ void nonpareil_count_mates(
   for (int i = 0; i < numberA; i++) {
     if (processID == 0 && talk > 0 && i % talk == 0)
       say("4sfs^", "Searching sequences: ", (double) i * 100 / (double) numberA,
-          "\% of the block");
+          "% of the block");
     for (int j = 0; j < numberB; j++)
       if (nonpareil_compare_reads(
             blockA[i + fromA], blockB[j + fromB], matepar))
