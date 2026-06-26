@@ -4,7 +4,8 @@ set -e
 
 for f in fasta fastq ; do
   gzip -cd "test/test.${f}.gz" > "test/test.${f}"
-  for t in kmer alignment ; do
+  for t in kmer alignment usearch ; do
+    [[ "$t" == "usearch" ]] && usearch &>/dev/null || continue
     for gz in "" .gz ; do
       echo "=======> TESTING $t $f $gz"
       ./nonpareil -T "$t" -s "test/test.${f}${gz}" -f "$f" \
