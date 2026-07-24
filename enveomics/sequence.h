@@ -6,6 +6,8 @@
 #ifndef ENVEOMICS_SEQUENCE_H
 #define ENVEOMICS_SEQUENCE_H
 
+#include <vector>
+
 /**
  * size_t count_seqs(
  *       char *file[, const char *format]
@@ -125,6 +127,37 @@ int get_seqs(
  */
 int reverse_complement(char *&out, char *in);
 int reverse_complement(string &out, string in);
+
+/**
+ * std::vector<unsigned int> get_seq_lengths(char *file, unsigned int total_seqs);
+ * Description:
+ *   Performs a single lightweight pass over a file in "enveomics-seq" format,
+ *   returning the length of every sequence, in file order, without loading
+ *   the full sequence content into memory.
+ * Input:
+ *   - `char *file`: The file containing the sequences (in "enveomics-seq"
+ *     format).
+ *   - `unsigned int total_seqs`: Total number of sequences in the file, used
+ *     to reserve the output vector.
+ * Output:
+ *   Returns a vector with the length of each sequence, in file order.
+ */
+std::vector<unsigned int> get_seq_lengths(char *file, unsigned int total_seqs);
+
+/**
+ * void write_seq_range_to_fasta(
+ *       char *file, char *outfile, size_t start, unsigned int count);
+ * Description:
+ *   Writes sequences `[start, start + count)` (1-based) from a file in
+ *   "enveomics-seq" format into a fresh FASTA file.
+ * Input:
+ *   - `char *file`: The source file (in "enveomics-seq" format).
+ *   - `char *outfile`: Path to the FASTA file to create.
+ *   - `size_t start`: First sequence to write (1-based).
+ *   - `unsigned int count`: Maximum number of sequences to write.
+ */
+void write_seq_range_to_fasta(
+      char *file, char *outfile, size_t start, unsigned int count);
 
 /*
  * bool has_gz_ext(const char *file);

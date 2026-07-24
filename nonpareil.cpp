@@ -88,7 +88,7 @@ void help(const char *msg) {
     <<"  -h       : Display this message and exit"                       << endl
     << endl
     <<"See all supported arguments and additional documentation at"      << endl
-    <<"http://nonpareil.readthedocs.org or with `man nonpareil`"         << endl
+    <<"https://nonpareil.readthedocs.org or with `man nonpareil`"        << endl
     << endl;
   finalize_multinode();
   if (processID == 0) { exit(1); } else { exit(0); }
@@ -518,6 +518,7 @@ restart_mates:
   matepar.n_as_mismatch = n_as_mismatch;
   matepar.k = k;
   matepar.hashsize = hashsize;
+  matepar.ram_max_mb = (double) ram;
 
   if (strcmp(nonpareiltype, "alignment") == 0) {
     matepar.type = 1;

@@ -364,6 +364,66 @@ int reverse_complement(string &out, string in) {
   return len;
 }
 
+vector<unsigned int> get_seq_lengths(char *file, unsigned int total_seqs) {
+  ifstream filein;
+  string   entry;
+  vector<unsigned int> lengths;
+  lengths.reserve(total_seqs);
+
+  filein.open(file, ios::in);
+  if (!filein.is_open()) error("Impossible to open the input file", file);
+
+  while (filein.good()) {
+    string line;
+    getline(filein, line);
+    if ((line.size() > 0 && line[0] == '>') || !filein.good()) {
+      if (entry.size() > 0) lengths.push_back((unsigned int) entry.length());
+      entry = (string)"";
+    } else {
+      entry.append(line);
+    }
+  }
+  filein.close();
+
+  return lengths;
+}
+
+void write_seq_range_to_fasta(
+      char *file, char *outfile, size_t start, unsigned int count) {
+  ifstream filein;
+  ofstream fileout;
+  size_t   i = 0, written = 0;
+  string   entry, header;
+
+  filein.open(file, ios::in);
+  if (!filein.is_open()) error("Impossible to open the input file", file);
+  fileout.open(outfile, ios::out);
+  if (!fileout.is_open()) error("Impossible to open the output file", outfile);
+
+  while (filein.good() && written < count) {
+    string line;
+    getline(filein, line);
+    if ((line.size() > 0 && line[0] == '>') || !filein.good()) {
+      if (entry.size() > 0) {
+        i++;
+        if (i >= start) {
+          fileout << header << "\n" << entry << "\n";
+          if (fileout.fail())
+            error("Write to output file failed", outfile);
+          written++;
+        }
+      }
+      header = line;
+      entry = (string)"";
+    } else {
+      entry.append(line);
+    }
+  }
+
+  fileout.close();
+  filein.close();
+}
+
 bool has_gz_ext(const char *file) {
   char *ext = new char[4];
   for (int i = 0; i < 4; i++) ext[i] = *(file + strlen(file) - 3 + i);

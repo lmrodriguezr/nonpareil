@@ -10,8 +10,11 @@
 #include <math.h>
 #include <pthread.h>
 #include <sys/types.h>
+#include <sys/resource.h>
 #include <sstream>
 #include <filesystem>
+#include <vector>
+#include <algorithm>
 
 #include "universal.h"
 #include "multinode.h"
@@ -22,110 +25,353 @@ extern int processID;
 extern int processes;
 
 #define LARGEST_PATH 4096
+#define USEARCH_RAM_SAFETY_FACTOR 0.75
+#define USEARCH_CALIB_SMALL 2000u
+#define USEARCH_CALIB_LARGE 8000u
 
-/**
- * size_t nonpareil_mate_usearch(
- *       int *&result, char *file, char *sampleFile, int threads,
- *       size_t qry_seqs, unsigned int total_seqs, matepar_t matepar);
- * Description:
- *   Performs the USearch-specific mating steps (indexing, searching, parsing).
- *   Assumes `result` is already allocated and `sampleFile` is the subsampled
- *   query file.
- * Input:
- *   - `int *&result`: Pre-allocated array for results (size = qry_seqs).
- *   - `char *file`: Path to the subject sequences file.
- *   - `char *sampleFile`: Path to the subsampled query sequences file.
- *   - `int threads`: Number of threads to use.
- *   - `size_t qry_seqs`: Number of query sequences.
- *   - `unsigned int total_seqs`: Total number of subject sequences.
- *   - `matepar_t matepar`: Parameters for mating (must have type == 3).
- * Output:
- *   `size_t`: Number of query sequences processed (qry_seqs).
- */
+namespace {
+
+// A contiguous, RAM-bounded slice of the subject dataset (1-based `start`,
+// matching the indexing convention of `get_seqs` elsewhere in this file).
+struct shard_t {
+  size_t       start;
+  unsigned int count;
+  int          max_len;
+  size_t       total_bases;
+};
+
+long usearch_children_rss_kb() {
+  struct rusage ru;
+  getrusage(RUSAGE_CHILDREN, &ru);
+#ifdef __APPLE__
+  return ru.ru_maxrss / 1024; // macOS reports bytes, Linux reports Kb
+#else
+  return ru.ru_maxrss;
+#endif
+}
+
+// Builds a usearch index from the first `n` reads of `file`, and returns the
+// peak RSS (Kb) attributable to that single build, via a
+// getrusage(RUSAGE_CHILDREN) delta read immediately before/after the
+// system() call (ru_maxrss is a running max since process start).
+long usearch_calibration_point(char *file, unsigned int n, size_t &out_bases) {
+  std::filesystem::path base = tmp_dir();
+  char *fasta = new char[LARGEST_PATH],
+       *db    = new char[LARGEST_PATH],
+       *log   = new char[LARGEST_PATH],
+       *cmd   = new char[LARGEST_PATH];
+  snprintf(fasta, LARGEST_PATH, "%s/usearch_calib_%u.fasta", base.c_str(), n);
+  snprintf(db,    LARGEST_PATH, "%s/usearch_calib_%u.db",    base.c_str(), n);
+  snprintf(log,   LARGEST_PATH, "%s/usearch_calib_%u.log",   base.c_str(), n);
+
+  write_seq_range_to_fasta(file, fasta, 1, n);
+
+  std::vector<unsigned int> lens = get_seq_lengths(fasta, n);
+  out_bases = 0;
+  for (size_t a = 0; a < lens.size(); a++) out_bases += lens[a];
+
+  snprintf(
+    cmd, LARGEST_PATH,
+    "usearch -makeudb_usearch '%s' -output '%s' -slots %u > '%s' 2>&1",
+    fasta, db, n * 2, log
+  );
+  say("5ss$", "CMD (calibration): ", cmd);
+  long baseline = usearch_children_rss_kb();
+  int  ret = system(cmd);
+  long peak = usearch_children_rss_kb();
+  if (ret != 0)
+    error("usearch 'makeudb' (calibration) failed with return code", ret);
+
+  remove(fasta);
+  remove(db);
+  remove(log);
+  delete[] fasta;
+  delete[] db;
+  delete[] log;
+  delete[] cmd;
+
+  return peak - baseline;
+}
+
+// Fits `peak_kb ~= a + b * total_bases` from two calibration points built
+// from the start of `file` (sizes bounded by USEARCH_CALIB_SMALL/_LARGE
+// regardless of dataset size, so calibration itself stays cheap), then walks
+// the per-read lengths of `file` to produce a list of RAM-bounded,
+// contiguous shards. `ram_mb_per_rank` is assumed to already be adjusted for
+// any co-located MPI ranks.
+std::vector<shard_t> plan_shards(
+      char *file, unsigned int total_seqs, double ram_mb_per_rank) {
+  std::vector<shard_t> shards;
+  std::vector<unsigned int> lengths = get_seq_lengths(file, total_seqs);
+
+  double bases_budget = -1;
+  unsigned int calib_a = std::min(USEARCH_CALIB_SMALL, total_seqs);
+  unsigned int calib_b = std::min(USEARCH_CALIB_LARGE, total_seqs);
+
+  if (calib_a > 0 && calib_b > calib_a) {
+    size_t bases_a, bases_b;
+    long rss_a = usearch_calibration_point(file, calib_a, bases_a);
+    long rss_b = usearch_calibration_point(file, calib_b, bases_b);
+
+    if (bases_b > bases_a) {
+      double b_coef = (double)(rss_b - rss_a) / (double)(bases_b - bases_a);
+      double a_coef = (double) rss_a - b_coef * (double) bases_a;
+      say("5sfsfs$", "Calibration: a=", a_coef, " Kb, b=", b_coef, " Kb/base");
+      if (b_coef > 0)
+        bases_budget = (
+          ram_mb_per_rank * 1024.0 * USEARCH_RAM_SAFETY_FACTOR - a_coef
+        ) / b_coef;
+    }
+  }
+
+  if (bases_budget <= 0) {
+    // Degenerate calibration (dataset too small for two distinct points, or
+    // a non-positive fitted slope): fall back to a single shard spanning
+    // the whole dataset, equivalent to the un-sharded orientation.
+    size_t total_bases = 0;
+    int    max_len = 0;
+    for (size_t a = 0; a < lengths.size(); a++) {
+      total_bases += lengths[a];
+      if ((int) lengths[a] > max_len) max_len = lengths[a];
+    }
+    shard_t shard = {1, total_seqs, max_len, total_bases};
+    shards.push_back(shard);
+    return shards;
+  }
+
+  say("3sfs$", "Shard budget: ", bases_budget, " bases");
+
+  size_t cur_start = 1, cur_bases = 0;
+  unsigned int cur_count = 0;
+  int cur_max_len = 0;
+  for (unsigned int i = 0; i < total_seqs; i++) {
+    unsigned int len = lengths[i];
+    if (cur_count > 0 && (double)(cur_bases + len) > bases_budget) {
+      shard_t shard = {cur_start, cur_count, cur_max_len, cur_bases};
+      shards.push_back(shard);
+      cur_start += cur_count;
+      cur_count = 0;
+      cur_bases = 0;
+      cur_max_len = 0;
+    }
+    cur_count++;
+    cur_bases += len;
+    if ((int) len > cur_max_len) cur_max_len = len;
+  }
+  if (cur_count > 0) {
+    shard_t shard = {cur_start, cur_count, cur_max_len, cur_bases};
+    shards.push_back(shard);
+  }
+
+  return shards;
+}
+
+// Single sequential pass over `file`: writes each shard owned by this rank
+// (`shard index % processes == processID`) to its own FASTA file at
+// "<tmp_dir>/usearch_shard_<start>.fasta", skipping (not buffering) reads
+// belonging to shards owned by other ranks. This avoids re-scanning the
+// whole dataset once per shard, which would be O(shards x total_seqs).
+void write_owned_shards_to_fasta(
+      char *file, const std::vector<shard_t> &shards) {
+  ifstream filein;
+  ofstream fileout;
+  string   entry, header;
+  size_t   i = 0, shard_i = 0;
+  bool     out_open = false;
+  std::filesystem::path base = tmp_dir();
+
+  filein.open(file, ios::in);
+  if (!filein.is_open()) error("Impossible to open the input file", file);
+
+  while (filein.good()) {
+    string line;
+    getline(filein, line);
+    if ((line.size() > 0 && line[0] == '>') || !filein.good()) {
+      if (entry.size() > 0) {
+        i++;
+        while (
+              shard_i < shards.size() &&
+              i > shards[shard_i].start + shards[shard_i].count - 1) {
+          if (out_open) { fileout.close(); out_open = false; }
+          shard_i++;
+        }
+        if (shard_i < shards.size() && i >= shards[shard_i].start &&
+              ((int)(shard_i % processes) == processID)) {
+          if (!out_open) {
+            char outfile[LARGEST_PATH];
+            snprintf(
+              outfile, LARGEST_PATH, "%s/usearch_shard_%zu.fasta",
+              base.c_str(), shards[shard_i].start
+            );
+            fileout.open(outfile, ios::out);
+            if (!fileout.is_open())
+              error("Impossible to open the output file", outfile);
+            out_open = true;
+          }
+          fileout << header << "\n" << entry << "\n";
+          if (fileout.fail())
+            error("Write to shard fasta failed", (int) shard_i);
+        }
+      }
+      header = line;
+      entry = (string)"";
+    } else {
+      entry.append(line);
+    }
+  }
+  if (out_open) fileout.close();
+  filein.close();
+}
+
+// Builds the shard's usearch index, queries it with `sampleFile` (the
+// subsample) as query -- the natural orientation, since the shard is now
+// small enough to be the DB -- and folds matching hits into `result`.
+// Deletes all of the shard's temporary files before returning.
+void process_one_shard(
+      int *&result, char *sampleFile, const shard_t &shard, int threads,
+      size_t qry_seqs, matepar_t matepar) {
+  std::filesystem::path base = tmp_dir();
+  char fasta[LARGEST_PATH], db[LARGEST_PATH], out[LARGEST_PATH],
+       log[LARGEST_PATH], cmd1[LARGEST_PATH], cmd2[LARGEST_PATH];
+  snprintf(
+    fasta, LARGEST_PATH, "%s/usearch_shard_%zu.fasta",
+    base.c_str(), shard.start
+  );
+  snprintf(
+    db, LARGEST_PATH, "%s/usearch_shard_%zu.db", base.c_str(), shard.start
+  );
+  snprintf(
+    out, LARGEST_PATH, "%s/usearch_shard_%zu.out", base.c_str(), shard.start
+  );
+  snprintf(
+    log, LARGEST_PATH, "%s/usearch_shard_%zu.log", base.c_str(), shard.start
+  );
+
+  // Index the shard's USearch DB
+  size_t slots = matepar.hashsize;
+  if (slots == 0) slots = (size_t)(shard.count * 2);
+  snprintf(
+    cmd1, LARGEST_PATH,
+    "usearch -makeudb_usearch '%s' -output '%s' -slots %zu > '%s' 2>&1",
+    fasta, db, slots, log
+  );
+  say("8ss$", "CMD: ", cmd1);
+  int ret1 = system(cmd1);
+  if (ret1 != 0) error("usearch 'makeudb' failed with return code", ret1);
+
+  // Query the subsample against the shard
+  snprintf(
+    cmd2, LARGEST_PATH,
+    "usearch -usearch_local '%s' -db '%s' -userout '%s' -threads '%d' \
+      -evalue 0.00001 -id 0.9 -userfields '%s' -strand both \
+      -maxaccepts 0 -maxrejects 0 \
+      >> '%s' 2>&1",
+    sampleFile, db, out, threads, "query+target+qcov+tcov", log
+  );
+  say("8ss$", "CMD: ", cmd2);
+  int ret2 = system(cmd2);
+  if (ret2 != 0) error("usearch 'local' failed with return code", ret2);
+
+  // Parse the output. Because query = subsample here (the flip vs the old,
+  // exhaustive DB=subsample orientation), the subsample id is in
+  // fields[0], not fields[1].
+  ifstream filein;
+  filein.open(out, ios::in);
+  if (!filein.is_open()) error("Impossible to open the input file", out);
+  while (filein.good()) {
+    string line;
+    getline(filein, line);
+    if (line.size() == 0) continue;
+
+    std::vector<string> fields;
+    string token;
+    stringstream ss(line);
+    while (getline(ss, token, '\t')) fields.push_back(token);
+    if (fields.size() < 4) continue; // not enough columns
+
+    try {
+      int tid = stoi(fields[0]); // <- This is the subsample "query"
+      double qcov = stod(fields[2]);
+      double tcov = stod(fields[3]);
+
+      if (tid <= 0 || qcov < matepar.overlap || tcov < matepar.overlap)
+        continue;
+      if ((size_t) tid > qry_seqs) {
+        say("2sss$",
+            "Warning: parsed query id out of range:",
+            fields[0].c_str(), " - ignored");
+        continue;
+      }
+
+      result[tid - 1]++;
+    } catch (const exception &e) {
+      // Parsing error - skip line
+      continue;
+    }
+  }
+  filein.close();
+
+  remove(fasta);
+  remove(db);
+  remove(out);
+  remove(log);
+}
+
+} // namespace
+
 size_t nonpareil_mate_usearch(
       int *&result, char *file, char *sampleFile, int threads,
       size_t qry_seqs, unsigned int total_seqs, matepar_t matepar) {
+  std::vector<shard_t> shards;
+  size_t n_shards = 0;
+
   if (processID == 0) {
-    char *tmp_base, *usearch_cmd1, *usearch_cmd2;
-    tmp_base = new char[LARGEST_PATH];
-    snprintf(tmp_base, LARGEST_PATH, "%s/usearch", tmp_dir().c_str());
-
-    // Index the USearch DB
-    // *NOTE* The "query" and "target" are flipped because the database was
-    // consuming too much RAM for large datasets
-    usearch_cmd1 = new char[LARGEST_PATH];
-    size_t slots = matepar.hashsize;
-    if (slots == 0) slots = (size_t)(total_seqs * 2);
-    snprintf(
-      usearch_cmd1, LARGEST_PATH,
-      "usearch -makeudb_usearch '%s' -output '%s.db' -slots %i \
-        > %s.log 2>&1",
-      sampleFile, tmp_base, slots, tmp_base
-    );
-    say("3ss$", "CMD: ", usearch_cmd1);
-    int ret1 = system(usearch_cmd1);
-    if (ret1 != 0) error(
-      "usearch 'makeudb' failed with return code",
-      (char*)std::to_string(ret1).c_str()
+    int    co_located = ranks_on_this_node();
+    double ram_mb_per_rank = matepar.ram_max_mb / (double) co_located;
+    say(
+      "4sisfs$", "RAM budget: ", co_located,
+      " rank(s) sharing this node, ", ram_mb_per_rank, " Mb/rank"
     );
 
-    // Run USearch Local search
-    usearch_cmd2 = new char[LARGEST_PATH];
-    snprintf(
-      usearch_cmd2, LARGEST_PATH,
-      "usearch -usearch_local '%s' -db '%s.db' -userout '%s' -threads '%d' \
-        -evalue 0.00001 -id 0.9 -userfields '%s' -strand both \
-        >> %s.log 2>&1",
-      file, tmp_base, tmp_base, threads, "query+target+qcov+tcov",
-      tmp_base
+    shards = plan_shards(file, total_seqs, ram_mb_per_rank);
+    n_shards = shards.size();
+    say("3sus$", "Sharded subject dataset into ", (unsigned int) n_shards,
+        " shard(s)");
+  }
+
+  // Broadcast the shard plan to all ranks
+  broadcast_size_t(&n_shards);
+  if (processID != 0) shards.resize(n_shards);
+  for (size_t s = 0; s < n_shards; s++) {
+    broadcast_size_t(&shards[s].start);
+    broadcast_int(&shards[s].count);
+    broadcast_int(&shards[s].max_len);
+    broadcast_size_t(&shards[s].total_bases);
+  }
+
+  // Write the shards owned by this rank, then process them round-robin
+  write_owned_shards_to_fasta(file, shards);
+  for (size_t s = 0; s < n_shards; s++) {
+    if ((int)(s % processes) != processID) continue;
+    if (processID == 0)
+      say("6susu$", "Processing shard ", (unsigned int)(s + 1), "/",
+          (unsigned int) n_shards);
+    process_one_shard(
+      result, sampleFile, shards[s], threads, qry_seqs, matepar
     );
-    say("3ss$", "CMD: ", usearch_cmd2);
-    int ret2 = system(usearch_cmd2);
-    if (ret2 != 0) error(
-      "usearch 'local' failed with return code",
-      (char*)std::to_string(ret2).c_str()
-    );
+  }
 
-    // Parse the output
-    ifstream filein;
-    long tid_prev = 0;
-    filein.open(tmp_base, ios::in);
-    if (!filein.is_open()) error("Impossible to open the input file", file);
-    while (filein.good()) {
-      string line;
-      getline(filein, line);
-      if (line.size() == 0) continue;
-
-      // Split the line by tabs
-      std::vector<string> fields;
-      string token;
-      stringstream ss(line);
-      while (getline(ss, token, '\t')) fields.push_back(token);
-      if (fields.size() < 4) continue; // not enough columns
-
-      try {
-        int tid = stoi(fields[1]); // <- This is the "query"
-        double qcov = stod(fields[2]);
-        double tcov = stod(fields[3]);
-
-        if (tid <= 0 || qcov < matepar.overlap || tcov < matepar.overlap)
-          continue;
-        if ((size_t) tid > qry_seqs) {
-          say("2sss$",
-              "Warning: parsed query id out of range:",
-              fields[0].c_str(), " - ignored");
-          continue;
-        }
-
-        result[tid - 1]++;
-      } catch (const exception &e) {
-        // Parsing error - skip line
-        continue;
-      }
-    }
-    filein.close();
+  // Reduce multi-node results
+  barrier_multinode();
+  if (processes > 1) {
+    int *result_sum = new int[qry_seqs];
+    reduce_sum_int(result, result_sum, qry_seqs);
+    if (processID == 0)
+      for (size_t a = 0; a < qry_seqs; a++) result[a] = result_sum[a];
+    delete[] result_sum;
   }
   barrier_multinode();
+
   return qry_seqs;
 }
 

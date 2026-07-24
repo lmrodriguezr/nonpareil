@@ -27,6 +27,9 @@
  *      usearch
  *   - `int hashsize`: For usearch (type 3), this parameter controls the number
  *     of slots in the database hash (-slots in the usearch indexing options)
+ *   - `double ram_max_mb`: For usearch (type 3), the maximum RAM (in MiB) to
+ *     use per MPI rank when sharding the subject dataset (see the `-R` CLI
+ *     option, which is otherwise a per-machine budget in this codebase)
  */
 typedef struct {
   double overlap;
@@ -37,6 +40,7 @@ typedef struct {
   int    k;
   int    type;
   int    hashsize;
+  double ram_max_mb;
 } matepar_t;
 
 /**
@@ -118,23 +122,28 @@ size_t nonpareil_mate(
 /**
  * size_t nonpareil_mate_usearch(
  *       int *&result, char *file, char *sampleFile, int threads,
- *       matepar_t matepar);
+ *       size_t qry_seqs, unsigned int total_seqs, matepar_t matepar);
  * Description:
- *   Performs the USearch-specific mating steps (indexing, searching, parsing).
- *   Assumes `result` is already allocated and `sampleFile` is the subsampled
- *   query file.
+ *   Performs the USearch-specific mating steps. Shards the subject dataset
+ *   (`file`) into RAM-bounded pieces (by cumulative bases), builds a USearch
+ *   index per shard, and queries the subsample (`sampleFile`) against each
+ *   shard, distributing shards round-robin across MPI ranks and summing
+ *   per-read hit counts. Assumes `result` is already allocated and
+ *   `sampleFile` is the subsampled query file.
  * Input:
  *   - `int *&result`: Pre-allocated array for results (size = qry_seqs).
  *   - `char *file`: Path to the subject sequences file.
  *   - `char *sampleFile`: Path to the subsampled query sequences file.
  *   - `int threads`: Number of threads to use.
+ *   - `size_t qry_seqs`: Number of query sequences.
+ *   - `unsigned int total_seqs`: Total number of subject sequences.
  *   - `matepar_t matepar`: Parameters for mating (must have type == 3).
  * Output:
  *   `size_t`: Number of query sequences processed (qry_seqs).
  */
 size_t nonpareil_mate_usearch(
-      int *&result, char *file, char *sampleFile, int threads, matepar_t
-      matepar);
+      int *&result, char *file, char *sampleFile, int threads,
+      size_t qry_seqs, unsigned int total_seqs, matepar_t matepar);
 
 /**
  * void nonpareil_count_mates_block(

@@ -28,6 +28,7 @@ void finalize_multinode();
 
 void broadcast_bool(void* value);
 void broadcast_int(void* value);
+void broadcast_size_t(void* value);
 void broadcast_double(void* value);
 void broadcast_char(void* value, size_t size);
 void broadcast_char(void* value);
@@ -35,6 +36,16 @@ void barrier_multinode();
 void reduce_sum_int(int *send, int *receive, int size);
 void reduce_sum_int(int send, int receive);
 void reduce_sum_double(double *send, double *receive, int size);
+
+/**
+ * int ranks_on_this_node();
+ * Description:
+ *   Counts how many MPI ranks share the current rank's hostname. Outside MPI
+ *   support, always returns 1.
+ * Output:
+ *   `int`: Number of ranks (including this one) running on the same node.
+ */
+int ranks_on_this_node();
 
 #endif
 

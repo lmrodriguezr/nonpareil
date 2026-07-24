@@ -11,6 +11,8 @@ extern int processes;
 
 #ifdef ENVEOMICS_MULTI_NODE
 #include <mpi.h>
+#include <vector>
+#include <cstring>
 
 void init_multinode(int& argc, char**& argv, int& pid, int& pp) {
   MPI_Init(&argc, &argv);
@@ -32,6 +34,11 @@ void broadcast_bool(void* value) {
 
 void broadcast_int(void* value) {
   MPI_Bcast(value, 1, MPI_INT, 0, MPI_COMM_WORLD);
+  barrier_multinode();
+}
+
+void broadcast_size_t(void* value) {
+  MPI_Bcast(value, 1, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
   barrier_multinode();
 }
 
@@ -63,6 +70,29 @@ void reduce_sum_double(double *send, double *receive, int size){
   MPI_Reduce(send, receive, size, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 }
 
+int ranks_on_this_node() {
+  char name[MPI_MAX_PROCESSOR_NAME];
+  int  len;
+  MPI_Get_processor_name(name, &len);
+
+  std::vector<char> all_names(
+    (size_t) processes * MPI_MAX_PROCESSOR_NAME
+  );
+  MPI_Allgather(
+    name, MPI_MAX_PROCESSOR_NAME, MPI_CHAR,
+    all_names.data(), MPI_MAX_PROCESSOR_NAME, MPI_CHAR, MPI_COMM_WORLD
+  );
+
+  int count = 0;
+  for (int i = 0; i < processes; i++)
+    if (strncmp(
+          &all_names[(size_t) i * MPI_MAX_PROCESSOR_NAME], name,
+          MPI_MAX_PROCESSOR_NAME
+        ) == 0) count++;
+
+  return count;
+}
+
 #else
 void init_multinode(int& argc, char**& argv, int& pid, int& pp){
   pid = 0;
@@ -71,6 +101,7 @@ void init_multinode(int& argc, char**& argv, int& pid, int& pp){
 void finalize_multinode() {}
 void broadcast_bool(void* value) {}
 void broadcast_int(void* value) {}
+void broadcast_size_t(void* value) {}
 void broadcast_double(void* value) {}
 void broadcast_char(void* value, size_t size) {}
 void broadcast_char(void* value) {}
@@ -78,5 +109,6 @@ void barrier_multinode() {}
 void reduce_sum_int(int *send, int *receive, int size) {}
 void reduce_sum_int(int send, int receive) {}
 void reduce_sum_double(double *send, double *receive, int size) {}
+int ranks_on_this_node() { return 1; }
 #endif
 
