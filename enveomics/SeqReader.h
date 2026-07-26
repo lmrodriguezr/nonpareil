@@ -27,8 +27,16 @@ public:
   vector<double> baseProb;
 };
 
-void buildFastqSeq(string header, string sequence, string qual, Sequence &out);
+void buildFastqSeq(
+  string header, string sequence, string qual, Sequence &out, int phredOffset
+);
 void buildFastaSeq(string header, string sequence);
+
+// Guesses the FastQ quality encoding's ASCII offset (33 for Sanger/Illumina
+// 1.8+, 64 for Illumina 1.3-1.7) by scanning quality lines for the lowest
+// character seen, rather than assuming Phred+33. Leaves `ifs`'s read
+// position unchanged.
+int detect_phred_offset(ifstream &ifs);
 
 class SeqReader {
 
@@ -50,6 +58,7 @@ public:
 class FastqReader: public SeqReader {
 
 public:
+  int phredOffset;
   FastqReader(ifstream &ifs);
   FastqReader(ifstream &ifs, unsigned int rseed);
   size_t readNextSeq(Sequence &out);

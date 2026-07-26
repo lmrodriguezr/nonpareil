@@ -69,14 +69,49 @@ Sequence::Sequence() {
   this->qualstr = "";
 }
 
-void buildFastqSeq(string header, string sequence, string qual, Sequence &out) {
+void buildFastqSeq(
+      string header, string sequence, string qual, Sequence &out,
+      int phredOffset) {
   vector<double> baseProb;
 
   for(size_t i = 0; i < qual.length(); i++) {
-    baseProb.push_back(PhredQual[int(qual[i]) - 33]);
+    int idx = (int)(unsigned char) qual[i] - phredOffset;
+    // Clamp defensively: an unexpected quality character (wrong encoding
+    // guess, corrupted data) must not read past PhredQual's bounds.
+    if (idx < 0) idx = 0;
+    if (idx >= 43) idx = 42;
+    baseProb.push_back(PhredQual[idx]);
   }
   Sequence seq = Sequence(header, sequence, qual, baseProb);
   out = seq;
+}
+
+int detect_phred_offset(ifstream &ifs) {
+  std::streampos start = ifs.tellg();
+  const size_t MAX_RECORDS = 10000;
+  size_t records_seen = 0, nline = 0;
+  int minChar = 127;
+  string line;
+
+  ifs.clear();
+  ifs.seekg(0, std::ios::beg);
+  while (records_seen < MAX_RECORDS && getline(ifs, line)) {
+    if (nline % 4 == 3) {
+      for (size_t i = 0; i < line.length(); i++) {
+        int c = (int)(unsigned char) line[i];
+        if (c < minChar) minChar = c;
+      }
+      records_seen++;
+    }
+    nline++;
+  }
+  ifs.clear();
+  ifs.seekg(start);
+
+  // Sanger/Illumina 1.8+ (Phred+33) reaches as low as '!' (33); Illumina
+  // 1.3-1.7 (Phred+64) practically never goes below '@'-ish (64). A
+  // low quality character below 64 can only occur in the +33 encoding.
+  return (minChar < 64) ? 33 : 64;
 }
 
 void buildFastaSeq(string header, string sequence, Sequence &out) {
@@ -102,9 +137,13 @@ void SeqReader::reset() {
   this->readNext = true;
 }
 
-FastqReader::FastqReader(ifstream &ifs) : SeqReader(ifs) {}
+FastqReader::FastqReader(ifstream &ifs) : SeqReader(ifs) {
+  this->phredOffset = detect_phred_offset(this->ifs);
+}
 FastaReader::FastaReader(ifstream &ifs) : SeqReader(ifs) {}
-FastqReader::FastqReader(ifstream &ifs, unsigned int rseed) : SeqReader(ifs, rseed) {}
+FastqReader::FastqReader(ifstream &ifs, unsigned int rseed) : SeqReader(ifs, rseed) {
+  this->phredOffset = detect_phred_offset(this->ifs);
+}
 FastaReader::FastaReader(ifstream &ifs, unsigned int rseed) : SeqReader(ifs, rseed) {}
 
 size_t FastqReader::readNextSeq(Sequence &out) {
@@ -132,7 +171,7 @@ size_t FastqReader::readNextSeq(Sequence &out) {
   if (!getline(this->ifs, qual).good())
     error("The file does not have proper fastq format: missing quality");
 
-  buildFastqSeq(header, sequence, qual, out);
+  buildFastqSeq(header, sequence, qual, out, this->phredOffset);
 
   return 0;
 }
@@ -190,6 +229,7 @@ size_t FastqReader::getRandomSeq(Sequence &out) {
       }
       this->ifs.get(c);
       if (c == '@') break;
+      this->ifs.seekg(-1, std::ios::cur);
     }
 
     getline(this->ifs, header);
@@ -203,7 +243,7 @@ size_t FastqReader::getRandomSeq(Sequence &out) {
     break;
   }
 
-  buildFastqSeq(header, sequence, qual, out);
+  buildFastqSeq(header, sequence, qual, out, this->phredOffset);
 
   this->randomHeaders.insert(header);
   return 0;
