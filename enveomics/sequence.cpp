@@ -17,11 +17,65 @@
 
 using namespace std;
 
+namespace {
+
+// Reads text lines from either a plain file or a gzip-compressed one
+// (detected via has_gz_ext), so callers don't need a separately
+// decompressed copy on disk first. Mirrors std::getline's unbounded-length
+// semantics: zlib's gzgets needs a fixed buffer, so long lines (e.g. an
+// unwrapped long-read FASTA sequence) are accumulated across chunks rather
+// than truncated.
+struct LineSource {
+  bool     isGz;
+  ifstream ifs;
+  gzFile   gzf;
+
+  LineSource(const char *file) : gzf(NULL) {
+    isGz = has_gz_ext(file);
+    if (isGz) {
+      gzf = gzopen(file, "rb");
+      if (gzf == NULL) error("Impossible to open the file", file);
+    } else {
+      ifs.open(file, ios::in);
+      if (!ifs.is_open()) error("Impossible to open the file", file);
+    }
+  }
+
+  ~LineSource() {
+    if (isGz && gzf != NULL) gzclose(gzf);
+  }
+
+  // Reads the next line (without its trailing newline) into `line`.
+  // Returns false once there is nothing left to read.
+  bool getline(string &line) {
+    if (!isGz) return (bool) std::getline(ifs, line);
+
+    const size_t CHUNK = 1 << 16;
+    char buf[CHUNK];
+    line.clear();
+    bool readAny = false;
+    while (true) {
+      char *r = gzgets(gzf, buf, CHUNK);
+      if (r == NULL) return readAny;
+      readAny = true;
+      size_t len = strlen(buf);
+      if (len > 0 && buf[len - 1] == '\n') {
+        line.append(buf, len - 1);
+        return true;
+      }
+      line.append(buf, len);
+      if (len < CHUNK - 1) return true; // EOF without a trailing newline
+      // else: buffer filled exactly, the line continues past this chunk
+    }
+  }
+};
+
+} // namespace
+
 size_t count_seqs(
       char *file, const char *format, int &largest_line, double &avg_seq) {
   // Vars
   unsigned int N = 0, nline = 0, totlen = 0, lastn = 0;
-  ifstream fileh;
   int      maxlen = 0;
   char     start;
   bool     isFastQ = false;
@@ -35,11 +89,9 @@ size_t count_seqs(
   else { error("Unsupported format", format); }
 
   // Count
-  fileh.open(file, ios::in);
-  if (!fileh.is_open()) error("Impossible to open the file", file);
-  while (fileh.good()) {
-    string line;
-      getline(fileh, line);
+  LineSource fileh(file);
+  string line;
+  while (fileh.getline(line)) {
       if (line.length() > (size_t) maxlen) maxlen = line.length();
       if ((isFastQ && (nline % 4 == 0)) ||
           (!isFastQ && (line[0] == start))) N++;
@@ -51,7 +103,6 @@ size_t count_seqs(
       }
       nline++;
   }
-  fileh.close();
 
   largest_line = maxlen;
   avg_seq = ((avg_seq / N) * lastn) + ((double) totlen / N);
@@ -93,7 +144,7 @@ size_t build_index(
   char     start, *namFile, *seqFile;
   bool     inSeq = false, isFastQ = false;
   string   seq, name;
-  ifstream infileh, testseq, testnam;
+  ifstream testseq, testnam;
   ofstream seqfileh, namfileh;
 
   // Format
@@ -128,8 +179,7 @@ size_t build_index(
   }
 
   // Open file streams
-  infileh.open(sourceFile, ios::in);
-  if (!infileh.is_open()) error("Cannot open the file", sourceFile);
+  LineSource infileh(sourceFile);
   seqfileh.open(seqFile, ios::out);
   if (!seqfileh.is_open()) error("Cannot open the file", seqFile);
   namfileh.open(namFile, ios::out);
@@ -137,9 +187,8 @@ size_t build_index(
 
   // Run
   avg_seq = 0.0;
-  while (!infileh.eof()) {
-    string line;
-    getline(infileh, line);
+  string line;
+  while (infileh.getline(line)) {
     if ((isFastQ && (nline % 4 == 0)) || (!isFastQ && (line[0] == start))) {
       if (seq.length() >= len_min) {
         N++;
@@ -171,7 +220,6 @@ size_t build_index(
   }
 
   // Close file streams
-  infileh.close();
   seqfileh.close();
   namfileh.close();
 

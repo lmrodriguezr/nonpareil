@@ -283,9 +283,18 @@ int main(int argc, char *argv[]) {
   // file checking
   // TODO
   // - Sequence lengths should be included here! (`len_min`)
-  int count = 0;
 
-  if (has_gz_ext(inputfile)) {
+  // NOTE: `build_index` (used by the alignment/usearch kernels below) reads
+  // gzipped input directly via zlib, so it never needs a decompressed
+  // temp copy. The kmer kernel's own file-reading path (SeqReader /
+  // FastaReader / FastqReader, right below) predates that and is NOT
+  // gz-aware -- it still needs a plain decompressed file. So decompression
+  // is scoped to kmer only, here. ONCE THE KMER KERNEL IS HARMONIZED onto
+  // the shared build_index/enveomics-seq path (see the saved kmer-kernel
+  // harmonization plan), this whole conditional -- and the kmer-only
+  // pre-scan block right after it -- should be removed, and kmer should
+  // just fall through to `build_index` like every other kernel.
+  if (strcmp(nonpareiltype, "kmer") == 0 && has_gz_ext(inputfile)) {
     if (processID == 0) {
       std::filesystem::path tmp_path = tmp_dir();
       snprintf(file, LARGEST_PATH, "%s/input_seq", tmp_path.c_str());
@@ -298,44 +307,54 @@ int main(int argc, char *argv[]) {
   broadcast_char(file, LARGEST_PATH);
 
   if (processID == 0) {
-    int limit = hX + 0;
-    if (strcmp(nonpareiltype, "kmer") == 0) limit = hX * 4 / 3;
-
-    Sequence test_temp;
-    ifstream testifs((string(file)));
-    if (strcmp(format, "fasta") == 0) {
-      FastaReader testfastaReader(testifs);
-      while(testfastaReader.readNextSeq(test_temp) != (size_t)(-1)) {
-        count++;
-        if (count > limit) break;
-      }
-    } else if(strcmp(format, "fastq") == 0) {
-      FastqReader testfastqReader(testifs);
-      while(testfastqReader.readNextSeq(test_temp) != (size_t)(-1)) {
-        count++;
-        if (count > limit) break;
-      }
-    } else {
-      error("Unsupported format", format);
-    }
-
-    if (count == 0) {
-      error("No reads found, check that the input file exists and is readable");
-    } else if (count <= limit) {
-      hX = count;
-      if (strcmp(nonpareiltype, "kmer") == 0) hX *= 3 / 4;
-      say("3si$", "Reducing query reads (-X) to ", hX);
-    }
-
     if (alldata && (strlen(alldata) > 0)) remove(alldata);
     if (cntfile && (strlen(cntfile) > 0)) remove(cntfile);
     if (outfile && (strlen(outfile) > 0) && (strcmp(outfile, "-") != 0))
       remove(outfile);
   }
-  broadcast_int(&count);
- 
+
   if (strcmp(nonpareiltype, "kmer") == 0) {
     if (processID != 0) goto restart_samples;
+
+    // Kmer-only pre-scan to clamp -X to the actual number of reads
+    // available. Same caveat as above: this duplicates what
+    // `build_index` would otherwise tell us for free, and only exists
+    // because the kmer kernel doesn't go through `build_index` yet.
+    if (processID == 0) {
+      int limit = hX * 4 / 3;
+      int count = 0;
+
+      Sequence test_temp;
+      ifstream testifs((string(file)));
+      if (strcmp(format, "fasta") == 0) {
+        FastaReader testfastaReader(testifs);
+        while(testfastaReader.readNextSeq(test_temp) != (size_t)(-1)) {
+          count++;
+          if (count > limit) break;
+        }
+      } else if(strcmp(format, "fastq") == 0) {
+        FastqReader testfastqReader(testifs);
+        while(testfastqReader.readNextSeq(test_temp) != (size_t)(-1)) {
+          count++;
+          if (count > limit) break;
+        }
+      } else {
+        error("Unsupported format", format);
+      }
+
+      if (count == 0) {
+        error("No reads found, check that the input file exists and is readable");
+      } else if (count <= limit) {
+        hX = count * 3 / 4;
+        say("3si$", "Reducing query reads (-X) to ", hX);
+      }
+    }
+    // NOTE: hX is deliberately not broadcast here, matching the original
+    // pre-scan's behavior: the kmer kernel doesn't support multi-rank MPI
+    // (see docs/mpi.rst), and non-zero ranks already left via the `goto`
+    // above without referencing hX, so a broadcast here would just be a
+    // collective call the other ranks never reach -- a deadlock risk in
+    // true MPI mode, not a safety net.
     if (alt_query) {
       if(strcmp(format, "fasta") == 0) {
         say("1ss$", "WARNING: The kmer kernel implements an error correction ",
@@ -433,6 +452,16 @@ int main(int argc, char *argv[]) {
   broadcast_int(&largest_seq);
   broadcast_double(&avg_seq_len);
   barrier_multinode();
+
+  // Clamp -X to the actual number of reads available. Replaces a
+  // separate capped pre-scan of the raw input that used to run before
+  // `build_index` -- now redundant, since `build_index` already gives us
+  // the exact count with no extra pass over the file.
+  if (processID == 0 && hX > total_seqs) {
+    hX = total_seqs;
+    say("3si$", "Reducing query reads (-X) to ", hX);
+  }
+  broadcast_int(&hX);
 
   // Parse Q-File
   qNamFile = (char *)malloc(LARGEST_PATH * (sizeof *qNamFile));
