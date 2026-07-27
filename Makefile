@@ -36,6 +36,10 @@ nuc_sampler:
 	cd $(enveomics) && $(MAKE) sequence
 	$(cpp) nuc_sampler.cpp $(universal) $(sequence) $(ldflags) $(CPPFLAGS) -o nuc_sampler
 
+usearch_ram_probe:
+	cd $(enveomics) && $(MAKE) sequence
+	$(cpp) usearch_ram_probe.cpp $(universal) $(sequence) $(ldflags) $(CPPFLAGS) -o usearch_ram_probe
+
 clean:
 	cd $(enveomics) && $(MAKE) clean
 	rm -f test/test.*.enve-* test/test.fast[aq] test/DELETE.np* nonpareil.np*

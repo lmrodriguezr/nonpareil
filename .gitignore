@@ -3,6 +3,7 @@ enveomics/*.o
 /nonpareil-mpi
 /nuc_sampler
 /utils/nuc_sampler
+/usearch_ram_probe
 /Nonpareil_*.tar.gz
 /Nonpareil.Rcheck*
 /*.np?
