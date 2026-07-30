@@ -8,6 +8,7 @@ Estimate average coverage and create Nonpareil curves for metagenomic datasets.
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](http://bioconda.github.io/recipes/nonpareil/README.html)
 [![container ready](https://quay.io/repository/biocontainers/nonpareil/status)](https://quay.io/repository/biocontainers/nonpareil)
+[![CI](https://github.com/lmrodriguezr/nonpareil/actions/workflows/ci.yml/badge.svg)](https://github.com/lmrodriguezr/nonpareil/actions/workflows/ci.yml)
 
 Citation
 --------

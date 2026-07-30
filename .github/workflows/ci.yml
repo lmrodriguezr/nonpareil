@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  test:
+    name: >-
+      test (${{ matrix.platform }}, mpi=${{ matrix.mpi }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: Linux_x86_64
+            mpi: true
+          - os: ubuntu-latest
+            platform: Linux_x86_64
+            mpi: false
+          - os: macos-latest
+            platform: MacOSX_ARM64
+            mpi: true
+          - os: macos-latest
+            platform: MacOSX_ARM64
+            mpi: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zlib1g-dev
+
+      - name: Install OpenMPI (Linux)
+        if: runner.os == 'Linux' && matrix.mpi
+        run: sudo apt-get install -y openmpi-bin libopenmpi-dev
+
+      - name: Install OpenMPI (macOS)
+        if: runner.os == 'macOS' && matrix.mpi
+        run: brew install open-mpi
+
+      # Deliberately calling the specific targets we need, not `make all`
+      # -- `all` also builds the unrelated `go` tool, which needs
+      # libsqlite3-dev and has nothing to do with nonpareil itself.
+      - name: Build nonpareil
+        run: make nonpareil
+
+      - name: Build nonpareil-mpi
+        if: matrix.mpi
+        run: make nonpareil-mpi
+
+      - name: Run tests
+        run: make test
+
+      # Only the mpi=true legs have both binaries; only used as release
+      # candidates when this run is a push to main.
+      - name: Upload binaries for release
+        if: matrix.mpi && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.platform }}
+          path: |
+            nonpareil
+            nonpareil-mpi
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: release
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        run: |
+          version=$(grep -oP '(?<=NP_VERSION ")[^"]+' nonpareil.cpp)
+          if [ -z "$version" ]; then
+            echo "Could not extract NP_VERSION from nonpareil.cpp" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether this version is already released
+        id: check
+        run: |
+          git fetch --tags
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Download release binaries
+        if: steps.check.outputs.exists == 'false'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: binaries-*
+          path: artifacts
+
+      - name: Assemble release assets
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          set -euo pipefail
+          version="${{ steps.version.outputs.version }}"
+          mkdir -p release_assets
+          for dir in artifacts/binaries-*; do
+            platform="${dir#artifacts/binaries-}"
+            cp "$dir/nonpareil" "release_assets/nonpareil-${version}-${platform}"
+            cp "$dir/nonpareil-mpi" "release_assets/nonpareil-mpi-${version}-${platform}"
+          done
+          chmod +x release_assets/*
+          ls -la release_assets
+
+      - name: Create release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v${{ steps.version.outputs.version }}" \
+            release_assets/* \
+            --title "v${{ steps.version.outputs.version }}" \
+            --generate-notes
+
+      - name: Skip (version already released)
+        if: steps.check.outputs.exists == 'true'
+        run: |
+          echo "v${{ steps.version.outputs.version }} already exists -- nothing to release."
