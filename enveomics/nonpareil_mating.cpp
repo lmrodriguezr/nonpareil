@@ -11,6 +11,8 @@
 #include <pthread.h>
 #include <sys/types.h>
 #include <sys/resource.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 #include <sstream>
 #include <filesystem>
 #include <vector>
@@ -26,8 +28,8 @@ extern int processes;
 
 #define LARGEST_PATH 4096
 #define USEARCH_RAM_SAFETY_FACTOR 0.75
-#define USEARCH_CALIB_SMALL 2000u
-#define USEARCH_CALIB_LARGE 8000u
+#define USEARCH_CALIB_SMALL 8000u
+#define USEARCH_CALIB_LARGE 32000u
 
 namespace {
 
@@ -40,9 +42,51 @@ struct shard_t {
   size_t       total_bases;
 };
 
-long usearch_children_rss_kb() {
+// Runs one child process to completion via fork()+execvp(), redirecting its
+// stdout/stderr to `log_file`, and returns its *exact* peak RSS (Kb) via
+// wait4(). This deliberately does NOT use system() + a
+// getrusage(RUSAGE_CHILDREN) delta (the calibration code's original
+// approach): RUSAGE_CHILDREN's ru_maxrss is a running max across every
+// child since process start, not a per-call reading, so a delta taken
+// around a *second* (or later) build silently measures
+// (that build's peak - the previous build's peak) instead of an absolute
+// value. That's exactly what made a real production run's calibration
+// undermeasure its slope by ~3x (confirmed empirically -- see
+// usearch_ram_probe.cpp/the calibration experiment this was validated
+// against). wait4() reports the exact rusage of the one child just
+// waited on, with no ordering or baseline assumptions -- do not
+// "simplify" this back to system()+getrusage(RUSAGE_CHILDREN).
+long run_and_get_peak_rss_kb(
+      const std::vector<std::string> &args, const char *log_file) {
+  std::vector<char*> argv;
+  for (const std::string &s : args) argv.push_back(const_cast<char*>(s.c_str()));
+  argv.push_back(NULL);
+
+  pid_t pid = fork();
+  if (pid < 0) error("fork() failed while launching usearch");
+  if (pid == 0) {
+    int fd = open(log_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+    if (fd >= 0) {
+      dup2(fd, STDOUT_FILENO);
+      dup2(fd, STDERR_FILENO);
+      close(fd);
+    }
+    execvp(argv[0], argv.data());
+    _exit(127); // exec failed
+  }
+
+  int status;
   struct rusage ru;
-  getrusage(RUSAGE_CHILDREN, &ru);
+  pid_t w = wait4(pid, &status, 0, &ru);
+  if (w != pid) error("wait4() failed while waiting for usearch");
+  if (WIFSIGNALED(status))
+    error("usearch (calibration) was killed by signal", WTERMSIG(status));
+  if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+    error(
+      "usearch 'makeudb' (calibration) failed with return code",
+      WIFEXITED(status) ? WEXITSTATUS(status) : -1
+    );
+
 #ifdef __APPLE__
   return ru.ru_maxrss / 1024; // macOS reports bytes, Linux reports Kb
 #else
@@ -50,16 +94,14 @@ long usearch_children_rss_kb() {
 #endif
 }
 
-// Builds a usearch index from the first `n` reads of `file`, and returns the
-// peak RSS (Kb) attributable to that single build, via a
-// getrusage(RUSAGE_CHILDREN) delta read immediately before/after the
-// system() call (ru_maxrss is a running max since process start).
+// Builds a usearch index from the first `n` reads of `file`, and returns
+// the exact peak RSS (Kb) of that single build.
 long usearch_calibration_point(char *file, unsigned int n, size_t &out_bases) {
   std::filesystem::path base = tmp_dir();
   char *fasta = new char[LARGEST_PATH],
        *db    = new char[LARGEST_PATH],
        *log   = new char[LARGEST_PATH],
-       *cmd   = new char[LARGEST_PATH];
+       *cmd_display = new char[LARGEST_PATH];
   snprintf(fasta, LARGEST_PATH, "%s/usearch_calib_%u.fasta", base.c_str(), n);
   snprintf(db,    LARGEST_PATH, "%s/usearch_calib_%u.db",    base.c_str(), n);
   snprintf(log,   LARGEST_PATH, "%s/usearch_calib_%u.log",   base.c_str(), n);
@@ -71,16 +113,18 @@ long usearch_calibration_point(char *file, unsigned int n, size_t &out_bases) {
   for (size_t a = 0; a < lens.size(); a++) out_bases += lens[a];
 
   snprintf(
-    cmd, LARGEST_PATH,
-    "usearch -makeudb_usearch '%s' -output '%s' -slots %u > '%s' 2>&1",
+    cmd_display, LARGEST_PATH,
+    "usearch -makeudb_usearch '%s' -output '%s' -slots %u (log: '%s')",
     fasta, db, n * 2, log
   );
-  say("5ss$", "CMD (calibration): ", cmd);
-  long baseline = usearch_children_rss_kb();
-  int  ret = system(cmd);
-  long peak = usearch_children_rss_kb();
-  if (ret != 0)
-    error("usearch 'makeudb' (calibration) failed with return code", ret);
+  say("5ss$", "CMD (calibration): ", cmd_display);
+  long peak = run_and_get_peak_rss_kb(
+    {
+      "usearch", "-makeudb_usearch", fasta, "-output", db,
+      "-slots", std::to_string(n * 2)
+    },
+    log
+  );
 
   remove(fasta);
   remove(db);
@@ -88,9 +132,9 @@ long usearch_calibration_point(char *file, unsigned int n, size_t &out_bases) {
   delete[] fasta;
   delete[] db;
   delete[] log;
-  delete[] cmd;
+  delete[] cmd_display;
 
-  return peak - baseline;
+  return peak;
 }
 
 // Fits `peak_kb ~= a + b * total_bases` from two calibration points built
