@@ -114,10 +114,11 @@ How can I evaluate the performance in pilot runs?
    output file, if you have a good Epiloge configured). For example, to measure
    the total RAM used, the total walltime, real time, user time, etc. Another
    source is the .npl file, which contains a log of the Nonpareil run (assuming
-   you used the ``-b`` option). The number in squared brackets is the CPU time
-   in minutes. Note that the CPU time here is only for the "master" machine.
-   That means: the number of CPU minutes added for all the threads in the main
-   machine. Another useful piece of information is the number of "blocks" used.
+   you used the ``-b`` option). The number in squared brackets is the wall-clock
+   time elapsed since the run started, in minutes. Note that this is tracked
+   independently per machine/process, so worker machines' logs (if you inspect
+   them) report their own elapsed time rather than the "master" machine's.
+   Another useful piece of information is the number of "blocks" used.
    Ideally, you should have one block per machine; if you have more it means
    that the RAM assigned (``-R``) was insufficient. You can find it right below
    the "Designing the blocks scheme..." line. In the ideal scenario (enough

@@ -162,9 +162,10 @@ Mates distribution: ``.npc`` file
 
 Log: ``.npl`` file
    A verbose log of internal Nonpareil processing. The number to the left
-   (inside squared brackets) indicate the CPU time (in minutes). This file also
-   provides quality assessment of the Nonpareil run (automated consistency
-   evaluation). Ideally, the last line should read "Everything seems correct".
+   (inside squared brackets) indicates the wall-clock time elapsed since the
+   run started (in minutes). This file also provides quality assessment of
+   the Nonpareil run (automated consistency evaluation). Ideally, the last
+   line should read "Everything seems correct".
    Otherwise, it suggests alternative parameters that may improve the
    estimation.
 

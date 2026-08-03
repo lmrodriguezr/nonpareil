@@ -514,6 +514,7 @@ Nonpareil.read_metadata <- function(
 
   # Set metadata
   if ("kernel" %in% keys) x$kernel <- vals[keys == "kernel"]
+  else x$kernel <- "alignment" # If the file was created before kernel selection
   if (!x$kernel %in% c("alignment", "kmer", "usearch")) {
     x$kernel <- "alignment"
     if ("ksize" %in% keys &&
