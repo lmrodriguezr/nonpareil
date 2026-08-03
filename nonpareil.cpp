@@ -129,8 +129,10 @@ int main(int argc, char *argv[]) {
   // Vars
   char  *file = new char[LARGEST_PATH], *inputfile = (char *)"",
         *format = (char *)"", *nonpareiltype = (char *)"",
-        *alldata, *cntfile, *outfile, *namFile, *seqFile,
-        *baseout = (char *)"nonpareil", *qfile, *qNamFile, *qSeqFile;
+        *alldata, *cntfile, *outfile,
+        *namFile = (char *)"", *seqFile = (char *)"",
+        *baseout = (char *)"nonpareil",
+        *qfile = (char *)"", *qNamFile = (char *)"", *qSeqFile = (char *)"";
   double
         min = 0.0, max = 1.0, itv = 0.01, qry_portion = 0, min_sim = 0.95,
         ovl = 0.50, *sample_result, avg_seq_len = 0.0, adj_avg_seq_len,
@@ -143,7 +145,8 @@ int main(int argc, char *argv[]) {
         qry_seqs_no, ram_Kb, required_ram_Kb;
   unsigned long long int total_seqs = 0;
   bool  n_as_mismatch = false, portion_label = false, revcom = true, ok,
-        autoadjust = false, alt_query = false, rseed_set = false;
+        autoadjust = false, alt_query = false, rseed_set = false,
+        keep_index = false;
   matepar_t matepar;
   samplepar_t samplepar;
 
@@ -154,10 +157,10 @@ int main(int argc, char *argv[]) {
 
   // GetOpt
   int   optchr;
-  // Available letters left: DeEgGHIjJKOQyYzZ
+  // Available letters left: DeEgGIjJOQyYzZ
   while ((optchr = getopt(
           argc, argv,
-          "a:Ab:BcC:d:f:FhH:i:k:l:L:m:M:n:No:p:q:r:R:s:S:t:T:v:Vx:X:"
+          "a:Ab:BcC:d:f:FhH:i:k:Kl:L:m:M:n:No:p:q:r:R:s:S:t:T:v:Vx:X:"
         )) != EOF) {
     switch (optchr) {
       case 'a': alldata = optarg;           break;
@@ -173,6 +176,7 @@ int main(int argc, char *argv[]) {
       case 'H': hashsize = atoi(optarg);    break;
       case 'i': itv = atof(optarg);         break;
       case 'k': k = atoi(optarg);           break;
+      case 'K': keep_index = true;          break;
       case 'l': open_log(optarg);           break;
       case 'L': ovl = atof(optarg) / 100.0; break;
       case 'm': min = atof(optarg);         break;
@@ -749,6 +753,19 @@ exit:
   say("9sis$", "Worker ", processID, " @exit");
   // Clean temporals
   if (processID == 0) {
+    // The sequence index (.enve-seq/.enve-nam) is only useful for reuse
+    // across MPI ranks *within* this run (they all read the same path) or
+    // across separate runs against the same input (the cache-hit check in
+    // build_index()) -- by default, remove it now that this run is done,
+    // unless the user asked to keep it (-K) for that cross-run reuse.
+    if (!keep_index) {
+      if (seqFile && strlen(seqFile) > 0) remove(seqFile);
+      if (namFile && strlen(namFile) > 0) remove(namFile);
+      if (alt_query) {
+        if (qSeqFile && strlen(qSeqFile) > 0) remove(qSeqFile);
+        if (qNamFile && strlen(qNamFile) > 0) remove(qNamFile);
+      }
+    }
     try {
       std::filesystem::remove_all(tmp_dir());
     } catch (const std::exception &e) {

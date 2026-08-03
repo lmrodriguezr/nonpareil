@@ -91,8 +91,17 @@ Additional options
               dash '-').  If an empty string '' is provided, does not produce
               the summary. See the OUTPUT section
    -q <str>   Path to the (input) file containing a second dataset to be used as
-              query, for dataset comparisons.  This option is currently 
+              query, for dataset comparisons.  This option is currently
               experimental
+   -K         Keep the sequence index (the ``.enve-seq``/``.enve-nam`` files
+              generated next to the input) after the run finishes, instead of
+              removing it. These files can always be reused across the MPI
+              processes of a single run regardless of this option; ``-K`` only
+              affects whether they also survive to be reused by a *separate*,
+              later run against the same input (skipping re-indexing). Has no
+              effect if the input's directory isn't writable, since in that
+              case the index is built in a temporary directory that is always
+              removed at the end of the run. This is uppercase K
 
 **Sampling**
    -d <num>   Subsample iteratively applying this factor to the number of reads,

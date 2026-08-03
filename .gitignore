@@ -9,3 +9,4 @@ enveomics/*.o
 /*.np?
 .DS_Store
 *.swp
+.vscode/settings.json
