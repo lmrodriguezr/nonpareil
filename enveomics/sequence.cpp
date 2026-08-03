@@ -157,14 +157,14 @@ size_t build_index(
     error("Unsupported format", format);
   }
 
-  // Files
+  // Files. Preferred location is next to the source, so that a repeat run
+  // against the same input can skip straight to the cache-hit check below
+  // instead of re-indexing.
   int fileLen = strlen(sourceFile) + 20;
   seqFile = new char[fileLen];
   snprintf(seqFile, fileLen, "%s.enve-seq", sourceFile);
   namFile = new char[fileLen];
   snprintf(namFile, fileLen, "%s.enve-nam", sourceFile);
-  namFileOut = namFile;
-  seqFileOut = seqFile;
 
   // Check if I need to do it
   testseq.open(seqFile, ios::in);
@@ -174,16 +174,52 @@ size_t build_index(
     if (testnam.is_open()) {
       testnam.close();
       N = count_seqs(seqFile, "enveomics-seq", largest_seq, avg_seq);
+      namFileOut = namFile;
+      seqFileOut = seqFile;
       return N;
     }
   }
 
-  // Open file streams
+  // Open file streams. If the source's directory isn't writable (e.g. a
+  // read-only/shared input location), fall back to this run's temp
+  // directory instead of failing outright -- this loses the cross-run
+  // cache-hit check above (tmp_dir() is unique per process and wiped at
+  // exit), but that's strictly better than being unable to run at all.
   LineSource infileh(sourceFile);
   seqfileh.open(seqFile, ios::out);
-  if (!seqfileh.is_open()) error("Cannot open the file", seqFile);
   namfileh.open(namFile, ios::out);
-  if (!namfileh.is_open()) error("Cannot open the file", namFile);
+  if (!seqfileh.is_open() || !namfileh.is_open()) {
+    if (seqfileh.is_open()) seqfileh.close();
+    if (namfileh.is_open()) namfileh.close();
+    say(
+      "2sss$", "Cannot write the sequence index next to ", sourceFile,
+      " -- falling back to the temporary directory (no cross-run cache)"
+    );
+
+    std::filesystem::path tmp_path = tmp_dir();
+    string flat = sourceFile;
+    for (size_t a = 0; a < flat.length(); a++)
+      if (flat[a] == '/') flat[a] = '_';
+
+    delete[] seqFile;
+    delete[] namFile;
+    fileLen = flat.length() + tmp_path.string().length() + 20;
+    seqFile = new char[fileLen];
+    snprintf(
+      seqFile, fileLen, "%s/%s.enve-seq", tmp_path.c_str(), flat.c_str()
+    );
+    namFile = new char[fileLen];
+    snprintf(
+      namFile, fileLen, "%s/%s.enve-nam", tmp_path.c_str(), flat.c_str()
+    );
+
+    seqfileh.open(seqFile, ios::out);
+    if (!seqfileh.is_open()) error("Cannot open the file", seqFile);
+    namfileh.open(namFile, ios::out);
+    if (!namfileh.is_open()) error("Cannot open the file", namFile);
+  }
+  namFileOut = namFile;
+  seqFileOut = seqFile;
 
   // Run
   avg_seq = 0.0;

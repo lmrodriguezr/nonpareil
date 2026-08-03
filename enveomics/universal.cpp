@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+#include <chrono>
 
 #include "universal.h"
 
@@ -94,10 +95,19 @@ void say(const char *format, ...) {
 
   if (format[startArg] == '!') startArg++;
   else {
+    // Wall-clock minutes elapsed since this process's first say() call
+    // (a proxy for process start -- negligible startup work happens
+    // before it). Deliberately NOT clock()/CLOCKS_PER_SEC: that measures
+    // CPU time, which is inflated by thread parallelism (-t) and doesn't
+    // reflect actual elapsed time.
+    static const std::chrono::steady_clock::time_point start_time =
+      std::chrono::steady_clock::now();
+    double elapsed_min = std::chrono::duration<double>(
+      std::chrono::steady_clock::now() - start_time
+    ).count() / 60.0;
+
     sArg = new char[LARGEST_STRING];
-    snprintf(
-      sArg, LARGEST_STRING, " [% 9.1f] ", clock() / (60.0 * CLOCKS_PER_SEC)
-    );
+    snprintf(sArg, LARGEST_STRING, " [% 9.1f] ", elapsed_min);
     out.append(sArg);
     for (int i = 0; i < level; i++) out.append(" ");
   }
