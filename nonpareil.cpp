@@ -81,8 +81,7 @@ void help(const char *msg) {
     <<"             Maximum value in this version: " << (UINT_MAX/1024)  << endl
     <<"  -t <int> : Number of threads. By default: 2"                    << endl
     <<"  -v <int> : Verbosity level. By default 7"                       << endl
-    <<"  -r <int> : Random seed to make runs reproducible. Currently"    << endl
-    <<"             only implemented when -T alignment"                  << endl
+    <<"  -r <int> : Random seed to make runs reproducible"               << endl
     <<"  -V       : Show version information and exit"                   << endl
     <<"  -B       : Show bibliography (citation) entries and exit"       << endl
     <<"  -h       : Display this message and exit"                       << endl

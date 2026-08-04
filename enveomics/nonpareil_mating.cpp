@@ -28,6 +28,17 @@ extern int processes;
 
 #define LARGEST_PATH 4096
 #define USEARCH_RAM_SAFETY_FACTOR 0.75
+// -maxrejects 0 (fully exhaustive) turned out to be the dominant cost of
+// the usearch kernel: for the (common) case of reads with few/no true
+// hits, it forces scanning the entire remaining shard just to confirm
+// there's nothing left. Bounding it is a deliberate, calibrated trade-off,
+// not just a performance knob -- the coverage-from-redundancy model
+// (`Nonpareil.kappa_to_coverage`'s `common_factor` in
+// utils/Nonpareil/R/Nonpareil.R, for kernel=="usearch") must be refit
+// against whatever value is used here, since it's what "redundancy" means
+// as far as that model is concerned. Do not change this without
+// recalibrating that constant to match.
+#define USEARCH_MAXREJECTS 100
 #define USEARCH_CALIB_SMALL 8000u
 #define USEARCH_CALIB_LARGE 32000u
 
@@ -308,17 +319,16 @@ void process_one_shard(
     cmd2, LARGEST_PATH,
     "usearch -usearch_local '%s' -db '%s' -userout '%s' -threads '%d' \
       -evalue 0.00001 -id 0.9 -userfields '%s' -strand both \
-      -maxaccepts 0 -maxrejects 0 \
+      -maxaccepts 0 -maxrejects %d \
       >> '%s' 2>&1",
-    sampleFile, db, out, threads, "query+target+qcov+tcov", log
+    sampleFile, db, out, threads, "query+target+qcov+tcov",
+    USEARCH_MAXREJECTS, log
   );
   say("8ss$", "CMD: ", cmd2);
   int ret2 = system(cmd2);
   if (ret2 != 0) error("usearch 'local' failed with return code", ret2);
 
-  // Parse the output. Because query = subsample here (the flip vs the old,
-  // exhaustive DB=subsample orientation), the subsample id is in
-  // fields[0], not fields[1].
+  // Parse the output.
   ifstream filein;
   filein.open(out, ios::in);
   if (!filein.is_open()) error("Impossible to open the input file", out);
