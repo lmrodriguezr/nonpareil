@@ -71,6 +71,30 @@ int nonpareil_sample_portion(
   return launched_replicates;
 }
 
+// This is the core of the Nonpareil extrapolation: it does NOT re-run the
+// mating step at each sequencing effort ("portion") -- it reuses the one
+// `mates` vector (hit counts from the real, full-size mating run) as an
+// estimator of each query read's population-level redundancy, then Monte
+// Carlo simulates what fraction of reads would appear redundant at a
+// hypothetical subsample of `portion * total_reads` reads:
+//   - `p` estimates the probability that any other single read in the
+//     dataset is a "mate" of read `j`, from its observed hit count
+//     (`mates_ref[j] - 1`, excluding the self-hit) over the dataset size
+//     (`total_reads - 1`, excluding the query read itself).
+//   - `n` is how many *other* reads such a hypothetical subsample would
+//     contain.
+//   - `p_gt_0 = 1 - (1-p)^n` is then the probability that read `j` has at
+//     least one mate among those `n` reads (treating each of the `n` as an
+//     independent Bernoulli trial with success probability `p`).
+//   - A second random draw against `p_gt_0` decides whether read `j`
+//     counts as "found" (redundant) in this one simulated replicate.
+// Repeated over many replicates (across sub-sampled reads and over
+// `samplepar.replicates` calls to this function), this produces the
+// rarefaction-like curve written to the `.npo` file. One consequence
+// worth knowing: `p_gt_0` saturates towards 1 very quickly as `mates[j]`
+// grows (for a large dataset, often by a hit count in the tens), so the
+// portion=1.0 (full-depth) estimate is disproportionately sensitive to
+// reads with only a handful of true hits, not to the most abundant ones.
 void *nonpareil_sample_portion_thr(void *samplejob_ref) {
   // Vars
   samplejob_t *samplejob = (samplejob_t *)samplejob_ref;

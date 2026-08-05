@@ -22,7 +22,7 @@
  *   - `bool revcom`: True if the sequences must be matted in both strands
  *   - `bool n_as_mismatch`: True if the 'N' characters must be treated as a
  *     mismatch
- *   - `int k`: TODO-DOC
+ *   - `int k`: kmer size (`-k`). Only meaningful for the kmer kernel
  *   - `int type`: Nonpareil algorithm: 1 for alignment, 2 for kmer, 3 for
  *      usearch
  *   - `int hashsize`: For usearch (type 3), this parameter controls the number

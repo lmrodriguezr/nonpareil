@@ -59,6 +59,12 @@ void broadcast_char(void* value) {
 void reduce_sum_int(int *send, int *receive, int size){
   MPI_Reduce(send, receive, size, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 }
+// BUG (not fixed here, just flagged): `receive` is passed by value, so the
+// result computed below is discarded when the function returns -- the
+// caller never sees it. Currently unused anywhere in this codebase (every
+// call site uses the array overload above), so it's a latent bug rather
+// than an active one, but worth fixing (change to `int &receive`) or
+// removing before anything starts relying on it.
 void reduce_sum_int(int send, int receive){
   int *send_ar = new int[1], *receive_ar = new int[1];
   send_ar[0] = send;

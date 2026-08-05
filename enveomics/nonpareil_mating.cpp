@@ -689,6 +689,17 @@ bool nonpareil_compare_reads(char *seqA, char *seqB, matepar_t matepar) {
   return nonpareil_compare_reads_shortfirst(seqB, seqA, lenB, lenA, matepar);
 }
 
+// Slides the shorter read (A) along the longer one (B) at every offset `i`
+// that still satisfies the minimum-overlap requirement, and accepts as
+// soon as any offset's overlapping window has few enough mismatches.
+// Negative `i` means A starts before B (only the overlapping suffix of A
+// is compared); `i` beyond 0 means A starts inside B. Errors are counted
+// while scanning the overlap and bail out via `goto next_i` the moment
+// they exceed what `matepar.similarity` allows for that window's length
+// (cheaper than finishing a window already known to fail). "W-W" below
+// means both reads compared as given (Watson-Watson, i.e. same strand);
+// "C-W" means seqA is reverse-complemented first (Crick-Watson) to also
+// catch matches on the opposite strand.
 bool nonpareil_compare_reads_shortfirst(
       char *seqA, char *seqB, int lenA, int lenB, matepar_t matepar) {
   int    min_len = (int) ceil(matepar.overlap * lenA);

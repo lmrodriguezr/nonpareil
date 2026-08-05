@@ -37,13 +37,17 @@ typedef struct {
  *   - `double portion_min`: Minimum portion in the run
  *   - `double portion_max`: Maximum portion in the run
  *   - `double portion_itv`: Interval of portions in the run
- *   - `double seq_overlap`: TODO-DOC
+ *   - `double seq_overlap`: Minimum overlap used by the mating step (same
+ *     value as `matepar_t.overlap`), reported in the `.npo`/`.npa` header
+ *     as `@overlap`, as a fraction (not a percentage)
  *   - `int replicates`: Number of replicates to generate
  *   - `int **mates`: Reference to the int array containing the matting results
  *   - `int mates_size`: Number of elements in the array referenced by mates
  *   - `int total_reads`: Total number of reads in the dataset
- *   - `int max_read_len`: TODO-DOC
- *   - `int k`: TODO-DOC
+ *   - `int max_read_len`: Length of the longest read in the dataset,
+ *     reported in the `.npo`/`.npa` header as `@maxL` (alignment kernel
+ *     only; kmer/usearch headers don't include it)
+ *   - `int k`: kmer size (`-k`). Only meaningful for the kmer kernel
  *   - `int type`: Nonpareil algorithm: 1 for alignment, 2 for kmer, 3 for
  *     usearch
  *   - `double avg_read_len`: Average read length (in bp)

@@ -534,6 +534,18 @@ void gunz_file(const char *infile, const char *outfile) {
   gzclose(fi);
 }
 
+// NOTE: this block is currently unreachable in practice, and not just
+// because nothing defines ENVEOMICS_NUC_T_DEFINE (see sequence.h): even if
+// something did, that only takes effect for translation units that define
+// ENVEOMICS_NUC_T_DEFINE *before* including sequence.h. This file includes
+// "sequence.h" unconditionally at the top (no such guard), so the
+// `#define ENVEOMICS_NUC_T` inside sequence.h's guarded block never runs
+// for this translation unit -- the #ifdef below can only be entered by
+// passing -DENVEOMICS_NUC_T directly on this file's compile command,
+// bypassing the header's gate entirely. Also, `seqtoa` below (declared
+// nowhere in sequence.h, so effectively private to this file even when
+// compiled in) is missing a `return` statement. Flagging rather than
+// fixing, since nothing exercises this code path to verify a fix against.
 #ifdef ENVEOMICS_NUC_T
 // The bitset representation of nucleotides (in 2 bits)
 nuc_t ctonuc(char c) {

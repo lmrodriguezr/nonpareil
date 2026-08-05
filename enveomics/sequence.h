@@ -114,7 +114,7 @@ int get_seqs(
 int get_seqs(
       char **&seqs, char *file, int from, int number, int largest_seq);
 
-/*
+/**
  * int reverse_complement(char *&out,  char  *in);
  * int reverse_complement(string &out, string in);
  * Description:
@@ -159,7 +159,7 @@ std::vector<unsigned int> get_seq_lengths(char *file, unsigned int total_seqs);
 void write_seq_range_to_fasta(
       char *file, char *outfile, size_t start, unsigned int count);
 
-/*
+/**
  * bool has_gz_ext(const char *file);
  * Description:
  *   Evaluates if the input file has a .gz extension
@@ -170,28 +170,100 @@ void write_seq_range_to_fasta(
  */
 bool has_gz_ext(const char *file);
 
-/*
- * void unzip_file(char *infile, char *outfile);
+/**
+ * void gunz_file(const char *infile, const char *outfile);
  * Description:
- *   Unzips infile it into outfile
+ *   Decompresses a gzip-compressed file in full, writing the result to a
+ *   new plain file. Most of this codebase reads `.gz` input directly
+ *   (see `build_index`), without needing this; it's still used where a
+ *   consumer genuinely needs a fully decompressed copy on disk.
  * Input:
- *   - `char *infile`: The path to the input file
- *   - `char *outfile`: The path to the output file
+ *   - `char *infile`: The path to the input (gzip-compressed) file
+ *   - `char *outfile`: The path to the output (decompressed) file
  */
 void gunz_file(const char *infile, const char *outfile);
 
+// The following block (a 2-bit-per-base nucleotide encoding, distinct from
+// the "enveomics-seq" file format used elsewhere in this file) is opt-in
+// via ENVEOMICS_NUC_T_DEFINE, which nothing in this codebase currently
+// defines -- no functions here are compiled or used today. Kept available
+// for callers that want a compact in-memory nucleotide representation.
 #ifdef ENVEOMICS_NUC_T_DEFINE
 #define ENVEOMICS_NUC_T
 #include <bitset>
+
+// A single nucleotide, 2 bits: 00=A, 01=C, 10=G, 11=T (see `ctonuc`).
 typedef std::bitset<2> nuc_t;
+
+// A nucleotide sequence stored in the 2-bit `nuc_t` encoding.
 struct nucseq_t {
    nuc_t	*seq;
    size_t	len;
 };
+
+/**
+ * nuc_t ctonuc(char c);
+ * Description:
+ *   Encodes a single nucleotide character ('A'/'C'/'G'/'T') as a `nuc_t`.
+ * Input:
+ *   - `char c`: The nucleotide character to encode
+ * Output:
+ *   Returns the corresponding `nuc_t`. Behavior is undefined for
+ *   characters other than 'A', 'C', 'G', or 'T'
+ */
 nuc_t ctonuc(char c);
+
+/**
+ * char nuctoc(nuc_t nuc);
+ * Description:
+ *   Decodes a `nuc_t` back into its nucleotide character.
+ * Input:
+ *   - `nuc_t nuc`: The encoded nucleotide
+ * Output:
+ *   Returns 'A', 'C', 'G', or 'T'
+ */
 char nuctoc(nuc_t nuc);
+
+/**
+ * int atonucseq(nucseq_t &nucseq, char *seq);
+ * Description:
+ *   Encodes a nucleotide-character sequence into a `nucseq_t`. `nucseq.seq`
+ *   must already point to a buffer with room for `strlen(seq)` `nuc_t`
+ *   elements.
+ * Input:
+ *   - `nucseq_t &nucseq`: The output, encoded sequence
+ *   - `char *seq`: The input sequence, as nucleotide characters
+ * Output:
+ *   Returns the length of the sequence (same as `nucseq.len` on return)
+ */
 int atonucseq(nucseq_t &nucseq, char *seq);
+
+/**
+ * int nucseqtoa(char *&charseq, nucseq_t nucseq);
+ * Description:
+ *   Decodes a `nucseq_t` back into a nucleotide-character string.
+ *   `charseq` must already point to a buffer with room for `nucseq.len + 1`
+ *   characters (including the terminating null).
+ * Input:
+ *   - `char *&charseq`: The output, decoded sequence (null-terminated)
+ *   - `nucseq_t nucseq`: The input, encoded sequence
+ * Output:
+ *   Returns the length of the sequence (excluding the terminating null)
+ */
 int nucseqtoa(char *&charseq, nucseq_t nucseq);
+
+/**
+ * int reverse_complement(nucseq_t &out, nucseq_t in);
+ * Description:
+ *   Calculate the reverse-complement of a `nucseq_t`-encoded sequence.
+ *   `out.seq` must already point to a buffer with room for `in.len`
+ *   `nuc_t` elements.
+ * Input:
+ *   - `nucseq_t &out`: The output, reverse-complemented sequence
+ *   - `nucseq_t in`: The input sequence
+ * Output:
+ *   Returns the length of the sequence
+ */
 int reverse_complement(nucseq_t &out, nucseq_t in);
 #endif
 

@@ -153,7 +153,6 @@ int main(int argc, char *argv[]) {
   cntfile = (char *) "";
   outfile = (char *) "-";
 
-
   // GetOpt
   int   optchr;
   // Available letters left: DeEgGIjJOQyYzZ
@@ -240,13 +239,11 @@ int main(int argc, char *argv[]) {
   if ((ovl <= 0.0) || (ovl > 1.0))
     help("Bad argument for -L option, accepted range: (0, 100]");
   if (thr <= 0)
-    help("Bad argumement for -t option, accepted: positive non-zero integers");
+    help("Bad argument for -t option, accepted: positive non-zero integers");
   if (n <= 0)
     help("Bad argument for -n option, accepted: positive non-zero integers");
   if (ram <= 0)
     help("Bad argument for -R option, accepted: positive non-zero integers");
-  if (thr <= 0)
-    help("Bad argument for -t option, accepted: positive non-zero integers");
   if ((min_sim <= 0) | (min_sim > 1))
     help("Bad argument for -S option, accepted range: (0, 1]");
   if ((qry_portion < 0) | (qry_portion > 1))
@@ -282,10 +279,6 @@ int main(int argc, char *argv[]) {
   broadcast_bool(&rseed_set);
   barrier_multinode();
   srand(rseed + processID);
-
-  // file checking
-  // TODO
-  // - Sequence lengths should be included here! (`len_min`)
 
   // NOTE: `build_index` (used by the alignment/usearch kernels below) reads
   // gzipped input directly via zlib, so it never needs a decompressed
@@ -502,7 +495,6 @@ int main(int argc, char *argv[]) {
   broadcast_double(&q_avg_seq_len);
   barrier_multinode();
 
-
 restart_vars:
   say("9sis$", "Worker ", processID, " @start_vars");
   if (processID == 0) {
@@ -510,14 +502,23 @@ restart_vars:
     if (qry_portion != 0) hX = (size_t) total_seqs * qry_portion;
     qry_portion = (double) hX / (alt_query ? q_total_seqs : total_seqs);
 
-    // Prepare memory arguments
+    // Prepare memory arguments for the alignment kernel's block-based
+    // comparison (nonpareil_mate's O(n^2) path). Not used by usearch,
+    // which sizes its own shards separately via empirical RAM calibration
+    // (see USEARCH_CALIB_SMALL/_LARGE in nonpareil_mating.cpp) rather than
+    // this fixed-size-block accounting.
     if ((size_t) ram > UINT_MAX / 1024)
       error("The memory to allocate is too large, reduce -R", ram);
     ram_Kb = ram * 1024;
+    // Reserve room for the per-thread result buffers (each thread
+    // accumulates its own copy before merging) before spending the rest
+    // of the budget on sequence blocks.
     required_ram_Kb = 2 * (int) hX * sizeof(int) * thr / 1024 + 2048;
     if (ram_Kb < required_ram_Kb)
       error("The amount of memory allowed is too small, increase -R to over ",
         (double) required_ram_Kb / 1024);
+    // How many sequences of the longest observed length fit in whatever
+    // budget remains.
     lines_in_ram = (ram_Kb - required_ram_Kb) / (largest_seq + 3);
     if (lines_in_ram > UINT_MAX / 1024) {
       say(
@@ -716,16 +717,16 @@ restart_checkings:
         "hence diversity estimations could be unreliable"
       );
       if (autoadjust) {
-	if (divide == 0) {
+        if (divide == 0) {
           itv *= 0.5;
           say("1sf$", "AUTOADJUST: -i ", itv);
         } else {
           divide = (double)(1.0 - ((1.0 - divide) / 2));
           say("1sf$", "AUTOADJUST: -d ", divide);
         }
-	goto restart_samples;
+        goto restart_samples;
       } else {
-	if (divide == 0) {
+        if (divide == 0) {
           say(
             "1ssf$",
             "To increase the resolution of the curve increase -i, ",
