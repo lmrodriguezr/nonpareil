@@ -76,7 +76,7 @@ void barrier_multinode();
 
 /**
  * void reduce_sum_int(int *send, int *receive, int size);
- * void reduce_sum_int(int send, int receive);
+ * void reduce_sum_int(int send, int &receive);
  *
  * Description:
  *   Sums a value (or array of values) element-wise across every rank, and
@@ -87,13 +87,13 @@ void barrier_multinode();
  * Input:
  *   - `int *send` / `int send`: This rank's value(s) to contribute to the
  *     sum
- *   - `int *receive` / `int receive`: Where to store the summed result, on
+ *   - `int *receive` / `int &receive`: Where to store the summed result, on
  *     rank 0
  *   - `int size` (array overload only): Number of elements in `send`/
  *     `receive`
  */
 void reduce_sum_int(int *send, int *receive, int size);
-void reduce_sum_int(int send, int receive);
+void reduce_sum_int(int send, int &receive);
 
 /**
  * void reduce_sum_double(double *send, double *receive, int size);

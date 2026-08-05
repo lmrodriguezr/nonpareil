@@ -14,6 +14,7 @@
 #include "enveomics/References.h"
 #include "enveomics/KmerCounter.h"
 #include <string>
+#include <vector>
 
 #define LARGEST_PATH 4096
 #define NP_VERSION "4.0.0"
@@ -589,7 +590,7 @@ restart_samples:
   sampling_points = (divide == 0) ?
     ((int)ceil((max - min) / itv) + 1) :
     ((int)ceil((log(2) - log(total_seqs)) / log(divide)) + 2);
-  sample_t sample_summary[sampling_points];
+  std::vector<sample_t> sample_summary(sampling_points);
   size_t dummy=0;
   if (processID == 0) {
     sample_i = sample_after_20 = 0;

@@ -10,6 +10,7 @@
 #include <math.h>
 #include <pthread.h>
 #include <algorithm>
+#include <vector>
 
 #include "universal.h"
 // #include "multinode.h"
@@ -26,8 +27,8 @@ int nonpareil_sample_portion(
       double *&result, int threads, samplepar_t samplepar) {
   // Vars
   if (samplepar.replicates < threads) threads = samplepar.replicates;
-  samplejob_t     samplejob[threads];
-  pthread_t       thread[threads];
+  std::vector<samplejob_t> samplejob(threads);
+  std::vector<pthread_t>   thread(threads);
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   int             rc, samples_per_thr, launched_replicates = 0;
   unsigned int    predictable_seed = rand();

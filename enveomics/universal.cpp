@@ -57,9 +57,7 @@ void error(const char *msg, unsigned int val) {
 }
 
 void error(const char *msg, string val) {
-  char valChr[val.size()];
-  for (size_t a = 0; a <= val.size(); a++) valChr[a] = val[a];
-  return error(msg, valChr);
+  return error(msg, val.c_str());
 }
 
 void set_verbosity(int v) { Verbosity = v; }

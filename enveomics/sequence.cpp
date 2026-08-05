@@ -13,6 +13,11 @@
 #include <sys/types.h>
 
 #include "universal.h"
+// Always compile the opt-in nuc_t helpers declared in sequence.h (see the
+// implementation block near the bottom of this file) -- external callers
+// still separately opt in to the *declarations* by defining this same
+// macro before including "sequence.h" in their own files.
+#define ENVEOMICS_NUC_T_DEFINE
 #include "sequence.h"
 
 using namespace std;
@@ -426,12 +431,12 @@ int get_seqs(char **&seqs, char *file, int from, int number, int largest_seq) {
 
 int reverse_complement(char *&out, char *in) {
   int len = strlen(in);
-  for (int i = len; i > 0; i--)
-    out[len - i] = in[i] == 'A' ? 'T' :
-		   in[i] == 'C' ? 'G' :
-		   in[i] == 'G' ? 'C' :
-		   in[i] == 'T' ? 'A' :
-			          'N';
+  for (int i = len - 1; i >= 0; i--)
+    out[len - 1 - i] = in[i] == 'A' ? 'T' :
+                        in[i] == 'C' ? 'G' :
+                        in[i] == 'G' ? 'C' :
+                        in[i] == 'T' ? 'A' :
+                                       'N';
   out[len] = (char)NULL;
   return len;
 }
@@ -534,19 +539,11 @@ void gunz_file(const char *infile, const char *outfile) {
   gzclose(fi);
 }
 
-// NOTE: this block is currently unreachable in practice, and not just
-// because nothing defines ENVEOMICS_NUC_T_DEFINE (see sequence.h): even if
-// something did, that only takes effect for translation units that define
-// ENVEOMICS_NUC_T_DEFINE *before* including sequence.h. This file includes
-// "sequence.h" unconditionally at the top (no such guard), so the
-// `#define ENVEOMICS_NUC_T` inside sequence.h's guarded block never runs
-// for this translation unit -- the #ifdef below can only be entered by
-// passing -DENVEOMICS_NUC_T directly on this file's compile command,
-// bypassing the header's gate entirely. Also, `seqtoa` below (declared
-// nowhere in sequence.h, so effectively private to this file even when
-// compiled in) is missing a `return` statement. Flagging rather than
-// fixing, since nothing exercises this code path to verify a fix against.
-#ifdef ENVEOMICS_NUC_T
+// Opt-in nucleotide-bitset helpers -- see the matching #ifdef and comment
+// in sequence.h. Always compiled into sequence.o (this file defines
+// ENVEOMICS_NUC_T_DEFINE before including its own header, above), even
+// though nothing in this codebase currently calls them.
+#ifdef ENVEOMICS_NUC_T_DEFINE
 // The bitset representation of nucleotides (in 2 bits)
 nuc_t ctonuc(char c) {
   nuc_t nuc;
@@ -558,15 +555,15 @@ nuc_t ctonuc(char c) {
 
   char letter[] = {c, (char)NULL};
   error("Impossible to interpret char as nucleotide", letter);
+  return nuc; // unreachable: error() always exits; satisfies the compiler
 }
 
 char nuctoc(nuc_t nuc) {
-  char c;
   nuc_t nucA = ctonuc('A');
   if (nuc == nucA)        return 'A';
   if (nuc == (nucA >> 1)) return 'C';
   if (nuc == (nucA << 1)) return 'G';
-                          return 'T';
+  return 'T';
 }
 
 int atonucseq(nucseq_t &nucseq, char *charseq) {
@@ -582,8 +579,9 @@ int nucseqtoa(char *&charseq, nucseq_t nucseq) {
   return nucseq.len;
 }
 
-int reverse_complement(nucseq_t &out, nucseq_t in) { 
-  for (size_t i = in.len; i > 0; i--) out.seq[in.len - i] = (~in.seq[i]);
+int reverse_complement(nucseq_t &out, nucseq_t in) {
+  for (size_t i = 0; i < in.len; i++)
+    out.seq[in.len - 1 - i] = (~in.seq[i]);
   out.len = in.len;
   return in.len;
 }
@@ -591,6 +589,7 @@ int reverse_complement(nucseq_t &out, nucseq_t in) {
 int seqtoa(char *&charseq, nucseq_t nucseq) {
   for (size_t i = 0; i < nucseq.len; i++) charseq[i] = nuctoc(nucseq.seq[i]);
   charseq[nucseq.len] = (char)NULL;
+  return nucseq.len;
 }
 
 #endif

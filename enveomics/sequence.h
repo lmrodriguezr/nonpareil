@@ -184,12 +184,14 @@ bool has_gz_ext(const char *file);
 void gunz_file(const char *infile, const char *outfile);
 
 // The following block (a 2-bit-per-base nucleotide encoding, distinct from
-// the "enveomics-seq" file format used elsewhere in this file) is opt-in
-// via ENVEOMICS_NUC_T_DEFINE, which nothing in this codebase currently
-// defines -- no functions here are compiled or used today. Kept available
-// for callers that want a compact in-memory nucleotide representation.
+// the "enveomics-seq" file format used elsewhere in this file) is opt-in:
+// define ENVEOMICS_NUC_T_DEFINE before including this header to see these
+// declarations. sequence.cpp always compiles the corresponding
+// definitions (it defines ENVEOMICS_NUC_T_DEFINE before including this
+// header itself), so they're available at link time even though nothing
+// in this codebase currently calls them -- kept for callers that want a
+// compact in-memory nucleotide representation.
 #ifdef ENVEOMICS_NUC_T_DEFINE
-#define ENVEOMICS_NUC_T
 #include <bitset>
 
 // A single nucleotide, 2 bits: 00=A, 01=C, 10=G, 11=T (see `ctonuc`).

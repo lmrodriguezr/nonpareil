@@ -582,8 +582,8 @@ void nonpareil_count_mates_block(
       int sizeBlockA, int sizeBlockB, int threads, matepar_t matepar) {
   // Vars
   if (sizeBlockA < threads) threads = sizeBlockA;
-  pthread_t       thread[threads];
-  matejob_t       matejob[threads];
+  std::vector<pthread_t> thread(threads);
+  std::vector<matejob_t> matejob(threads);
   pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
   unsigned int    mates_per_thr = (unsigned int) ceil(
                         (double) sizeBlockA / threads);
